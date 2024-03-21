@@ -53,8 +53,10 @@ class _CustHomeState extends State<CustHome> {
             bottom: PreferredSize(
               preferredSize: const Size.fromHeight(48),
               child: TabBar(
+                  unselectedLabelColor: kPrimaryLightColor,
                   indicatorColor: kPrimaryLightColor,
                   indicatorWeight: 5,
+                  labelColor: kPrimaryLightColor,
                   tabs: [
                     Tab(
                       text: 'Hair',
