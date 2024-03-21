@@ -1,0 +1,118 @@
+{
+  "project_info": {
+    "project_number": "633300206578",
+    "project_id": "pamphere-f2557",
+    "storage_bucket": "pamphere-f2557.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:633300206578:android:9449c1c7864c9cb98b616b",
+        "android_client_info": {
+          "package_name": "com.example.android"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "633300206578-aojrlg83j2p6nng3i8v9jq5pi4ftukv0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCIXnl1V_t590uwnnUuC7zhqk6QYBHoFXA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "633300206578-aojrlg83j2p6nng3i8v9jq5pi4ftukv0.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "633300206578-15m7lkcja4ad9mnnidbv9t9isg2arrgt.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.flutterAuth"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:633300206578:android:22a2d7d1bd28bdc18b616b",
+        "android_client_info": {
+          "package_name": "com.mycompany.pampherecustomer"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "633300206578-aojrlg83j2p6nng3i8v9jq5pi4ftukv0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCIXnl1V_t590uwnnUuC7zhqk6QYBHoFXA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "633300206578-aojrlg83j2p6nng3i8v9jq5pi4ftukv0.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "633300206578-15m7lkcja4ad9mnnidbv9t9isg2arrgt.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.flutterAuth"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:633300206578:android:da5eede47b2b67558b616b",
+        "android_client_info": {
+          "package_name": "com.pamphere.customer"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "633300206578-aojrlg83j2p6nng3i8v9jq5pi4ftukv0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCIXnl1V_t590uwnnUuC7zhqk6QYBHoFXA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "633300206578-aojrlg83j2p6nng3i8v9jq5pi4ftukv0.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "633300206578-15m7lkcja4ad9mnnidbv9t9isg2arrgt.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.flutterAuth"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
