@@ -46,7 +46,7 @@ class _SpecificServicesState extends State<SpecificServices> {
         .collection('${widget.userID}services')
         .get();
 
-    List<SubService> subServices = [];0.
+    List<SubService> subServices = [];
 
     for (final doc in catDocSnap.docs) {
       subServices.add(SubService(
