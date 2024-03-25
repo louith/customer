@@ -8,27 +8,6 @@ import 'package:flutter/material.dart';
 
 final db = FirebaseFirestore.instance;
 
-// class Service {
-// final String name;
-// final List<SubService> subservices;
-//
-// Service({required this.name, required this.subservices});
-// }
-//
-// class SubService {
-// final String name;
-// final double? price;
-// final String? desc;
-// final String? duration;
-//
-// SubService({
-// required this.name,
-// this.price,
-// this.desc,
-// this.duration,
-// });
-// }
-//
 class ServicesList extends StatefulWidget {
   final String userID;
   const ServicesList({super.key, required this.userID});

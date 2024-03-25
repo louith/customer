@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:customer/components/constants.dart';
+import 'package:customer/screens/ServicesOffered/IndivService.dart';
 import 'package:flutter/material.dart';
 
 final db = FirebaseFirestore.instance;
@@ -36,52 +37,6 @@ class SpecificServices extends StatefulWidget {
 }
 
 class _SpecificServicesState extends State<SpecificServices> {
-  // Future<SubService?> getSubService(String id) async {
-  // String subserviceID = '';
-  // String desc = '';
-  // String presyo = '';
-  // String duracio = '';
-
-  // final subServiceCol = await db
-  // .collection('users')
-  // .doc(widget.userID)
-  // .collection('services')
-  // .doc(widget.serviceCategory)
-  // .collection('${widget.userID}services')
-  // .get();
-  // .then((snapshot) => snapshot.docs.forEach((element) {
-  // subserviceID = element.id.toString();
-  // desc = element.get('description');
-  // presyo = element.get('price');
-  // duracio = element.get('duration');
-  // }));
-
-  // return SubService(
-  // subService: subserviceID,
-  // price: presyo,
-  // description: desc,
-  // duration: duracio);
-  // }
-
-  // Future<List<SubService>> getAll() async {
-  // List<Future<SubService?>> futures = [];
-  // final QuerySnapshot subServCollection = await db
-  // .collection('users')
-  // .doc(widget.userID)
-  // .collection('services')
-  // .doc(widget.serviceCategory)
-  // .collection('${widget.userID}services')
-  // .get();
-
-  // for (final doc in subServCollection.docs) {
-  // futures.add(getSubService(doc.id));
-  // }
-
-  // List<SubService?> resultsWithNull = await Future.wait<SubService?>(futures);
-
-  // return resultsWithNull.whereType<SubService>().toList();
-  // }
-
   Future<Service> getService(String id) async {
     final QuerySnapshot catDocSnap = await db
         .collection('users')
@@ -91,7 +46,7 @@ class _SpecificServicesState extends State<SpecificServices> {
         .collection('${widget.userID}services')
         .get();
 
-    List<SubService> subServices = [];
+    List<SubService> subServices = [];0.
 
     for (final doc in catDocSnap.docs) {
       subServices.add(SubService(
@@ -135,10 +90,17 @@ class _SpecificServicesState extends State<SpecificServices> {
               return ListView.builder(
                   itemCount: serve.length,
                   itemBuilder: (context, index) {
-                    return Card(
-                      elevation: 5,
-                      shadowColor: Colors.black12,
-                      child: Column(children: [
+                    return ListTile(
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => IndivServicePage(
+                                    subserviceID: serve[index]
+                                        .subservices[index]
+                                        .subService)));
+                      },
+                      title: Column(children: [
                         Text(
                           serve[index].subservices[index].subService,
                           style: TextStyle(
