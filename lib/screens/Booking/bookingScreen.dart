@@ -84,18 +84,19 @@ class _BookingScreenState extends State<BookingScreen> {
   }
 
   Future<List<Appointment>> getAppointments() async {
-    List<Map<String, dynamic>> appointments = [];
     try {
+      List<Map<String, dynamic>> appointments = [];
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
           .collection('users')
           .doc(widget.userID)
           .collection('bookings')
           .get();
-      querySnapshot.docs.forEach((doc) {
-        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-        appointments.add(data);
-      });
-
+      if (querySnapshot.docs.isNotEmpty) {
+        querySnapshot.docs.forEach((doc) {
+          Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+          appointments.add(data);
+        });
+      }
       final List<Appointment> appointmentList = appointments.map((a) {
         // Assign a default color if 'status' doesn't match any expected values
         final color = a['status'] == 'pending'

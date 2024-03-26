@@ -5,6 +5,7 @@ import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:customer/components/background.dart';
 import 'package:customer/components/constants.dart';
+import 'package:customer/models/service.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
@@ -23,7 +24,7 @@ class _BookingAppointmentState extends State<BookingAppointment> {
   DateTime from = DateTime.now();
   DateTime to = DateTime.now();
   FirebaseFirestore db = FirebaseFirestore.instance;
-  int addedServices = 0;
+  Map<String, ClientService> addedServices = {};
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +38,7 @@ class _BookingAppointmentState extends State<BookingAppointment> {
                 badgeColor: kPrimaryLightColor,
               ),
               showBadge: true,
-              badgeContent: Text(addedServices.toString()),
+              badgeContent: Text(addedServices.length.toString()),
               child: IconButton(
                   onPressed: () {},
                   icon: const Icon(
@@ -193,12 +194,13 @@ class _BookingAppointmentState extends State<BookingAppointment> {
 
     return FutureBuilder<List<String>>(
       future: getServiceTypes(),
-      builder: (context, types) {
-        if (types.hasData) {
+      builder: (context, serviceTypes) {
+        if (serviceTypes.hasData) {
           return BookingList(
             clientID: widget.userID,
-            serviceTypes: types.data!,
-            cartValue: addedServices,
+            serviceTypes: serviceTypes.data!,
+            cartNum: addedServices.length,
+            updateCart: updateCart,
           );
         } else {
           return const Text('LOADING...');
@@ -206,6 +208,15 @@ class _BookingAppointmentState extends State<BookingAppointment> {
         }
       },
     );
+  }
+
+  updateCart(ClientService service) {
+    if (!addedServices.keys.contains(service.serviceName)) {
+      addedServices[service.serviceName] = service;
+    } else {
+      addedServices.remove(service.serviceName);
+    }
+    setState(() {});
   }
 
   Future<void> finishDialog() async {
@@ -277,13 +288,15 @@ class _BookingAppointmentState extends State<BookingAppointment> {
 class BookingList extends StatefulWidget {
   String clientID;
   List<String> serviceTypes;
-  int cartValue;
+  int cartNum;
+  Function(ClientService) updateCart;
 
   BookingList({
     super.key,
     required this.clientID,
     required this.serviceTypes,
-    required this.cartValue,
+    required this.cartNum,
+    required this.updateCart,
   });
 
   @override
@@ -309,15 +322,17 @@ class _BookingListState extends State<BookingList> {
       itemBuilder: (context, index) {
         final serviceType = widget.serviceTypes[index]; // Hair, Wax, etc.
         return FutureBuilder(
-          future: getServices(serviceType),
+          future: getServices(serviceType, widget.clientID),
           builder: (context, services) {
             if (services.hasData) {
-              return buildServiceCheckBox(
-                serviceType,
-                services,
-                index,
-                widget.cartValue,
-              );
+              log(services.data!.length.toString());
+              return Container();
+              // return buildServiceCheckBox(
+              //   serviceType, //string
+              //   services, // list of services
+              //   services.data!.length, // index of each service type
+              //   widget.cartNum, // int cart values
+              // );
             } else {
               return const Text('LOADING...');
             }
@@ -329,9 +344,9 @@ class _BookingListState extends State<BookingList> {
 
   Widget buildServiceCheckBox(
       String serviceType,
-      AsyncSnapshot<List<Map<String, dynamic>>> service,
+      AsyncSnapshot<List<ClientService>> service,
       int serviceIndex,
-      int cart) {
+      int cartNum) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -344,12 +359,13 @@ class _BookingListState extends State<BookingList> {
           physics: const NeverScrollableScrollPhysics(),
           itemCount: service.data!.length,
           itemBuilder: (context, index) {
-            String servicename = service.data![index]['serviceName'];
-            String price = service.data![index]['price'];
-            String duration = service.data![index]['duration'];
+            String servicename = service.data![index].serviceName;
+            String price = service.data![index].price;
+            String duration = service.data![index].duration;
+            bool chcekboxValue = checkboxValues[serviceIndex][index];
             return CheckboxListTile(
               title: Text(servicename),
-              value: checkboxValues[serviceIndex][index],
+              value: chcekboxValue,
               subtitle: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -359,7 +375,9 @@ class _BookingListState extends State<BookingList> {
               ),
               onChanged: (bool? value) {
                 setState(() {
-                  checkboxValues[serviceIndex][index] = value!;
+                  checkboxValues[serviceIndex][index] =
+                      value!; //checks for each card
+                  widget.updateCart(service.data![index]);
                 });
               },
             );
@@ -367,32 +385,5 @@ class _BookingListState extends State<BookingList> {
         ),
       ],
     );
-  }
-
-  Future<List<Map<String, dynamic>>> getServices(String serviceType) async {
-    List<Map<String, dynamic>> services = [];
-    try {
-      QuerySnapshot querySnapshot = await db
-          .collection('users')
-          .doc(widget.clientID)
-          .collection('services')
-          .doc(serviceType)
-          .collection('${widget.clientID}services')
-          .get();
-      for (var service in querySnapshot.docs) {
-        if (service.exists) {
-          services.add({
-            'serviceName': service.id, //is Hair Color or Haircut etc..
-            'duration': service['duration'],
-            'price': service['price'],
-            'description': service['description'],
-          });
-        }
-      }
-      return services;
-    } catch (e) {
-      log('error getting service tpyes $e');
-      return [];
-    }
   }
 }
