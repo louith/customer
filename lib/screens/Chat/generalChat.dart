@@ -48,7 +48,6 @@ class _GeneralChatPageState extends State<GeneralChatPage> {
       ),
       body: Background(
           child: Container(
-        margin: const EdgeInsets.only(top: 35),
         child: usersChatList(),
       )),
     );

@@ -1,5 +1,6 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:customer/components/bottomNav.dart';
 import 'package:customer/components/constants.dart';
 import 'package:customer/screens/Booking/bookingScreen.dart';
 import 'package:customer/screens/Chat/indivChat.dart';
@@ -10,9 +11,6 @@ import 'package:line_icons/line_icon.dart';
 class WorkerDetailsCard {
   final String id;
   final String name;
-  // final String stars;
-  // final String feedbacks;
-
   final String role;
   final String address;
   final List<String> categories;
@@ -28,25 +26,41 @@ class WorkerDetailsCard {
   });
 }
 
-class IndivWorkerProfile extends StatelessWidget {
+class IndivWorkerProfile extends StatefulWidget {
   final String userID;
   final String userName;
 
+<<<<<<< HEAD:lib/screens/indivProfile/indiv_profile.dart
   IndivWorkerProfile({
+=======
+  const IndivWorkerProfile({
+>>>>>>> 3a40f45acddc24627a5f3aeca589558fc98da565:lib/screens/indivProfile/indivWorkerProfile.dart
     super.key,
     required this.userID,
     required this.userName,
   });
 
+<<<<<<< HEAD:lib/screens/indivProfile/indiv_profile.dart
   Future<WorkerDetailsCard> getWorkerDetailsCard(String id) async {
     //gets user document first layer
+=======
+  @override
+  State<IndivWorkerProfile> createState() => _IndivWorkerProfileState();
+}
+
+class _IndivWorkerProfileState extends State<IndivWorkerProfile> {
+  ////////////////////////////////////////////////////////////////
+  Future<WorkerDetailsCard> getWorkerDetailsCard(String id) async {
+    id = widget.userID;
+>>>>>>> 3a40f45acddc24627a5f3aeca589558fc98da565:lib/screens/indivProfile/indivWorkerProfile.dart
     final DocumentSnapshot user =
         await FirebaseFirestore.instance.collection('users').doc(id).get();
     Map<String, dynamic> userMap = user.data() as Map<String, dynamic>;
 
     //gets categories offered by worker
     List<String> cats = [];
-    var snapshot = await FirebaseFirestore.instance
+
+    await FirebaseFirestore.instance
         .collection('users')
         .doc(id)
         .collection('categories')
@@ -67,29 +81,50 @@ class IndivWorkerProfile extends StatelessWidget {
   Widget build(BuildContext context) {
     final screens = [
       ServicesList(
-        userID: userID,
+        userID: widget.userID,
       ),
       IndivChat(
-        userName: userName,
+        userName: widget.userName,
       ),
+      BookingScreen(
+        clientId: widget.userID,
+        clientUsername: widget.userName,
+      ),
+<<<<<<< HEAD:lib/screens/indivProfile/indiv_profile.dart
       BookingScreen(
         username: userName,
         userID: userID,
       )
+=======
+>>>>>>> 3a40f45acddc24627a5f3aeca589558fc98da565:lib/screens/indivProfile/indivWorkerProfile.dart
     ];
 
     return Scaffold(
         appBar: AppBar(
+<<<<<<< HEAD:lib/screens/indivProfile/indiv_profile.dart
           backgroundColor: kPrimaryColor,
           foregroundColor: kPrimaryLightColor,
         ),
+=======
+            backgroundColor: kPrimaryColor,
+            elevation: 0,
+            leading: IconButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                icon: const Icon(Icons.arrow_back_ios))),
+>>>>>>> 3a40f45acddc24627a5f3aeca589558fc98da565:lib/screens/indivProfile/indivWorkerProfile.dart
         body: Stack(children: [
           Container(
             color: kPrimaryColor,
             height: 100,
           ),
           FutureBuilder<WorkerDetailsCard>(
+<<<<<<< HEAD:lib/screens/indivProfile/indiv_profile.dart
               future: getWorkerDetailsCard(userID),
+=======
+              future: getWorkerDetailsCard(widget.userID),
+>>>>>>> 3a40f45acddc24627a5f3aeca589558fc98da565:lib/screens/indivProfile/indivWorkerProfile.dart
               builder: (context, AsyncSnapshot<WorkerDetailsCard> snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
@@ -100,18 +135,22 @@ class IndivWorkerProfile extends StatelessWidget {
                 }
 
                 if (!snapshot.hasData || snapshot.data == null) {
-                  return Text('No data available');
+                  return const Text('No data available');
                 }
 
+<<<<<<< HEAD:lib/screens/indivProfile/indiv_profile.dart
                 final clientData = snapshot.data!;
 
+=======
+                final plainWorkerdata = snapshot.data!;
+>>>>>>> 3a40f45acddc24627a5f3aeca589558fc98da565:lib/screens/indivProfile/indivWorkerProfile.dart
                 return Padding(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(defaultPadding),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      SizedBox(
-                        height: 25,
+                      const SizedBox(
+                        height: defaultPadding,
                       ),
                       Row(
                         children: [
@@ -125,8 +164,13 @@ class IndivWorkerProfile extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
                                 Text(
+<<<<<<< HEAD:lib/screens/indivProfile/indiv_profile.dart
                                   clientData.name,
                                   style: TextStyle(
+=======
+                                  plainWorkerdata.name,
+                                  style: const TextStyle(
+>>>>>>> 3a40f45acddc24627a5f3aeca589558fc98da565:lib/screens/indivProfile/indivWorkerProfile.dart
                                     fontWeight: FontWeight.bold,
                                     fontSize: 20,
                                   ),
@@ -136,34 +180,34 @@ class IndivWorkerProfile extends StatelessWidget {
                                     crossAxisAlignment:
                                         WrapCrossAlignment.start,
                                     children: [
+<<<<<<< HEAD:lib/screens/indivProfile/indiv_profile.dart
                                       Icon(Icons.location_on_outlined),
                                       Text(
                                         clientData.address,
                                       )
+=======
+                                      const Icon(Icons.location_on_outlined),
+                                      Text(plainWorkerdata.address)
+>>>>>>> 3a40f45acddc24627a5f3aeca589558fc98da565:lib/screens/indivProfile/indivWorkerProfile.dart
                                     ]),
-                                Wrap(children: [
+                                const Wrap(children: [
                                   Icon(Icons.work_outline),
                                   Text('Works at')
                                 ]),
                                 ElevatedButton(
                                     onPressed: () {},
-                                    child: Text('More Information'))
+                                    child: const Text('More Information'))
                               ],
                             ),
                           ),
                         ],
                       ),
-                      Text('Feedbacks section below')
+                      const Text('Feedbacks section below')
                     ],
                   ),
                 );
               }),
         ]),
-        // bottomNavigationBar: TabBar(tabs: [
-        //   Tab(text: 'Services List', icon: Icon(Icons.list_alt)),
-        //   Tab(text: 'Chat Now', icon: Icon(Icons.chat_outlined)),
-        //   Tab(text: 'Book Now', icon: Icon(Icons.edit_calendar_outlined)),
-        // ]),
         bottomNavigationBar: NavigationBarTheme(
           data: NavigationBarThemeData(
               height: 80,
@@ -171,7 +215,6 @@ class IndivWorkerProfile extends StatelessWidget {
               labelTextStyle: MaterialStateProperty.all(
                   const TextStyle(fontSize: 14, fontWeight: FontWeight.w500))),
           child: NavigationBar(
-              // selectedIndex: index,
               onDestinationSelected: (index) {
                 Navigator.push(context,
                     MaterialPageRoute(builder: ((context) => screens[index])));
@@ -210,7 +253,7 @@ class CategoriesRow extends StatelessWidget {
         children: List.generate(
           itemList.length,
           (index) => Container(
-            padding: EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
             decoration: BoxDecoration(
                 color: Colors.purple[100],
                 borderRadius: BorderRadius.circular(100)),
