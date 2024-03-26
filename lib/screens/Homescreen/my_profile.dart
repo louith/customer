@@ -1,5 +1,7 @@
 import 'package:customer/components/constants.dart';
 import 'package:customer/components/widgets.dart';
+import 'package:customer/screens/Homescreen/Homescreen.dart';
+import 'package:customer/screens/Homescreen/MainScreen.dart';
 import 'package:customer/screens/customerProfile/custprofile.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -37,7 +39,12 @@ class _MyProfileState extends State<MyProfile> {
       appBar: AppBar(
         centerTitle: true,
         backgroundColor: kPrimaryColor,
-        leading: IconButton(onPressed: () {}, icon: Icon(LineIcons.angleLeft)),
+        leading: IconButton(
+            onPressed: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: ((context) => CustMainScreen())));
+            },
+            icon: Icon(LineIcons.angleLeft)),
         title: Text(
           'My Profile',
         ),
@@ -90,7 +97,7 @@ class _MyProfileState extends State<MyProfile> {
 
               //Menu
               ProfileMenuWidget(
-                title: 'My Locations',
+                title: 'My Addresses',
                 icon: LineIcons.locationArrow,
                 onPress: () {},
               ),

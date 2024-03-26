@@ -59,14 +59,6 @@ class IndivWorkerProfile extends StatelessWidget {
         categories: cats);
   }
 
-  // TabController tabController;
-  // int selectedIndex = 0;
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   tabController = TabController(length: screens.length, vsync: this)
-  // }
-
   @override
   Widget build(BuildContext context) {
     final screens = [
@@ -122,17 +114,21 @@ class IndivWorkerProfile extends StatelessWidget {
                       SizedBox(
                         height: 25,
                       ),
-                      Row(
-                        children: [
-                          Image.asset(
-                            'assets/images/suzy.jpg',
-                            width: 100,
-                            height: 100,
-                          ),
-                          Expanded(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
+                      Image.asset(
+                        'assets/images/suzy.jpg',
+                        width: 150,
+                        height: 150,
+                      ),
+                      Expanded(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
+                                SizedBox(
+                                  height: 10,
+                                ),
                                 Text(
                                   plainWorkerdata.name,
                                   style: TextStyle(
@@ -140,28 +136,52 @@ class IndivWorkerProfile extends StatelessWidget {
                                     fontSize: 20,
                                   ),
                                 ),
+                                SizedBox(
+                                  height: 5,
+                                ),
                                 CategoriesRow(
                                     itemList: plainWorkerdata.categories),
-                                Wrap(
-                                    crossAxisAlignment:
-                                        WrapCrossAlignment.start,
-                                    children: [
-                                      Icon(Icons.location_on_outlined),
-                                      Text(
-                                        plainWorkerdata.address,
-                                      )
-                                    ]),
-                                Wrap(children: [
-                                  Icon(Icons.work_outline),
-                                  Text('Works at')
-                                ]),
-                                ElevatedButton(
-                                    onPressed: () {},
-                                    child: Text('More Information'))
                               ],
                             ),
-                          ),
-                        ],
+                            SizedBox(
+                              height: 10,
+                            ),
+                            Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Icon(Icons.location_on_outlined),
+                                  SizedBox(
+                                    width: 5,
+                                  ),
+                                  Expanded(
+                                    child: Text(plainWorkerdata.address,
+                                        overflow: TextOverflow.clip,
+                                        maxLines: 3),
+                                  )
+                                ]),
+                            SizedBox(
+                              height: 5,
+                            ),
+                            Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Icon(Icons.work_outline),
+                                  SizedBox(
+                                    width: 5,
+                                  ),
+                                  Text('Works at')
+                                ]),
+                            SizedBox(
+                              height: 10,
+                            ),
+                            ElevatedButton(
+                                onPressed: () {},
+                                child: Text(
+                                  'More Information',
+                                  style: TextStyle(color: kPrimaryLightColor),
+                                ))
+                          ],
+                        ),
                       ),
                       Text('Feedbacks section below')
                     ],
@@ -169,11 +189,6 @@ class IndivWorkerProfile extends StatelessWidget {
                 );
               }),
         ]),
-        // bottomNavigationBar: TabBar(tabs: [
-        //   Tab(text: 'Services List', icon: Icon(Icons.list_alt)),
-        //   Tab(text: 'Chat Now', icon: Icon(Icons.chat_outlined)),
-        //   Tab(text: 'Book Now', icon: Icon(Icons.edit_calendar_outlined)),
-        // ]),
         bottomNavigationBar: NavigationBarTheme(
           data: NavigationBarThemeData(
               height: 80,
