@@ -26,33 +26,18 @@ class WorkerDetailsCard {
   });
 }
 
-class IndivWorkerProfile extends StatefulWidget {
+class IndivWorkerProfile extends StatelessWidget {
   final String userID;
   final String userName;
 
-<<<<<<< HEAD:lib/screens/indivProfile/indiv_profile.dart
   IndivWorkerProfile({
-=======
-  const IndivWorkerProfile({
->>>>>>> 3a40f45acddc24627a5f3aeca589558fc98da565:lib/screens/indivProfile/indivWorkerProfile.dart
     super.key,
     required this.userID,
     required this.userName,
   });
 
-<<<<<<< HEAD:lib/screens/indivProfile/indiv_profile.dart
   Future<WorkerDetailsCard> getWorkerDetailsCard(String id) async {
     //gets user document first layer
-=======
-  @override
-  State<IndivWorkerProfile> createState() => _IndivWorkerProfileState();
-}
-
-class _IndivWorkerProfileState extends State<IndivWorkerProfile> {
-  ////////////////////////////////////////////////////////////////
-  Future<WorkerDetailsCard> getWorkerDetailsCard(String id) async {
-    id = widget.userID;
->>>>>>> 3a40f45acddc24627a5f3aeca589558fc98da565:lib/screens/indivProfile/indivWorkerProfile.dart
     final DocumentSnapshot user =
         await FirebaseFirestore.instance.collection('users').doc(id).get();
     Map<String, dynamic> userMap = user.data() as Map<String, dynamic>;
@@ -81,50 +66,29 @@ class _IndivWorkerProfileState extends State<IndivWorkerProfile> {
   Widget build(BuildContext context) {
     final screens = [
       ServicesList(
-        userID: widget.userID,
+        userID: userID,
       ),
       IndivChat(
-        userName: widget.userName,
+        userName: userName,
       ),
       BookingScreen(
-        clientId: widget.userID,
-        clientUsername: widget.userName,
-      ),
-<<<<<<< HEAD:lib/screens/indivProfile/indiv_profile.dart
-      BookingScreen(
-        username: userName,
         userID: userID,
-      )
-=======
->>>>>>> 3a40f45acddc24627a5f3aeca589558fc98da565:lib/screens/indivProfile/indivWorkerProfile.dart
+        username: userName,
+      ),
     ];
 
     return Scaffold(
         appBar: AppBar(
-<<<<<<< HEAD:lib/screens/indivProfile/indiv_profile.dart
           backgroundColor: kPrimaryColor,
           foregroundColor: kPrimaryLightColor,
         ),
-=======
-            backgroundColor: kPrimaryColor,
-            elevation: 0,
-            leading: IconButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                icon: const Icon(Icons.arrow_back_ios))),
->>>>>>> 3a40f45acddc24627a5f3aeca589558fc98da565:lib/screens/indivProfile/indivWorkerProfile.dart
         body: Stack(children: [
           Container(
             color: kPrimaryColor,
             height: 100,
           ),
           FutureBuilder<WorkerDetailsCard>(
-<<<<<<< HEAD:lib/screens/indivProfile/indiv_profile.dart
               future: getWorkerDetailsCard(userID),
-=======
-              future: getWorkerDetailsCard(widget.userID),
->>>>>>> 3a40f45acddc24627a5f3aeca589558fc98da565:lib/screens/indivProfile/indivWorkerProfile.dart
               builder: (context, AsyncSnapshot<WorkerDetailsCard> snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
@@ -138,12 +102,8 @@ class _IndivWorkerProfileState extends State<IndivWorkerProfile> {
                   return const Text('No data available');
                 }
 
-<<<<<<< HEAD:lib/screens/indivProfile/indiv_profile.dart
                 final clientData = snapshot.data!;
 
-=======
-                final plainWorkerdata = snapshot.data!;
->>>>>>> 3a40f45acddc24627a5f3aeca589558fc98da565:lib/screens/indivProfile/indivWorkerProfile.dart
                 return Padding(
                   padding: const EdgeInsets.all(defaultPadding),
                   child: Column(
@@ -164,13 +124,8 @@ class _IndivWorkerProfileState extends State<IndivWorkerProfile> {
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
                                 Text(
-<<<<<<< HEAD:lib/screens/indivProfile/indiv_profile.dart
                                   clientData.name,
                                   style: TextStyle(
-=======
-                                  plainWorkerdata.name,
-                                  style: const TextStyle(
->>>>>>> 3a40f45acddc24627a5f3aeca589558fc98da565:lib/screens/indivProfile/indivWorkerProfile.dart
                                     fontWeight: FontWeight.bold,
                                     fontSize: 20,
                                   ),
@@ -180,15 +135,10 @@ class _IndivWorkerProfileState extends State<IndivWorkerProfile> {
                                     crossAxisAlignment:
                                         WrapCrossAlignment.start,
                                     children: [
-<<<<<<< HEAD:lib/screens/indivProfile/indiv_profile.dart
                                       Icon(Icons.location_on_outlined),
                                       Text(
                                         clientData.address,
                                       )
-=======
-                                      const Icon(Icons.location_on_outlined),
-                                      Text(plainWorkerdata.address)
->>>>>>> 3a40f45acddc24627a5f3aeca589558fc98da565:lib/screens/indivProfile/indivWorkerProfile.dart
                                     ]),
                                 const Wrap(children: [
                                   Icon(Icons.work_outline),
