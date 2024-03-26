@@ -31,10 +31,14 @@ class WorkerDetailsCard {
 class IndivWorkerProfile extends StatelessWidget {
   final String userID;
   final String userName;
-  // int index = 0;
-  IndivWorkerProfile({super.key, required this.userID, required this.userName});
+
+  IndivWorkerProfile({
+    super.key,
+    required this.userID,
+    required this.userName,
+  });
+
   Future<WorkerDetailsCard> getWorkerDetailsCard(String id) async {
-    id = userID;
     //gets user document first layer
     final DocumentSnapshot user =
         await FirebaseFirestore.instance.collection('users').doc(id).get();
@@ -59,14 +63,6 @@ class IndivWorkerProfile extends StatelessWidget {
         categories: cats);
   }
 
-  // TabController tabController;
-  // int selectedIndex = 0;
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   tabController = TabController(length: screens.length, vsync: this)
-  // }
-
   @override
   Widget build(BuildContext context) {
     final screens = [
@@ -76,32 +72,27 @@ class IndivWorkerProfile extends StatelessWidget {
       IndivChat(
         userName: userName,
       ),
-      BookingScreen()
+      BookingScreen(
+        username: userName,
+        userID: userID,
+      )
     ];
 
     return Scaffold(
         appBar: AppBar(
-            backgroundColor: kPrimaryColor,
-            elevation: 0,
-            leading: IconButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                icon: Icon(Icons.arrow_back_ios))),
+          backgroundColor: kPrimaryColor,
+          foregroundColor: kPrimaryLightColor,
+        ),
         body: Stack(children: [
           Container(
             color: kPrimaryColor,
             height: 100,
           ),
           FutureBuilder<WorkerDetailsCard>(
-              // future: FirebaseFirestore.instance
-              //     .collection('users')
-              //     .doc(userID)
-              //     .get(),
               future: getWorkerDetailsCard(userID),
               builder: (context, AsyncSnapshot<WorkerDetailsCard> snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
+                  return const Center(child: CircularProgressIndicator());
                 }
 
                 if (snapshot.hasError) {
@@ -112,7 +103,7 @@ class IndivWorkerProfile extends StatelessWidget {
                   return Text('No data available');
                 }
 
-                final plainWorkerdata = snapshot.data!;
+                final clientData = snapshot.data!;
 
                 return Padding(
                   padding: const EdgeInsets.all(16),
@@ -134,21 +125,20 @@ class IndivWorkerProfile extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
                                 Text(
-                                  plainWorkerdata.name,
+                                  clientData.name,
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 20,
                                   ),
                                 ),
-                                CategoriesRow(
-                                    itemList: plainWorkerdata.categories),
+                                CategoriesRow(itemList: clientData.categories),
                                 Wrap(
                                     crossAxisAlignment:
                                         WrapCrossAlignment.start,
                                     children: [
                                       Icon(Icons.location_on_outlined),
                                       Text(
-                                        plainWorkerdata.address,
+                                        clientData.address,
                                       )
                                     ]),
                                 Wrap(children: [

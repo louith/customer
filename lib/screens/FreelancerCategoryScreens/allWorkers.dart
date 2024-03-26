@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:customer/components/constants.dart';
 import 'package:customer/screens/FreelancerCategoryScreens/components/getVerified.dart';
-import 'package:customer/screens/indivProfile/indivWorkerProfile.dart';
+import 'package:customer/screens/indivProfile/indiv_profile.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
@@ -103,6 +103,12 @@ class _AllWorkersState extends State<AllWorkers> {
       appBar: AppBar(
           elevation: 0,
           backgroundColor: kPrimaryColor,
+          leading: IconButton(
+              onPressed: () {},
+              icon: const Icon(
+                Icons.arrow_back,
+                color: kPrimaryLightColor,
+              )),
           title: TextField(
             controller: searchController,
             onChanged: (value) {

@@ -2,7 +2,7 @@ import 'package:customer/components/constants.dart';
 import 'package:customer/screens/Booking/EditEventComponents/event_provider.dart';
 import 'package:customer/screens/Homescreen/MainScreen.dart';
 import 'package:customer/screens/WelcomeScreen/CustWelcomeScreen.dart';
-import 'package:customer/screens/indivProfile/indivWorkerProfile.dart';
+import 'package:customer/screens/indivProfile/indiv_profile.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 import 'firebase_options.dart';

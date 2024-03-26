@@ -1,229 +1,391 @@
+// ignore_for_file: unused_element, non_constant_identifier_names, must_be_immutable
+
+import 'dart:developer';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:customer/components/background.dart';
 import 'package:customer/components/constants.dart';
-import 'package:customer/models/booking-event.dart';
-import 'package:customer/screens/Booking/EditEventComponents/event_provider.dart';
-import 'package:customer/screens/Booking/EditEventComponents/utils.dart';
-import 'package:customer/screens/Booking/EditEventComponents/widgets.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
+import 'package:syncfusion_flutter_calendar/calendar.dart';
+import 'package:badges/badges.dart' as badges;
 
-class BookingEventDetails extends StatefulWidget {
-  final Event? event;
+class BookingAppointment extends StatefulWidget {
+  String userID;
 
-  const BookingEventDetails({this.event, super.key});
+  BookingAppointment({super.key, required this.userID});
 
   @override
-  State<BookingEventDetails> createState() => _BookingEventDetailsState();
+  State<BookingAppointment> createState() => _BookingAppointmentState();
 }
 
-class _BookingEventDetailsState extends State<BookingEventDetails> {
-  final _eventFormKey = GlobalKey<FormState>();
-  final titleController = TextEditingController();
-  late DateTime fromDate;
-  late DateTime toDate;
-
-  Widget buildTitle() => TextFormField(
-        style: TextStyle(fontSize: 24),
-        onFieldSubmitted: (_) => saveForm(),
-        decoration: InputDecoration(
-            border: UnderlineInputBorder(), hintText: 'Enter service name'),
-        validator: (title) =>
-            title != null && title.isEmpty ? 'Title cannot be empty' : null,
-        controller: titleController,
-      );
-
-  Widget buildDateTimePickers() => Column(
-        children: [
-          buildFrom(),
-          buildTo(),
-        ],
-      );
-
-  Widget buildFrom() => buildHeader(
-        header: 'FROM',
-        child: Row(
-          children: [
-            Expanded(
-                flex: 2,
-                child: buildDropdownField(
-                    text: Utils.toDate(fromDate),
-                    onClicked: () => pickFromDateTime(pickDate: true))),
-            Expanded(
-                child: buildDropdownField(
-                    text: Utils.toTime(fromDate),
-                    onClicked: () => pickFromDateTime(pickDate: false)))
-          ],
-        ),
-      );
-
-  Future pickFromDateTime({required bool pickDate}) async {
-    final date = await pickDateTime(fromDate, pickDate: pickDate);
-
-    if (date == null) return;
-
-    if (date.isAfter(toDate)) {
-      toDate =
-          DateTime(date.year, date.month, date.day, toDate.hour, toDate.minute);
-    }
-
-    setState(() => fromDate = date);
-  }
-
-  Future pickToDateTime({required bool pickDate}) async {
-    final date = await pickDateTime(toDate,
-        pickDate: pickDate, firstDate: pickDate ? fromDate : null);
-    if (date == null) return;
-    // if (date.isAfter(toDate)) {
-    // toDate =
-    // DateTime(date.year, date.month, date.day, toDate.hour, toDate.minute);
-    // }
-    setState(() => toDate = date);
-  }
-
-  Future<DateTime?> pickDateTime(
-    DateTime initialDate, {
-    required bool pickDate,
-    DateTime? firstDate,
-  }) async {
-    if (pickDate) {
-      final date = await showDatePicker(
-          context: context,
-          initialDate: initialDate,
-          firstDate: firstDate ?? DateTime(2024, 3),
-          lastDate: DateTime(2404));
-
-      if (date == null) return null;
-
-      final time =
-          Duration(hours: initialDate.hour, minutes: initialDate.minute);
-      return date.add(time);
-    } else {
-      final timeOfDay = await showTimePicker(
-          context: context, initialTime: TimeOfDay.fromDateTime(initialDate));
-
-      if (timeOfDay == null) return null;
-
-      final date =
-          DateTime(initialDate.year, initialDate.month, initialDate.day);
-      final time = Duration(hours: timeOfDay.hour, minutes: timeOfDay.minute);
-      return date.add(time);
-    }
-  }
-
-  Widget buildDropdownField({
-    required String text,
-    required VoidCallback onClicked,
-  }) =>
-      ListTile(
-        title: Text(text),
-        trailing: Icon(Icons.arrow_drop_down),
-        onTap: onClicked,
-      );
-
-  Widget buildHeader({
-    required String header,
-    required Widget child,
-  }) =>
-      Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            header,
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-          child
-        ],
-      );
-
-  Future saveForm() async {
-    final isValid = _eventFormKey.currentState!.validate();
-
-    if (isValid) {
-      final event = Event(
-          title: titleController.text,
-          description: 'Description',
-          from: fromDate,
-          to: toDate,
-          isAllDay: false);
-
-      final provider = Provider.of<EventProvider>(context, listen: false);
-      provider.addEvent(event);
-
-      Navigator.of(context).pop();
-    }
-  }
-
-  Widget buildTo() => buildHeader(
-      header: 'TO',
-      child: Row(
-        children: [
-          Expanded(
-              flex: 2,
-              child: buildDropdownField(
-                  text: Utils.toDate(toDate),
-                  onClicked: () => pickToDateTime(pickDate: true))),
-          Expanded(
-              flex: 1,
-              child: buildDropdownField(
-                  text: Utils.toTime(toDate),
-                  onClicked: () => pickToDateTime(pickDate: false)))
-        ],
-      ));
-
-  @override
-  void initState() {
-    super.initState();
-    if (widget.event == null) {
-      fromDate = DateTime.now();
-      toDate = DateTime.now().add(Duration(hours: 2));
-    }
-  }
-
-  @override
-  void dispose() {
-    titleController.dispose();
-    super.dispose();
-  }
+class _BookingAppointmentState extends State<BookingAppointment> {
+  DateTime from = DateTime.now();
+  DateTime to = DateTime.now();
+  FirebaseFirestore db = FirebaseFirestore.instance;
+  int addedServices = 0;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          backgroundColor: kPrimaryColor,
-          foregroundColor: kPrimaryLightColor,
-          leading: IconButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              icon: Icon(Icons.close)),
-          actions: <Widget>[
-            TextButton.icon(
-                onPressed: saveForm,
-                icon: Icon(
-                  Icons.check,
-                  color: kPrimaryLightColor,
-                ),
-                label: Text(
-                  'SAVE',
-                  style: TextStyle(color: kPrimaryLightColor),
-                ))
-          ],
+      appBar: AppBar(
+        centerTitle: true,
+        actions: [
+          badges.Badge(
+              position: badges.BadgePosition.topEnd(top: 1, end: 4),
+              badgeStyle: const badges.BadgeStyle(
+                badgeColor: kPrimaryLightColor,
+              ),
+              showBadge: true,
+              badgeContent: Text(addedServices.toString()),
+              child: IconButton(
+                  onPressed: () {},
+                  icon: const Icon(
+                    Icons.list_alt_rounded,
+                    size: 28,
+                  )))
+        ],
+        backgroundColor: kPrimaryColor,
+        foregroundColor: kPrimaryLightColor,
+        title: const Text('Services Booking'),
+      ),
+      body: Background(
+          child: Container(
+        margin: const EdgeInsets.fromLTRB(15, 30, 15, 0),
+        child: FutureBuilder<List<Appointment>>(
+          future:
+              getAppointmentsTime(), //has starttime and endtime of appointments
+          builder: (context, snapshot) {
+            //enclosed in this builder since it needs the snapshot data of the future method
+            bool hasOverlap(Appointment newAppointment) {
+              for (Appointment existingAppointment in snapshot.data!) {
+                if (newAppointment.startTime
+                        .isBefore(existingAppointment.endTime) &&
+                    newAppointment.endTime
+                        .isAfter(existingAppointment.startTime)) {
+                  return true; //has overlap
+                }
+              }
+              return false; // has no overlap
+            }
+
+            if (snapshot.hasData) {
+              return Column(
+                children: [
+                  const Text(
+                    'Select Service(s)',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: defaultPadding),
+                  SizedBox(
+                    width: double.infinity,
+                    height: MediaQuery.of(context).size.height * .55,
+                    child: ServicesList(widget.userID),
+                  ),
+                  const SizedBox(height: defaultPadding),
+                  //list of services by client here
+                  const Text(
+                    'Select Date & Time of Appointment',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: defaultPadding),
+                  //scheduling method
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      Column(
+                        children: [
+                          const Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text('From'),
+                              Text(
+                                '*',
+                                style: TextStyle(color: Colors.red),
+                              )
+                            ],
+                          ),
+                          TextButton(
+                            onPressed: () async {
+                              final date = await pickDate(from);
+                              if (date == null) return; // when pressed cancel
+                              final time =
+                                  await pickTime(TimeOfDay.fromDateTime(from));
+                              if (time == null) return; // when pressed cancel
+                              final dateTimeSet = DateTime(
+                                date.year,
+                                date.month,
+                                date.day,
+                                time.hour,
+                                time.minute,
+                              );
+                              if (dateTimeSet.isAfter(DateTime.now())) {
+                                log(dateTimeSet.toString());
+                                setState(() {
+                                  from = dateTimeSet;
+                                  to = dateTimeSet;
+                                });
+                              } else {
+                                log('date cannot be before now');
+                                return;
+                              }
+                            },
+                            child: Text(
+                              '${DateFormat.MMMEd().format(from)}, ${DateFormat.jm().format(from)}',
+                              style: const TextStyle(color: kPrimaryColor),
+                            ),
+                          ),
+                        ],
+                      ),
+                      if (from.isAfter(DateTime.now())) const Text('-'),
+                      if (from.isAfter(DateTime.now()))
+                        Column(
+                          children: [
+                            const Text('To'),
+                            TextButton(
+                                onPressed: null,
+                                child: Text(
+                                    '${DateFormat.MMMEd().format(to)}, ${DateFormat.jm().format(to)}',
+                                    style:
+                                        const TextStyle(color: kPrimaryColor))),
+                          ],
+                        )
+                    ],
+                  ),
+                ],
+              );
+              //test out function first by adding datettime pickers for datefrom and dateto
+              //get services duration once checked and add the duration of each services to the datefrom time variable
+            } else {
+              return const Center(
+                child: CircularProgressIndicator(color: kPrimaryColor),
+              );
+            }
+          },
         ),
-        body: SingleChildScrollView(
-          padding: EdgeInsets.all(defaultPadding),
-          child: Form(
-            key: _eventFormKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                buildTitle(),
-                const SizedBox(
-                  height: 12,
-                ),
-                buildDateTimePickers(),
-              ],
+      )),
+      floatingActionButton: FloatingActionButton(
+          onPressed: finishDialog,
+          backgroundColor: kPrimaryColor,
+          child: const Icon(
+            Icons.check,
+            color: kPrimaryLightColor,
+          )),
+    );
+  }
+
+  Widget ServicesList(String id) {
+    //gets service types of user
+    Future<List<String>> getServiceTypes() async {
+      try {
+        List<String> serviceTypes = [];
+        QuerySnapshot querySnapshot =
+            await db.collection('users').doc(id).collection('services').get();
+        for (var types in querySnapshot.docs) {
+          serviceTypes.add(types.id);
+        }
+        return serviceTypes;
+      } catch (e) {
+        log('error getting service types $e');
+        return [];
+      }
+    }
+
+    return FutureBuilder<List<String>>(
+      future: getServiceTypes(),
+      builder: (context, types) {
+        if (types.hasData) {
+          return BookingList(
+            clientID: widget.userID,
+            serviceTypes: types.data!,
+            cartValue: addedServices,
+          );
+        } else {
+          return const Text('LOADING...');
+          // return const CircularProgressIndicator(color: kPrimaryColor);
+        }
+      },
+    );
+  }
+
+  Future<void> finishDialog() async {
+    return showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Finish Booking?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('BACK'),
             ),
-          ),
-        ));
+            TextButton(
+              onPressed: () {},
+              child: const Text('SAVE'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<DateTime?> pickDate(DateTime dateTime) => showDatePicker(
+        context: context,
+        firstDate: DateTime(2000),
+        lastDate: DateTime(3000),
+        initialDate: dateTime,
+      );
+
+  Future<TimeOfDay?> pickTime(TimeOfDay timeOfDay) => showTimePicker(
+        context: context,
+        initialTime: TimeOfDay(hour: timeOfDay.hour, minute: timeOfDay.minute),
+      );
+
+  Future<List<Appointment>> getAppointmentsTime() async {
+    List<Map<String, dynamic>> appointments = [];
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(widget.userID)
+          .collection('bookings')
+          .get();
+      for (var doc in querySnapshot.docs) {
+        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+        appointments.add(data);
+      }
+
+      final List<Appointment> appointmentList = appointments.map(
+        (a) {
+          final appointment = Appointment(
+            startTime: a['dateFrom'].toDate(),
+            endTime: a['dateTo'].toDate(),
+          );
+          return appointment;
+        },
+      ).toList();
+      return appointmentList;
+    } catch (e) {
+      log('error getting start and end time $e');
+      return [];
+    }
+  }
+}
+
+class BookingList extends StatefulWidget {
+  String clientID;
+  List<String> serviceTypes;
+  int cartValue;
+
+  BookingList({
+    super.key,
+    required this.clientID,
+    required this.serviceTypes,
+    required this.cartValue,
+  });
+
+  @override
+  State<BookingList> createState() => _BookingListState();
+}
+
+class _BookingListState extends State<BookingList> {
+  FirebaseFirestore db = FirebaseFirestore.instance;
+  late List<List<bool>> checkboxValues;
+
+  @override
+  void initState() {
+    super.initState();
+    checkboxValues = List.generate(widget.serviceTypes.length,
+        (_) => List.filled(widget.serviceTypes.length, false));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.separated(
+      itemCount: widget.serviceTypes.length,
+      separatorBuilder: (context, index) => const Divider(),
+      itemBuilder: (context, index) {
+        final serviceType = widget.serviceTypes[index]; // Hair, Wax, etc.
+        return FutureBuilder(
+          future: getServices(serviceType),
+          builder: (context, services) {
+            if (services.hasData) {
+              return buildServiceCheckBox(serviceType, services, index);
+            } else {
+              return const Text('LOADING...');
+            }
+          },
+        );
+      },
+    );
+  }
+
+  Widget buildServiceCheckBox(String serviceType,
+      AsyncSnapshot<List<Map<String, dynamic>>> service, int serviceIndex) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          serviceType,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+        ListView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: service.data!.length,
+          itemBuilder: (context, index) {
+            String servicename = service.data![index]['serviceName'];
+            String price = service.data![index]['price'];
+            String duration = service.data![index]['duration'];
+            return CheckboxListTile(
+              title: Text(servicename),
+              value: checkboxValues[serviceIndex][index],
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('PHP $price'), //price
+                  Text(duration),
+                ],
+              ),
+              onChanged: (bool? value) {
+                setState(() {
+                  checkboxValues[serviceIndex][index] = value!;
+                });
+                log(servicename + price + duration);
+              },
+            );
+          },
+        ),
+      ],
+    );
+  }
+
+  Future<List<Map<String, dynamic>>> getServices(String serviceType) async {
+    List<Map<String, dynamic>> services = [];
+    try {
+      QuerySnapshot querySnapshot = await db
+          .collection('users')
+          .doc(widget.clientID)
+          .collection('services')
+          .doc(serviceType)
+          .collection('${widget.clientID}services')
+          .get();
+      for (var service in querySnapshot.docs) {
+        if (service.exists) {
+          services.add({
+            'serviceName': service.id, //is Hair Color or Haircut etc..
+            'duration': service['duration'],
+            'price': service['price'],
+            'description': service['description'],
+          });
+        }
+      }
+      return services;
+    } catch (e) {
+      log('error getting service tpyes $e');
+      return [];
+    }
   }
 }

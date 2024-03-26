@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:customer/components/constants.dart';
 import 'package:customer/screens/ServicesOffered/IndivService.dart';
@@ -59,7 +61,7 @@ class _SpecificServicesState extends State<SpecificServices> {
     return Service(name: widget.serviceCategory, subservices: subServices);
   }
 
-  Future<List<Service>> getServices() async {
+  Future<List<Service>> getServiceType() async {
     final QuerySnapshot servicesQuery = await db
         .collection('users')
         .doc(widget.userID)
@@ -79,16 +81,17 @@ class _SpecificServicesState extends State<SpecificServices> {
     return Scaffold(
       appBar: AppBar(title: Text(widget.serviceCategory)),
       body: StreamBuilder(
-          stream: Stream.fromFuture(getServices()),
-          builder: (context, snapshot) {
-            if (!snapshot.hasData) {
+          stream: Stream.fromFuture(getServiceType()),
+          builder: (context, servicetype) {
+            if (!servicetype.hasData) {
               return Center(
                   child: CircularProgressIndicator(color: kPrimaryColor));
             } else {
-              List<Service> serve = snapshot.data!;
-
+              List<Service> type = servicetype.data!;
+              log(type[0].subservices.length.toString());
+              // return Container();
               return ListView.builder(
-                  itemCount: serve.length,
+                  itemCount: type.length,
                   itemBuilder: (context, index) {
                     return ListTile(
                       onTap: () {
@@ -96,18 +99,18 @@ class _SpecificServicesState extends State<SpecificServices> {
                             context,
                             MaterialPageRoute(
                                 builder: (context) => IndivServicePage(
-                                    subserviceID: serve[index]
+                                    subserviceID: type[index]
                                         .subservices[index]
                                         .subService)));
                       },
                       title: Column(children: [
                         Text(
-                          serve[index].subservices[index].subService,
-                          style: TextStyle(
+                          type[index].subservices[index].subService,
+                          style: const TextStyle(
                               fontSize: 20, fontWeight: FontWeight.bold),
                         ),
-                        Text(serve[index].subservices[index].duration),
-                        Text('Php ${serve[index].subservices[index].price}'),
+                        Text(type[index].subservices[index].duration),
+                        Text('Php ${type[index].subservices[index].price}'),
                       ]),
                     );
                   });

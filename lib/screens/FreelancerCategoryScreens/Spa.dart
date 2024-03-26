@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:customer/screens/FreelancerCategoryScreens/components/getVerified.dart';
-import 'package:customer/screens/indivProfile/indivWorkerProfile.dart';
+import 'package:customer/screens/indivProfile/indiv_profile.dart';
 import 'package:flutter/material.dart';
 
 final db = FirebaseFirestore.instance;

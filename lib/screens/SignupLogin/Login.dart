@@ -58,17 +58,17 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
+      body: Background(
         child: Center(
           child: Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.fromLTRB(15, 30, 15, 0),
             child: Form(
               key: _formKey,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  LoginScreenTopImage(),
-                  SizedBox(height: 30),
+                  const LoginScreenTopImage(),
+                  const SizedBox(height: defaultPadding),
                   FormContainerWidget(
                     hintText: 'Email',
                     controller: _emailController,
@@ -76,7 +76,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     validator: (value) =>
                         value!.isEmpty ? "Please enter your Email" : null,
                   ),
-                  SizedBox(height: 10),
+                  const SizedBox(height: defaultPadding),
                   FormContainerWidget(
                     hintText: 'Password',
                     controller: _passwordController,
@@ -84,7 +84,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     validator: (value) =>
                         value!.isEmpty ? 'Type your password' : null,
                   ),
-                  SizedBox(height: 30),
+                  const SizedBox(height: defaultPadding),
                   GestureDetector(
                     onTap: _signIn,
                     child: Container(
@@ -94,7 +94,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         color: kPrimaryColor,
                         borderRadius: BorderRadius.circular(90),
                       ),
-                      child: Center(
+                      child: const Center(
                           child: Text(
                         "LOGIN",
                         style: TextStyle(
@@ -106,24 +106,20 @@ class _LoginScreenState extends State<LoginScreen> {
                       )),
                     ),
                   ),
-                  SizedBox(
-                    height: 20,
-                  ),
+                  const SizedBox(height: defaultPadding),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text("Don't have an account?"),
-                      SizedBox(
-                        width: 5,
-                      ),
+                      const Text("Don't have an account?"),
+                      const SizedBox(width: 5),
                       GestureDetector(
                         onTap: () {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: ((context) => CustSignUp())));
+                                  builder: ((context) => const CustSignUp())));
                         },
-                        child: Text(
+                        child: const Text(
                           "Sign Up",
                           style: TextStyle(
                               color: kPrimaryColor,
