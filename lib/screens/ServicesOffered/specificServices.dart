@@ -79,7 +79,11 @@ class _SpecificServicesState extends State<SpecificServices> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(widget.serviceCategory)),
+      appBar: AppBar(
+        title: Text('${widget.serviceCategory}  Services'),
+        backgroundColor: kPrimaryColor,
+        foregroundColor: kPrimaryLightColor,
+      ),
       body: StreamBuilder(
           stream: Stream.fromFuture(getServiceType()),
           builder: (context, servicetype) {

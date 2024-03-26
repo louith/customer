@@ -67,7 +67,7 @@ class _ServicesListState extends State<ServicesList> {
                     itemCount: serviceCategories.length,
                     itemBuilder: (context, index) {
                       return Container(
-                        width: 150,
+                        width: double.infinity,
                         margin: EdgeInsets.fromLTRB(0, 0, 0, 16),
                         decoration: const BoxDecoration(
                             color: Colors.white,
@@ -150,32 +150,6 @@ class _ServicesListState extends State<ServicesList> {
                       );
                     }),
               );
-            })
-        // body: StreamBuilder(
-        // stream: Stream.fromFuture(getServices()),
-        // builder: (context, snapshot) {
-        // if (!snapshot.hasData) {
-        // return Center(child: Text('walay unod yawa'));
-        // } else {
-        // List<Service> serve = snapshot.data!;
-
-        // return ListView.builder(itemBuilder: ((context, index) {
-        // return Container(
-        // margin: EdgeInsets.fromLTRB(0, 0, 0, 4),
-        // decoration: const BoxDecoration(
-        // color: Colors.white,
-        // boxshadow code/styling
-        // ),
-        // child: Column(
-        // children: [
-        // Text(serve[index].name),
-        // ListTile(),
-        // ],
-        // ));
-        // }));
-        // }
-        // }),
-
-        );
+            }));
   }
 }
