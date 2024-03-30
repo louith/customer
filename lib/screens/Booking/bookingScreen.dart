@@ -67,8 +67,10 @@ class _BookingScreenState extends State<BookingScreen> {
             Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) =>
-                        BookingAppointment(userID: widget.userID)));
+                    builder: (context) => BookingAppointment(
+                          userID: widget.userID,
+                          username: widget.username,
+                        )));
           },
           backgroundColor: kPrimaryColor,
           child: const Icon(
