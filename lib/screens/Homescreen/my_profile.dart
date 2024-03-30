@@ -1,8 +1,11 @@
+import 'package:customer/components/assets_strings.dart';
 import 'package:customer/components/constants.dart';
 import 'package:customer/components/widgets.dart';
 import 'package:customer/screens/Homescreen/Homescreen.dart';
 import 'package:customer/screens/Homescreen/MainScreen.dart';
+import 'package:customer/screens/WelcomeScreen/CustWelcomeScreen.dart';
 import 'package:customer/screens/customerProfile/custprofile.dart';
+import 'package:customer/screens/customerProfile/editProfile.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:line_icons/line_icons.dart';
@@ -33,6 +36,11 @@ class _MyProfileState extends State<MyProfile> {
     });
   }
 
+  void signUserOut() {
+    FirebaseAuth.instance.signOut();
+    Navigator.popAndPushNamed(context, '/');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -58,8 +66,8 @@ class _MyProfileState extends State<MyProfile> {
                 width: 120,
                 height: 120,
                 child: ClipRRect(
-                  borderRadius: BorderRadius.circular(100),
-                  child: const Image(image: AssetImage(suzyImg)),
+                  borderRadius: BorderRadius.circular(150),
+                  child: const Image(image: AssetImage(DefaultProfilePic)),
                 ),
               ),
               SizedBox(
@@ -85,7 +93,9 @@ class _MyProfileState extends State<MyProfile> {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: ((context) => AfterSignup())));
+                                builder: ((context) => EditProfile())));
+
+                        //separate page na dapat na naga fetch ug data from db
                       })),
               SizedBox(
                 height: 30,
@@ -130,7 +140,7 @@ class _MyProfileState extends State<MyProfile> {
                   title: 'Logout',
                   icon: LineIcons.alternateSignOut,
                   endIcon: false,
-                  onPress: () {},
+                  onPress: signUserOut,
                 ),
               ),
             ],

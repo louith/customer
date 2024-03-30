@@ -1,17 +1,32 @@
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:customer/components/assets_strings.dart';
 import 'package:customer/components/form_container_widget.dart';
 import 'package:customer/components/constants.dart';
 import 'package:customer/screens/Homescreen/MainScreen.dart';
 import 'package:customer/screens/Homescreen/my_profile.dart';
+import 'package:customer/screens/customerProfile/ChangeProfilePicture.dart';
 import 'package:customer/screens/customerProfile/components/user_model.dart';
 import 'package:customer/user_auth/firebase_auth_implementation/firebase_auth_services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:toastification/toastification.dart';
+
+final db = FirebaseFirestore.instance;
 
 class AfterSignup extends StatefulWidget {
-  const AfterSignup({super.key});
+  final String email;
+  final String username;
+  final String password;
+  const AfterSignup({
+    super.key,
+    required this.email,
+    required this.username,
+    required this.password,
+  });
 
   @override
   State<AfterSignup> createState() => _AfterSignupState();
@@ -22,7 +37,6 @@ class _AfterSignupState extends State<AfterSignup> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          centerTitle: true,
           backgroundColor: kPrimaryColor,
           leading: IconButton(
               onPressed: () {
@@ -34,18 +48,58 @@ class _AfterSignupState extends State<AfterSignup> {
             'My Profile',
           ),
         ),
-        body: const CustProfile());
+        body: CustProfile(
+          email: widget.email,
+          username: widget.username,
+          password: widget.password,
+        ));
   }
 }
 
 class CustProfile extends StatefulWidget {
-  const CustProfile({super.key});
+  final String email;
+  final String username;
+  final String password;
+
+  const CustProfile({
+    super.key,
+    required this.email,
+    required this.username,
+    required this.password,
+  });
 
   @override
   State<CustProfile> createState() => _CustProfileState();
 }
 
 class _CustProfileState extends State<CustProfile> {
+  File? image;
+  UploadTask? uploadTask;
+  Future pickImage(ImageSource source) async {
+    try {
+      final image = await ImagePicker().pickImage(source: source);
+      if (image == null) return;
+      final imageTemporary = File(image.path);
+      this.image = imageTemporary;
+      setState(() {
+        this.image = imageTemporary;
+      });
+    } on PlatformException catch (e) {
+      print('Failed to pick image: ${e}');
+    }
+  }
+
+  Future<String> uploadProfPic() async {
+    final path = 'customerProfilePics/${image!}';
+    final file = File(image!.path);
+    final ref = FirebaseStorage.instance.ref().child(path);
+    uploadTask = ref.putFile(file);
+    final snapshot = await uploadTask!.whenComplete(() => {});
+    final urlDownload = await snapshot.ref.getDownloadURL();
+    print('Download Link: ${urlDownload}');
+    return urlDownload;
+  }
+
   final FirebaseAuthService _auth = FirebaseAuthService();
   final currentUser = FirebaseAuth.instance.currentUser;
   final _formKey = GlobalKey<FormState>();
@@ -64,6 +118,83 @@ class _CustProfileState extends State<CustProfile> {
   final TextEditingController _username = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+    _email.text = widget.email;
+    _username.text = widget.username;
+  }
+
+  Future<void> addDataToFirestore() async {
+    String profpicURL = await uploadProfPic();
+    if (_formKey.currentState!.validate()) {
+      try {
+        // Collection reference
+        var users = FirebaseFirestore.instance
+            .collection('users')
+            .doc(currentUser!.uid);
+        // Get data from text fields
+        String firstName = _firstname.text;
+        String middleName = _middlename.text;
+        String lastName = _lastname.text;
+        String gender = _gender.text;
+        String age = _age.text;
+        String phonenum = _phonenum.text;
+        String prov = _province.text;
+        String city = _city.text;
+        String brgy = _brgy.text;
+        String extAddress = _extaddress.text;
+        String email = widget.email;
+        String userName = widget.username;
+        String password = widget.password;
+        // Document data
+        Map<String, dynamic> userData = {
+          "First Name": firstName,
+          "Middle Name": middleName,
+          "Last Name": lastName,
+          "Gender": gender,
+          "Age": age,
+          'Email': email,
+          'Contact Number': phonenum,
+          'Username': userName,
+          'Password': password,
+          'role': 'customer',
+          'Profile Picture': profpicURL
+        };
+        // Add document to the collection
+        await users.set(userData);
+        var addressCol = db
+            .collection('users')
+            .doc(currentUser!.uid)
+            .collection('addresses')
+            .doc('Address 1');
+        Map<String, dynamic> addressData = {
+          'Province': prov,
+          'City': city,
+          'Barangay': brgy,
+          'Extended Address': extAddress,
+        };
+        await addressCol.set(addressData);
+        toastification.show(
+            type: ToastificationType.success,
+            context: context,
+            icon: Icon(Icons.check_circle_outline_outlined),
+            title: Text('Personal data added'),
+            autoCloseDuration: const Duration(seconds: 3),
+            showProgressBar: false,
+            alignment: Alignment.topCenter,
+            style: ToastificationStyle.fillColored);
+        print('Data added successfully');
+        Navigator.push(context,
+            MaterialPageRoute(builder: ((context) => CustMainScreen())));
+      } catch (e) {
+        print('Error adding data: $e');
+      }
+    } else {
+      print('Some error happened');
+    }
+  }
+
+  @override
   void dispose() {
     _firstname.dispose();
     _middlename.dispose();
@@ -78,100 +209,6 @@ class _CustProfileState extends State<CustProfile> {
     _email.dispose();
     _username.dispose();
     super.dispose();
-  }
-
-  Future<void> addDataToFirestore() async {
-    try {
-      // Collection reference
-      var users =
-          FirebaseFirestore.instance.collection('users').doc(currentUser!.uid);
-
-      // Get data from text fields
-      String firstName = _firstname.text;
-      String middleName = _middlename.text;
-      String lastName = _lastname.text;
-      String gender = _gender.text;
-      String age = _age.text;
-      String phonenum = _phonenum.text;
-      String prov = _province.text;
-      String city = _city.text;
-      String brgy = _brgy.text;
-      String extAddress = _extaddress.text;
-      String email = _email.text;
-      String userName = _username.text;
-
-      // Document data
-      Map<String, dynamic> userData = {
-        "First Name": firstName,
-        "Middle Name": middleName,
-        "Last Name": lastName,
-        "Gender": gender,
-        "Age": age,
-        "Phone Number": phonenum,
-        'Province': prov,
-        'City': city,
-        'Barangay': brgy,
-        'Extended Address': extAddress,
-        'Email': email,
-        'Username': userName,
-        'role': 'customer'
-      };
-
-      // Add document to the collection
-      await users.set(userData);
-
-      print('Data added successfully');
-      showAlertDialog(context, 'SUCCESS', 'Customer data added successfully.');
-      Navigator.push(
-          context, MaterialPageRoute(builder: ((context) => CustMainScreen())));
-    } catch (e) {
-      print('Error adding data: $e');
-    }
-  }
-
-  File? image;
-  Widget buildButton({
-    required String title,
-    IconData? icon,
-    Function()? onClicked,
-  }) =>
-      ElevatedButton(
-        style: ButtonStyle(
-            backgroundColor: MaterialStateProperty.all(kPrimaryColor),
-            foregroundColor: MaterialStateProperty.all(kPrimaryLightColor)),
-        child: Row(
-          children: [
-            Icon(
-              icon,
-              size: 28,
-            ),
-            SizedBox(
-              width: 16,
-            ),
-            Text(
-              title,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 13,
-                fontFamily: 'Inter',
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ],
-        ),
-        onPressed: onClicked,
-      );
-
-  Future pickImage(ImageSource source) async {
-    try {
-      final image = await ImagePicker().pickImage(source: source);
-      if (image == null) return;
-
-      final imageTemporary = File(image.path);
-      setState(() => this.image = imageTemporary);
-    } on Exception catch (e) {
-      print('Failed to pick image: $e');
-    }
   }
 
   String dropdownvalue = 'Male';
@@ -199,16 +236,29 @@ class _CustProfileState extends State<CustProfile> {
                       height: 160,
                       fit: BoxFit.cover,
                     )
-                  : FlutterLogo(size: 160),
-              buildButton(
-                  title: 'Pick from Gallery',
-                  icon: Icons.image_outlined,
-                  onClicked: () => pickImage(ImageSource.gallery)),
-              SizedBox(height: defaultformspacing),
-              buildButton(
-                  title: 'Pick from Camera',
-                  icon: Icons.camera_alt_outlined,
-                  onClicked: () => pickImage(ImageSource.camera)),
+                  : Image.asset(
+                      DefaultProfilePic,
+                      width: 130,
+                      fit: BoxFit.cover,
+                    ),
+              TextButton.icon(
+                  onPressed: () => pickImage(ImageSource.gallery),
+                  icon: const Icon(Icons.image_outlined),
+                  label: const Text('Pick from Gallery')),
+              const SizedBox(
+                height: defaultformspacing,
+              ),
+              TextButton.icon(
+                  onPressed: () => pickImage(ImageSource.camera),
+                  icon: const Icon(Icons.camera_outlined),
+                  label: const Text('Pick from Camera')),
+              const SizedBox(
+                height: defaultformspacing,
+              ),
+              TextButton(
+                onPressed: uploadProfPic,
+                child: Text('Upload New Picture'),
+              ),
               Container(
                 child: Form(
                     key: _formKey,
@@ -216,23 +266,59 @@ class _CustProfileState extends State<CustProfile> {
                       SizedBox(
                         height: defaultformspacing,
                       ),
-                      FormContainerWidget(
-                        controller: _firstname,
-                        hintText: 'First Name',
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'First Name',
+                            style: TextStyle(color: kPrimaryColor),
+                          ),
+                          FormContainerWidget(
+                              hintText: 'Juan',
+                              controller: _firstname,
+                              labelText: 'First Name',
+                              validator: (value) => value!.isEmpty
+                                  ? 'Field cannot be empty'
+                                  : null),
+                        ],
                       ),
                       SizedBox(
                         height: defaultformspacing,
                       ),
-                      FormContainerWidget(
-                        controller: _middlename,
-                        hintText: 'Middle Name',
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Middle Name',
+                            style: TextStyle(color: kPrimaryColor),
+                          ),
+                          FormContainerWidget(
+                              hintText: 'Santos',
+                              controller: _middlename,
+                              labelText: 'Middle Name',
+                              validator: (value) => value!.isEmpty
+                                  ? 'Field cannot be empty'
+                                  : null),
+                        ],
                       ),
                       SizedBox(
                         height: defaultformspacing,
                       ),
-                      FormContainerWidget(
-                        controller: _lastname,
-                        hintText: 'Last Name',
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Last Name',
+                            style: TextStyle(color: kPrimaryColor),
+                          ),
+                          FormContainerWidget(
+                              hintText: 'dela Cruz',
+                              controller: _lastname,
+                              labelText: 'Last Name',
+                              validator: (value) => value!.isEmpty
+                                  ? 'Field cannot be empty'
+                                  : null),
+                        ],
                       ),
                       SizedBox(
                         height: defaultformspacing,
@@ -272,16 +358,40 @@ class _CustProfileState extends State<CustProfile> {
                       SizedBox(
                         height: defaultformspacing,
                       ),
-                      FormContainerWidget(
-                        controller: _age,
-                        hintText: 'Age',
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Age',
+                            style: TextStyle(color: kPrimaryColor),
+                          ),
+                          FormContainerWidget(
+                              hintText: '20',
+                              controller: _age,
+                              labelText: 'Age',
+                              validator: (value) => value!.isEmpty
+                                  ? 'Field cannot be empty'
+                                  : null),
+                        ],
                       ),
                       SizedBox(
                         height: defaultformspacing,
                       ),
-                      FormContainerWidget(
-                        controller: _phonenum,
-                        hintText: 'Phone Number',
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Contact Number',
+                            style: TextStyle(color: kPrimaryColor),
+                          ),
+                          FormContainerWidget(
+                              hintText: '094738347',
+                              controller: _phonenum,
+                              labelText: 'Phone Number',
+                              validator: (value) => value!.isEmpty
+                                  ? 'Field cannot be empty'
+                                  : null),
+                        ],
                       ),
                       SizedBox(
                         height: 25,
@@ -293,30 +403,80 @@ class _CustProfileState extends State<CustProfile> {
                       SizedBox(
                         height: 10,
                       ),
-                      FormContainerWidget(
-                        controller: _province,
-                        hintText: 'Province',
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Province',
+                            style: TextStyle(color: kPrimaryColor),
+                          ),
+                          FormContainerWidget(
+                              hintText: 'Davao del Sur',
+                              controller: _province,
+                              labelText: 'Province',
+                              validator: (value) => value!.isEmpty
+                                  ? 'Field cannot be empty'
+                                  : null),
+                        ],
                       ),
                       SizedBox(
                         height: defaultformspacing,
                       ),
-                      FormContainerWidget(
-                        controller: _city,
-                        hintText: 'City',
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'City',
+                            style: TextStyle(color: kPrimaryColor),
+                          ),
+                          FormContainerWidget(
+                              hintText: 'Davao City',
+                              controller: _city,
+                              labelText: 'City',
+                              validator: (value) => value!.isEmpty
+                                  ? 'Field cannot be empty'
+                                  : null),
+                        ],
                       ),
                       SizedBox(
                         height: defaultformspacing,
                       ),
-                      FormContainerWidget(
-                        controller: _brgy,
-                        hintText: 'Baranggay',
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Baranggay',
+                            style: TextStyle(color: kPrimaryColor),
+                          ),
+                          FormContainerWidget(
+                              hintText: 'Sasa',
+                              controller: _brgy,
+                              labelText: 'Baranggay',
+                              validator: (value) => value!.isEmpty
+                                  ? 'Field cannot be empty'
+                                  : null),
+                        ],
                       ),
                       SizedBox(
                         height: defaultformspacing,
                       ),
-                      FormContainerWidget(
-                        controller: _extaddress,
-                        hintText: 'House No.,Street, Subdivision/Village',
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'House No.,Street, Subdivision/Village',
+                            style: TextStyle(color: kPrimaryColor),
+                          ),
+                          FormContainerWidget(
+                              hintText:
+                                  '100 Pisces Street, Vincent Heights Subdivision',
+                              controller: _extaddress,
+                              labelText:
+                                  'House No.,Street, Subdivision/Village',
+                              validator: (value) => value!.isEmpty
+                                  ? 'Field cannot be empty'
+                                  : null),
+                        ],
                       ),
                       SizedBox(
                         height: 25,
@@ -328,16 +488,41 @@ class _CustProfileState extends State<CustProfile> {
                       SizedBox(
                         height: 10,
                       ),
-                      FormContainerWidget(
-                        controller: _email,
-                        hintText: 'Email Address',
+                      // Text(widget.email),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Email Address',
+                            style: TextStyle(color: kPrimaryColor),
+                          ),
+                          FormContainerWidget(
+                              isDisabled: true,
+                              controller: _email,
+                              labelText: 'Email Address',
+                              validator: (value) => value!.isEmpty
+                                  ? 'Field cannot be empty'
+                                  : null),
+                        ],
                       ),
                       SizedBox(
                         height: defaultformspacing,
                       ),
-                      FormContainerWidget(
-                        controller: _username,
-                        hintText: 'Username',
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Username',
+                            style: TextStyle(color: kPrimaryColor),
+                          ),
+                          FormContainerWidget(
+                              isDisabled: true,
+                              controller: _username,
+                              labelText: 'Username',
+                              validator: (value) => value!.isEmpty
+                                  ? 'Field cannot be empty'
+                                  : null),
+                        ],
                       ),
                       SizedBox(
                         height: 30,
@@ -347,9 +532,12 @@ class _CustProfileState extends State<CustProfile> {
                             addDataToFirestore();
                           },
                           style: ElevatedButton.styleFrom(
-                              backgroundColor: kPrimaryColor,
-                              textStyle: TextStyle(color: kPrimaryLightColor)),
-                          child: Text('SUBMIT'))
+                            backgroundColor: kPrimaryColor,
+                          ),
+                          child: Text(
+                            'SUBMIT',
+                            style: TextStyle(color: kPrimaryLightColor),
+                          ))
                     ])),
               ),
             ])),
