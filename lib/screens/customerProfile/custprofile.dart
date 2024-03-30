@@ -27,7 +27,7 @@ class _AfterSignupState extends State<AfterSignup> {
           leading: IconButton(
               onPressed: () {
                 Navigator.push(context,
-                    MaterialPageRoute(builder: ((context) => MyProfile())));
+                    MaterialPageRoute(builder: ((context) => const MyProfile())));
               },
               icon: const Icon(Icons.arrow_back)),
           title: const Text(
@@ -123,7 +123,7 @@ class _CustProfileState extends State<CustProfile> {
       print('Data added successfully');
       showAlertDialog(context, 'SUCCESS', 'Customer data added successfully.');
       Navigator.push(
-          context, MaterialPageRoute(builder: ((context) => CustMainScreen())));
+          context, MaterialPageRoute(builder: ((context) => const CustMainScreen())));
     } catch (e) {
       print('Error adding data: $e');
     }
@@ -139,13 +139,14 @@ class _CustProfileState extends State<CustProfile> {
         style: ButtonStyle(
             backgroundColor: MaterialStateProperty.all(kPrimaryColor),
             foregroundColor: MaterialStateProperty.all(kPrimaryLightColor)),
+        onPressed: onClicked,
         child: Row(
           children: [
             Icon(
               icon,
               size: 28,
             ),
-            SizedBox(
+            const SizedBox(
               width: 16,
             ),
             Text(
@@ -159,7 +160,6 @@ class _CustProfileState extends State<CustProfile> {
             ),
           ],
         ),
-        onPressed: onClicked,
       );
 
   Future pickImage(ImageSource source) async {
@@ -180,13 +180,13 @@ class _CustProfileState extends State<CustProfile> {
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
-    return Container(
+    return SizedBox(
       height: screenHeight,
       width: screenWidth,
       child: Scrollbar(
         child: SingleChildScrollView(
             scrollDirection: Axis.vertical,
-            padding: EdgeInsets.all(defaultPadding),
+            padding: const EdgeInsets.all(defaultPadding),
             child: Column(children: [
               Text(
                 'Customer Profile'.toUpperCase(),
@@ -199,12 +199,12 @@ class _CustProfileState extends State<CustProfile> {
                       height: 160,
                       fit: BoxFit.cover,
                     )
-                  : FlutterLogo(size: 160),
+                  : const FlutterLogo(size: 160),
               buildButton(
                   title: 'Pick from Gallery',
                   icon: Icons.image_outlined,
                   onClicked: () => pickImage(ImageSource.gallery)),
-              SizedBox(height: defaultformspacing),
+              const SizedBox(height: defaultformspacing),
               buildButton(
                   title: 'Pick from Camera',
                   icon: Icons.camera_alt_outlined,
@@ -213,49 +213,49 @@ class _CustProfileState extends State<CustProfile> {
                 child: Form(
                     key: _formKey,
                     child: Column(children: [
-                      SizedBox(
+                      const SizedBox(
                         height: defaultformspacing,
                       ),
                       FormContainerWidget(
                         controller: _firstname,
                         hintText: 'First Name',
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: defaultformspacing,
                       ),
                       FormContainerWidget(
                         controller: _middlename,
                         hintText: 'Middle Name',
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: defaultformspacing,
                       ),
                       FormContainerWidget(
                         controller: _lastname,
                         hintText: 'Last Name',
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: defaultformspacing,
                       ),
                       DropdownButtonFormField(
                         // dropdownColor: kPrimaryColor.withOpacity(.35),
-                        hint: Text("Gender"),
+                        hint: const Text("Gender"),
                         decoration: InputDecoration(
                             fillColor: kPrimaryColor.withOpacity(0.35),
                             filled: true,
-                            focusedBorder: OutlineInputBorder(
+                            focusedBorder: const OutlineInputBorder(
                                 borderSide: BorderSide(color: Colors.white)),
                             enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10),
-                              borderSide: BorderSide(
+                              borderSide: const BorderSide(
                                 color: kPrimaryColor,
                                 width: 1,
                               ),
                             )),
 
-                        style: TextStyle(color: Colors.black45),
+                        style: const TextStyle(color: Colors.black45),
                         value: dropdownvalue,
-                        icon: Icon(Icons.keyboard_arrow_down),
+                        icon: const Icon(Icons.keyboard_arrow_down),
                         items: items.map((String items) {
                           return DropdownMenuItem(
                             value: items,
@@ -269,77 +269,77 @@ class _CustProfileState extends State<CustProfile> {
                           });
                         },
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: defaultformspacing,
                       ),
                       FormContainerWidget(
                         controller: _age,
                         hintText: 'Age',
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: defaultformspacing,
                       ),
                       FormContainerWidget(
                         controller: _phonenum,
                         hintText: 'Phone Number',
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 25,
                       ),
                       Text(
                         'Address'.toUpperCase(),
                         // style: TextStyle(fontSize: defTitleFontSize),
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 10,
                       ),
                       FormContainerWidget(
                         controller: _province,
                         hintText: 'Province',
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: defaultformspacing,
                       ),
                       FormContainerWidget(
                         controller: _city,
                         hintText: 'City',
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: defaultformspacing,
                       ),
                       FormContainerWidget(
                         controller: _brgy,
                         hintText: 'Baranggay',
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: defaultformspacing,
                       ),
                       FormContainerWidget(
                         controller: _extaddress,
                         hintText: 'House No.,Street, Subdivision/Village',
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 25,
                       ),
                       Text(
                         'Login Information'.toUpperCase(),
                         // style: TextStyle(fontSize: defTitleFontSize),
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 10,
                       ),
                       FormContainerWidget(
                         controller: _email,
                         hintText: 'Email Address',
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: defaultformspacing,
                       ),
                       FormContainerWidget(
                         controller: _username,
                         hintText: 'Username',
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 30,
                       ),
                       ElevatedButton(
@@ -348,8 +348,8 @@ class _CustProfileState extends State<CustProfile> {
                           },
                           style: ElevatedButton.styleFrom(
                               backgroundColor: kPrimaryColor,
-                              textStyle: TextStyle(color: kPrimaryLightColor)),
-                          child: Text('SUBMIT'))
+                              textStyle: const TextStyle(color: kPrimaryLightColor)),
+                          child: const Text('SUBMIT'))
                     ])),
               ),
             ])),

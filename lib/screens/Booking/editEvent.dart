@@ -197,6 +197,7 @@ class _BookingAppointmentState extends State<BookingAppointment> {
       builder: (context, serviceTypes) {
         if (serviceTypes.hasData) {
           return BookingList(
+            //scrollwidget thingy
             clientID: widget.userID,
             serviceTypes: serviceTypes.data!,
             cartNum: addedServices.length,
@@ -316,23 +317,24 @@ class _BookingListState extends State<BookingList> {
 
   @override
   Widget build(BuildContext context) {
+    ////////////////LIST OF DIFFERENT SERVICES////////////////////
     return ListView.separated(
       itemCount: widget.serviceTypes.length,
-      separatorBuilder: (context, index) => const Divider(),
-      itemBuilder: (context, index) {
-        final serviceType = widget.serviceTypes[index]; // Hair, Wax, etc.
+      separatorBuilder: (context, serviceTypeIndex) => const Divider(),
+      itemBuilder: (context, serviceTypeIndex) {
+        String serviceType =
+            widget.serviceTypes[serviceTypeIndex]; // Hair, Wax, etc.
+        //FUTUREBUILDER/////////////////////////////////////////////////////////////////////////////////////////////
         return FutureBuilder(
           future: getServices(serviceType, widget.clientID),
           builder: (context, services) {
             if (services.hasData) {
-              log(services.data!.length.toString());
-              return Container();
-              // return buildServiceCheckBox(
-              //   serviceType, //string
-              //   services, // list of services
-              //   services.data!.length, // index of each service type
-              //   widget.cartNum, // int cart values
-              // );
+              return buildServiceCheckBox(
+                serviceType, //string Hair, Wax, etc...
+                services.data!, // list of services List of ClientService
+                serviceTypeIndex, // index of each service from a single service type
+                widget.cartNum, // int cart values
+              );
             } else {
               return const Text('LOADING...');
             }
@@ -343,10 +345,11 @@ class _BookingListState extends State<BookingList> {
   }
 
   Widget buildServiceCheckBox(
-      String serviceType,
-      AsyncSnapshot<List<ClientService>> service,
-      int serviceIndex,
-      int cartNum) {
+    String serviceType,
+    List<ClientService> services,
+    int serviceTypeIndex,
+    int cartNum,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -357,30 +360,36 @@ class _BookingListState extends State<BookingList> {
         ListView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          itemCount: service.data!.length,
-          itemBuilder: (context, index) {
-            String servicename = service.data![index].serviceName;
-            String price = service.data![index].price;
-            String duration = service.data![index].duration;
-            bool chcekboxValue = checkboxValues[serviceIndex][index];
-            return CheckboxListTile(
-              title: Text(servicename),
-              value: chcekboxValue,
-              subtitle: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('PHP $price'), //price
-                  Text(duration),
-                ],
-              ),
-              onChanged: (bool? value) {
-                setState(() {
-                  checkboxValues[serviceIndex][index] =
-                      value!; //checks for each card
-                  widget.updateCart(service.data![index]);
-                });
-              },
-            );
+          itemCount: services.length,
+          itemBuilder: (context, serviceIndex) {
+            try {
+              String servicename = services[serviceIndex].serviceName;
+              String price = services[serviceIndex].price;
+              String duration = services[serviceIndex].duration;
+              bool checkboxValue =
+                  checkboxValues[serviceTypeIndex][serviceIndex];
+              // log(serviceType + servicename + checkboxValue.toString());
+              return CheckboxListTile(
+                title: Text(servicename),
+                value: checkboxValue,
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('PHP $price'), //price
+                    Text(duration),
+                  ],
+                ),
+                onChanged: (bool? value) {
+                  setState(() {
+                    checkboxValues[serviceTypeIndex][serviceIndex] =
+                        value!; //checks for each card
+                    widget.updateCart(services[serviceIndex]);
+                  });
+                },
+              );
+            } catch (e) {
+              return Center(child: Text(e.toString()));
+            }
           },
         ),
       ],

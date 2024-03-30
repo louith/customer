@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:customer/components/constants.dart';
 import 'package:customer/screens/FreelancerCategoryScreens/components/getVerified.dart';
 import 'package:customer/screens/indivProfile/indiv_profile.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
 final db = FirebaseFirestore.instance;
@@ -55,10 +54,10 @@ class _AllWorkersState extends State<AllWorkers> {
     List<String> subcats = [];
     // List<String> cats = snapshot.docs.map((doc) => doc.id).toList();
 
-    snapshot.docs.forEach((DocumentSnapshot subcatDoc) {
+    for (var subcatDoc in snapshot.docs) {
       Map<String, dynamic> data = subcatDoc.data() as Map<String, dynamic>;
       subcats.addAll(data.keys);
-    });
+    }
     return AllWorkerCard(
         id: plainID.toString(),
         name: profileMap['name'],
@@ -93,6 +92,7 @@ class _AllWorkersState extends State<AllWorkers> {
   }
 
   // _stream = Stream.fromFuture(getAll());
+  @override
   void initState() {
     super.initState();
   }
@@ -136,7 +136,7 @@ class _AllWorkersState extends State<AllWorkers> {
           stream: Stream.fromFuture(searchFunc(searchSubcat)),
           builder: (context, snapshot) {
             if (!snapshot.hasData) {
-              return Center(
+              return const Center(
                   child: CircularProgressIndicator(
                 color: kPrimaryColor,
               ));
@@ -147,7 +147,7 @@ class _AllWorkersState extends State<AllWorkers> {
                   itemBuilder: (context, index) {
                     var data = allWorkers[index];
                     return Container(
-                      margin: EdgeInsets.fromLTRB(0, 0, 0, 4),
+                      margin: const EdgeInsets.fromLTRB(0, 0, 0, 4),
                       decoration: const BoxDecoration(
                         color: Colors.white,
                         //boxshadow code/styling
@@ -174,8 +174,8 @@ class _AllWorkersState extends State<AllWorkers> {
                             // Text(hairWorkers[index].id.toString())
                           ],
                         ),
-                        trailing: Text('4 stars'),
-                        shape: RoundedRectangleBorder(),
+                        trailing: const Text('4 stars'),
+                        shape: const RoundedRectangleBorder(),
                         onTap: () {
                           Navigator.push(
                             context,
@@ -209,7 +209,7 @@ class CategoriesRow extends StatelessWidget {
         children: List.generate(
           itemList.length,
           (index) => Container(
-            padding: EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
             decoration: BoxDecoration(
                 color: Colors.purple[100],
                 borderRadius: BorderRadius.circular(100)),

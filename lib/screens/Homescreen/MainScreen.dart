@@ -15,7 +15,7 @@ class CustMainScreen extends StatefulWidget {
 
 class _CustMainScreenState extends State<CustMainScreen> {
   int index = 0;
-  final screens = [CustHome(), AllWorkers(), GeneralChatPage(), MyProfile()];
+  final screens = [const CustHome(), const AllWorkers(), const GeneralChatPage(), const MyProfile()];
   @override
   Widget build(BuildContext context) {
     return Scaffold(

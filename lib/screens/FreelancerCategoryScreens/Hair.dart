@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:customer/components/constants.dart';
@@ -84,7 +83,7 @@ class _HairFreelancersState extends State<HairFreelancers> {
       stream: Stream.fromFuture(getHairs()), // Convert the Future to a Stream
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
-          return Center(
+          return const Center(
               child: CircularProgressIndicator(
             color: kPrimaryColor,
           ));
@@ -94,7 +93,7 @@ class _HairFreelancersState extends State<HairFreelancers> {
               itemCount: hairWorkers.length,
               itemBuilder: (context, index) {
                 return Container(
-                  margin: EdgeInsets.fromLTRB(0, 0, 0, 4),
+                  margin: const EdgeInsets.fromLTRB(0, 0, 0, 4),
                   decoration: const BoxDecoration(
                     color: Colors.white,
                     //boxshadow code/styling
@@ -121,7 +120,7 @@ class _HairFreelancersState extends State<HairFreelancers> {
                         // Text(hairWorkers[index].id.toString())
                       ],
                     ),
-                    shape: RoundedRectangleBorder(),
+                    shape: const RoundedRectangleBorder(),
                     onTap: () {
                       Navigator.push(
                         context,
@@ -154,7 +153,7 @@ class SubCategoriesRow extends StatelessWidget {
         children: List.generate(
           itemList.length,
           (index) => Container(
-            padding: EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
             decoration: BoxDecoration(
                 color: Colors.purple[100],
                 borderRadius: BorderRadius.circular(100)),

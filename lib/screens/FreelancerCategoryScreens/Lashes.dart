@@ -72,14 +72,14 @@ class _LashesFreelancersState extends State<LashesFreelancers> {
       stream: Stream.fromFuture(getLashes()), // Convert the Future to a Stream
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
-          return Text('loading');
+          return const Text('loading');
         } else {
           List<LashesWorkerCard> lashWorkers = snapshot.data!;
           return ListView.builder(
               itemCount: lashWorkers.length,
               itemBuilder: (context, index) {
                 return Container(
-                  margin: EdgeInsets.fromLTRB(0, 0, 0, 4),
+                  margin: const EdgeInsets.fromLTRB(0, 0, 0, 4),
                   decoration: const BoxDecoration(
                     color: Colors.white,
                     //boxshadow code/styling
@@ -104,7 +104,7 @@ class _LashesFreelancersState extends State<LashesFreelancers> {
                             style: const TextStyle(fontWeight: FontWeight.w300))
                       ],
                     ),
-                    shape: RoundedRectangleBorder(),
+                    shape: const RoundedRectangleBorder(),
                     onTap: () {
                       Navigator.push(
                         context,
@@ -137,7 +137,7 @@ class SubCategoriesRow extends StatelessWidget {
         children: List.generate(
           itemList.length,
           (index) => Container(
-            padding: EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
             decoration: BoxDecoration(
                 color: Colors.purple[100],
                 borderRadius: BorderRadius.circular(100)),

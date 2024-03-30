@@ -88,7 +88,7 @@ class _SpecificServicesState extends State<SpecificServices> {
           stream: Stream.fromFuture(getServiceType()),
           builder: (context, servicetype) {
             if (!servicetype.hasData) {
-              return Center(
+              return const Center(
                   child: CircularProgressIndicator(color: kPrimaryColor));
             } else {
               List<Service> type = servicetype.data!;

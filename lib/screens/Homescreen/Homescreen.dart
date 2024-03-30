@@ -156,7 +156,7 @@ class _CustHomeState extends State<CustHome> {
                       ),
                     ]),
               ),
-              title: Text('Current Address'),
+              title: const Text('Current Address'),
               backgroundColor: kPrimaryColor,
             ),
             body: TabBarView(children: [

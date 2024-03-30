@@ -1,15 +1,11 @@
-import 'package:customer/components/already_have_an_account_check.dart';
 import 'package:customer/components/background.dart';
 import 'package:customer/components/form_container_widget.dart';
-import 'package:customer/components/widgets.dart';
 import 'package:customer/components/constants.dart';
-import 'package:customer/screens/Homescreen/Homescreen.dart';
 import 'package:customer/screens/Homescreen/MainScreen.dart';
 import 'package:customer/screens/SignupLogin/Signup.dart';
 import 'package:customer/screens/SignupLogin/components/login_topimg.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:customer/user_auth/firebase_auth_implementation/firebase_auth_services.dart';
 
 //loys' code
@@ -24,8 +20,8 @@ class _LoginScreenState extends State<LoginScreen> {
   final FirebaseAuthService _auth = FirebaseAuthService();
   final _formKey = GlobalKey<FormState>();
 
-  TextEditingController _emailController = TextEditingController();
-  TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
 
   @override
   void dispose() {

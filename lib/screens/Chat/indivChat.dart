@@ -3,8 +3,6 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:customer/components/constants.dart';
-import 'package:customer/components/form_container_widget.dart';
-import 'package:customer/components/widgets.dart';
 import 'package:customer/screens/Chat/chatBubble.dart';
 import 'package:customer/screens/Chat/chatservices.dart';
 import 'package:firebase_auth/firebase_auth.dart';

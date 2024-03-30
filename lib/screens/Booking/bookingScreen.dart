@@ -3,13 +3,8 @@ import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:customer/components/constants.dart';
 import 'package:customer/features/parse.dart';
-import 'package:customer/screens/Booking/EditEventComponents/event_provider.dart';
 import 'package:customer/screens/Booking/editEvent.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 // ignore: must_be_immutable
@@ -92,10 +87,10 @@ class _BookingScreenState extends State<BookingScreen> {
           .collection('bookings')
           .get();
       if (querySnapshot.docs.isNotEmpty) {
-        querySnapshot.docs.forEach((doc) {
+        for (var doc in querySnapshot.docs) {
           Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
           appointments.add(data);
-        });
+        }
       }
       final List<Appointment> appointmentList = appointments.map((a) {
         // Assign a default color if 'status' doesn't match any expected values

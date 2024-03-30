@@ -1,4 +1,3 @@
-import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:customer/components/constants.dart';
@@ -30,7 +29,7 @@ class IndivWorkerProfile extends StatelessWidget {
   final String userID;
   final String userName;
 
-  IndivWorkerProfile({
+  const IndivWorkerProfile({
     super.key,
     required this.userID,
     required this.userName,
@@ -125,7 +124,7 @@ class IndivWorkerProfile extends StatelessWidget {
                               children: [
                                 Text(
                                   clientData.name,
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 20,
                                   ),
@@ -135,7 +134,7 @@ class IndivWorkerProfile extends StatelessWidget {
                                     crossAxisAlignment:
                                         WrapCrossAlignment.start,
                                     children: [
-                                      Icon(Icons.location_on_outlined),
+                                      const Icon(Icons.location_on_outlined),
                                       Text(
                                         clientData.address,
                                       )
