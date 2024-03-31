@@ -21,9 +21,6 @@ class WorkerCard {
       required this.subcategories});
 }
 
-// List<dynamic> hairSubCats = [];
-// List<dynamic> hairList = [];
-
 class HairFreelancers extends StatefulWidget {
   const HairFreelancers({super.key});
 

@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:customer/components/constants.dart';
 import 'package:customer/screens/FreelancerCategoryScreens/components/getVerified.dart';
 import 'package:customer/screens/indivProfile/indiv_profile.dart';
 import 'package:flutter/material.dart';
@@ -72,7 +73,10 @@ class _WaxWorkersState extends State<WaxWorkers> {
       stream: Stream.fromFuture(getWax()), // Convert the Future to a Stream
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
-          return const Text('loading');
+          return const Center(
+              child: CircularProgressIndicator(
+            color: kPrimaryColor,
+          ));
         } else {
           List<WaxWorkerCard> waxWorkers = snapshot.data!;
           return ListView.builder(

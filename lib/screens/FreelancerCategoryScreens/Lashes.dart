@@ -1,3 +1,4 @@
+import 'package:customer/components/constants.dart';
 import 'package:customer/screens/FreelancerCategoryScreens/components/getVerified.dart';
 import 'package:customer/screens/indivProfile/indiv_profile.dart';
 import 'package:flutter/material.dart';
@@ -72,7 +73,10 @@ class _LashesFreelancersState extends State<LashesFreelancers> {
       stream: Stream.fromFuture(getLashes()), // Convert the Future to a Stream
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
-          return const Text('loading');
+          return const Center(
+              child: CircularProgressIndicator(
+            color: kPrimaryColor,
+          ));
         } else {
           List<LashesWorkerCard> lashWorkers = snapshot.data!;
           return ListView.builder(
