@@ -1,11 +1,13 @@
+import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:customer/components/constants.dart';
+import 'package:customer/models/service.dart';
 import 'package:customer/screens/Booking/bookingScreen.dart';
 import 'package:customer/screens/Chat/indivChat.dart';
 import 'package:customer/screens/ServicesOffered/servicesList.dart';
 import 'package:flutter/material.dart';
-import 'package:line_icons/line_icon.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
 class WorkerDetailsCard {
   final String id;
@@ -13,7 +15,9 @@ class WorkerDetailsCard {
   final String role;
   final String address;
   final List<String> categories;
+  final String? profileimage;
   final String? worksAt;
+  final String? rating;
 
   WorkerDetailsCard({
     required this.id,
@@ -21,6 +25,8 @@ class WorkerDetailsCard {
     required this.role,
     required this.address,
     required this.categories,
+    this.rating,
+    this.profileimage,
     this.worksAt,
   });
 }
@@ -58,134 +64,243 @@ class IndivWorkerProfile extends StatelessWidget {
         name: userMap['name'],
         role: userMap['role'],
         address: userMap['address'],
+        profileimage: userMap['profilePicture'],
+        rating: userMap['rating'],
         categories: cats);
+  }
+
+  Future<List<String>> getServiceCategories() async {
+    try {
+      List<String> mainCategories = [];
+      final QuerySnapshot querySnapshot =
+          await db.collection('users').doc(userID).collection('services').get();
+      querySnapshot.docs.forEach((element) {
+        mainCategories.add(element.id);
+        log(element.id);
+      });
+      return mainCategories;
+    } catch (e) {
+      log('error getting service types $e');
+      return [];
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final screens = [
-      ServicesList(
-        userID: userID,
-      ),
-      IndivChat(
-        userName: userName,
-      ),
-      BookingScreen(
-        userID: userID,
-        username: userName,
-      ),
-    ];
-
     return Scaffold(
-        appBar: AppBar(
-          backgroundColor: kPrimaryColor,
-          foregroundColor: kPrimaryLightColor,
+      appBar: AppBar(
+        backgroundColor: kPrimaryColor,
+        foregroundColor: kPrimaryLightColor,
+      ),
+      body: Stack(children: [
+        Container(
+          color: kPrimaryColor,
+          height: 100,
         ),
-        body: Stack(children: [
-          Container(
-            color: kPrimaryColor,
-            height: 100,
-          ),
-          FutureBuilder<WorkerDetailsCard>(
-              future: getWorkerDetailsCard(userID),
-              builder: (context, AsyncSnapshot<WorkerDetailsCard> snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                }
+        FutureBuilder<WorkerDetailsCard>(
+            future: getWorkerDetailsCard(userID),
+            builder: (context, AsyncSnapshot<WorkerDetailsCard> snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              }
 
-                if (snapshot.hasError) {
-                  return Center(child: Text('Error: ${snapshot.error}'));
-                }
+              if (snapshot.hasError) {
+                return Center(child: Text('Error: ${snapshot.error}'));
+              }
 
-                if (!snapshot.hasData || snapshot.data == null) {
-                  return const Text('No data available');
-                }
+              if (!snapshot.hasData || snapshot.data == null) {
+                return const Text('No data available');
+              }
 
-                final clientData = snapshot.data!;
+              final clientData = snapshot.data!;
 
-                return Padding(
-                  padding: const EdgeInsets.all(defaultPadding),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      const SizedBox(
-                        height: defaultPadding,
-                      ),
-                      Row(
-                        children: [
-                          Image.asset(
-                            'assets/images/suzy.jpg',
-                            width: 100,
-                            height: 100,
-                          ),
-                          Expanded(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Text(
-                                  clientData.name,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 20,
-                                  ),
+              return Padding(
+                padding: const EdgeInsets.all(defaultPadding),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: defaultPadding),
+                    Row(
+                      children: [
+                        clientData.profileimage!.isEmpty
+                            ? const CircleAvatar(
+                                radius: 50,
+                                child: Text(
+                                  'Profile Picture',
+                                  style: TextStyle(fontSize: 12),
+                                  textAlign: TextAlign.center,
                                 ),
-                                CategoriesRow(itemList: clientData.categories),
-                                Wrap(
-                                    crossAxisAlignment:
-                                        WrapCrossAlignment.start,
-                                    children: [
-                                      const Icon(Icons.location_on_outlined),
-                                      Text(
-                                        clientData.address,
-                                      )
-                                    ]),
-                                const Wrap(children: [
-                                  Icon(Icons.work_outline),
-                                  Text('Works at')
-                                ]),
-                                ElevatedButton(
-                                    onPressed: () {},
-                                    child: const Text('More Information'))
-                              ],
-                            ),
+                              )
+                            : CircleAvatar(
+                                radius: 50,
+                                backgroundImage:
+                                    NetworkImage(clientData.profileimage!),
+                              ),
+                        Expanded(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Text(
+                                clientData.name,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20,
+                                ),
+                              ),
+                              CategoriesRow(itemList: clientData.categories),
+                              Wrap(
+                                  crossAxisAlignment: WrapCrossAlignment.start,
+                                  children: [
+                                    const Icon(Icons.location_on_outlined),
+                                    Text(
+                                      clientData.address,
+                                    )
+                                  ]),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
+                                children: [
+                                  SizedBox(
+                                    width: 135,
+                                    child: ElevatedButton(
+                                        style: const ButtonStyle(
+                                          backgroundColor:
+                                              MaterialStatePropertyAll(
+                                                  kPrimaryLightColor),
+                                          foregroundColor:
+                                              MaterialStatePropertyAll(
+                                                  kPrimaryColor),
+                                        ),
+                                        onPressed: () {
+                                          Navigator.push(context,
+                                              MaterialPageRoute(
+                                            builder: (context) {
+                                              return IndivChat(
+                                                  userName: userName);
+                                            },
+                                          ));
+                                        },
+                                        child: const Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceAround,
+                                          children: [
+                                            Icon(
+                                              Icons.chat,
+                                              size: 16,
+                                            ),
+                                            Text('Chat Now')
+                                          ],
+                                        )),
+                                  ),
+                                  SizedBox(
+                                    width: 135,
+                                    child: ElevatedButton(
+                                        style: const ButtonStyle(
+                                            foregroundColor:
+                                                MaterialStatePropertyAll(
+                                                    kPrimaryLightColor)),
+                                        onPressed: () {
+                                          Navigator.push(context,
+                                              MaterialPageRoute(
+                                            builder: (context) {
+                                              return BookingScreen(
+                                                userID: userID,
+                                                username: userName,
+                                              );
+                                            },
+                                          ));
+                                        },
+                                        child: const Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceAround,
+                                          children: [
+                                            Icon(
+                                              Icons.post_add,
+                                              size: 16,
+                                            ),
+                                            Text('Book Now')
+                                          ],
+                                        )),
+                                  )
+                                ],
+                              )
+                            ],
                           ),
-                        ],
+                        ),
+                      ],
+                    ),
+                    //
+                    RatingBar.builder(
+                      allowHalfRating: true,
+                      ignoreGestures: true,
+                      initialRating: double.parse(clientData.rating!),
+                      maxRating: 5,
+                      minRating: 0,
+                      itemBuilder: (context, index) => const Icon(
+                        Icons.star,
+                        color: Colors.amber,
                       ),
-                      const Text('Feedbacks section below')
-                    ],
-                  ),
-                );
-              }),
-        ]),
-        bottomNavigationBar: NavigationBarTheme(
-          data: NavigationBarThemeData(
-              height: 80,
-              indicatorColor: kPrimaryColor,
-              labelTextStyle: MaterialStateProperty.all(
-                  const TextStyle(fontSize: 14, fontWeight: FontWeight.w500))),
-          child: NavigationBar(
-              onDestinationSelected: (index) {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: ((context) => screens[index])));
-              },
-              destinations: const [
-                NavigationDestination(
-                    icon: LineIcon.servicestack(),
-                    label: 'Services',
-                    selectedIcon:
-                        LineIcon.servicestack(color: kLoysPrimaryIconColor)),
-                NavigationDestination(
-                    icon: Icon(Icons.chat_outlined),
-                    label: 'Chat Now',
-                    selectedIcon:
-                        Icon(Icons.chat, color: kLoysPrimaryIconColor)),
-                NavigationDestination(
-                    icon: LineIcon.calendarPlus(),
-                    label: 'Book Now',
-                    selectedIcon:
-                        LineIcon.calendarPlusAlt(color: kLoysPrimaryIconColor)),
-              ]),
-        ));
+                      onRatingUpdate: (value) => {},
+                    ),
+                    Expanded(
+                      child: FutureBuilder<List<String>>(
+                          future: getServiceCategories(),
+                          builder: (context, serviceType) {
+                            if (serviceType.hasData) {
+                              return ListView.separated(
+                                itemCount: serviceType.data!.length,
+                                shrinkWrap: true,
+                                itemBuilder: (context, serviceTypeIndex) {
+                                  return Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        serviceType.data![serviceTypeIndex],
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                      FutureBuilder(
+                                        future: getServices(
+                                            serviceType.data![serviceTypeIndex],
+                                            clientData.id),
+                                        builder: (context, service) {
+                                          if (service.hasData) {
+                                            return ListView.builder(
+                                              shrinkWrap: true,
+                                              physics:
+                                                  const NeverScrollableScrollPhysics(),
+                                              itemCount: service.data!.length,
+                                              itemBuilder:
+                                                  (context, serviceIndex) {
+                                                return Text(service
+                                                    .data![serviceIndex]
+                                                    .serviceName);
+                                              },
+                                            );
+                                          } else {
+                                            return const Text('LOADING...');
+                                          }
+                                        },
+                                      ),
+                                    ],
+                                  );
+                                },
+                                separatorBuilder: (context, index) =>
+                                    const Divider(),
+                              );
+                            } else {
+                              return const Text('LOADING...');
+                            }
+                          }),
+                    ),
+                  ],
+                ),
+              );
+            }),
+      ]),
+    );
   }
 }
 
@@ -203,6 +318,7 @@ class CategoriesRow extends StatelessWidget {
           itemList.length,
           (index) => Container(
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+            margin: const EdgeInsets.only(left: 4),
             decoration: BoxDecoration(
                 color: Colors.purple[100],
                 borderRadius: BorderRadius.circular(100)),
