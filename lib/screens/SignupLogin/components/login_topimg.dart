@@ -24,7 +24,7 @@ class LoginScreenTopImage extends StatelessWidget {
               child: SvgPicture.asset(
                 'assets/svg/login.svg',
                 height: 260,
-                width: 316,
+                width: 280,
               ),
             ),
           ],

@@ -1,3 +1,6 @@
+
+import 'package:customer/components/already_have_an_account_check.dart';
+import 'package:customer/components/assets_strings.dart';
 import 'package:customer/components/background.dart';
 import 'package:customer/components/form_container_widget.dart';
 import 'package:customer/components/constants.dart';
@@ -7,6 +10,7 @@ import 'package:customer/screens/SignupLogin/components/login_topimg.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:customer/user_auth/firebase_auth_implementation/firebase_auth_services.dart';
+import 'package:toastification/toastification.dart';
 
 //loys' code
 class LoginScreen extends StatefulWidget {
@@ -39,11 +43,31 @@ class _LoginScreenState extends State<LoginScreen> {
       try {
         await FirebaseAuth.instance.signInWithEmailAndPassword(
             email: email.trim(), password: password.trim());
+
+        toastification.show(
+            type: ToastificationType.success,
+            context: context,
+            icon: Icon(Icons.check_circle),
+            title: Text('User successfully logged in!'),
+            autoCloseDuration: const Duration(seconds: 3),
+            showProgressBar: false,
+            alignment: Alignment.topCenter,
+            style: ToastificationStyle.fillColored);
+
         print("User successfully LOGGED IN");
         // Navigator.pushNamed(context, "/home");
         Navigator.push(context,
             MaterialPageRoute(builder: ((context) => const CustMainScreen())));
       } catch (e) {
+        toastification.show(
+            type: ToastificationType.error,
+            context: context,
+            icon: Icon(Icons.error),
+            title: Text('User not found!'),
+            autoCloseDuration: const Duration(seconds: 3),
+            showProgressBar: false,
+            alignment: Alignment.topCenter,
+            style: ToastificationStyle.fillColored);
         print(e);
       }
     } else {
@@ -118,13 +142,58 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: const Text(
                           "Sign Up",
                           style: TextStyle(
-                              color: kPrimaryColor,
-                              fontWeight: FontWeight.bold),
+                            color: Colors.white,
+                            fontSize: 13,
+                            fontFamily: 'Inter',
+                            fontWeight: FontWeight.w500,
+                          ),
+                        )),
+                      ),
+                    ),
+                    SizedBox(height: 5),
+                    Text('OR'),
+                    SizedBox(height: 5),
+                    SizedBox(
+                        width: double.infinity,
+                        height: 60,
+                        child: OutlinedButton.icon(
+                            style: OutlinedButton.styleFrom(
+                              side: BorderSide(color: kPrimaryColor),
+                            ),
+                            onPressed: () {},
+                            icon: Image(
+                              image: AssetImage(GoogleLogoImg),
+                              width: 20.0,
+                            ),
+                            label: Text('Sign-in with Google'))),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text("Don't have an account?"),
+                        SizedBox(
+                          width: 5,
                         ),
-                      )
-                    ],
-                  )
-                ],
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: ((context) => CustSignUp())));
+                          },
+                          child: Text(
+                            "Sign Up",
+                            style: TextStyle(
+                                color: kPrimaryColor,
+                                fontWeight: FontWeight.bold),
+                          ),
+                        )
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

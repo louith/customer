@@ -1,7 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:customer/components/assets_strings.dart';
 import 'package:customer/components/constants.dart';
 import 'package:customer/components/widgets.dart';
 import 'package:customer/screens/Homescreen/MainScreen.dart';
+import 'package:customer/screens/WelcomeScreen/CustWelcomeScreen.dart';
 import 'package:customer/screens/customerProfile/custprofile.dart';
+import 'package:customer/screens/customerProfile/editProfile.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:line_icons/line_icons.dart';
@@ -16,6 +20,7 @@ class MyProfile extends StatefulWidget {
 class _MyProfileState extends State<MyProfile> {
   User? _user;
   String currUserEmail = '';
+  String currUserID = '';
 
   @override
   void initState() {
@@ -28,8 +33,24 @@ class _MyProfileState extends State<MyProfile> {
       setState(() {
         _user = user;
         currUserEmail = _user!.email!;
+        currUserID = _user!.uid;
       });
     });
+  }
+
+  Future<String> getUsername() async {
+    DocumentSnapshot<Map<String, dynamic>> userDoc = await FirebaseFirestore
+        .instance
+        .collection('users')
+        .doc(currUserID)
+        .get();
+
+    return userDoc.data()!['Username'];
+  }
+
+  void signUserOut() {
+    FirebaseAuth.instance.signOut();
+    Navigator.popAndPushNamed(context, '/');
   }
 
   @override
@@ -49,92 +70,104 @@ class _MyProfileState extends State<MyProfile> {
         ),
       ),
       body: SingleChildScrollView(
-        child: Container(
-          padding: const EdgeInsets.all(defaultPadding),
-          child: Column(
-            children: [
-              SizedBox(
-                width: 120,
-                height: 120,
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(100),
-                  child: const Image(image: AssetImage(suzyImg)),
-                ),
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              Text(
-                // _user != null ? _user!.uid : 'No user found',
-                'NAME',
-                style: Theme.of(context).textTheme.headlineSmall,
-              ),
-              Text(
-                _user != null ? currUserEmail : 'No user found',
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-              SizedBox(
-                  width: 200,
-                  child: elevButton(
-                      title: 'Edit Profile',
-                      onClicked: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: ((context) => const AfterSignup())));
-                      })),
-              const SizedBox(
-                height: 30,
-              ),
-              const Divider(),
-              const SizedBox(
-                height: 10,
-              ),
-
-              //Menu
-              ProfileMenuWidget(
-                title: 'My Addresses',
-                icon: LineIcons.locationArrow,
-                onPress: () {},
-              ),
-              ProfileMenuWidget(
-                title: 'Settings',
-                icon: LineIcons.cog,
-                onPress: () {},
-              ),
-              ProfileMenuWidget(
-                title: 'Billing Details',
-                icon: LineIcons.wallet,
-                onPress: () {},
-              ),
-              ProfileMenuWidget(
-                title: 'Booking Transactions',
-                icon: LineIcons.calendar,
-                onPress: () {},
-              ),
-
-              const Divider(),
-              const SizedBox(
-                height: 10,
-              ),
-              Container(
-                width: double.infinity,
-                decoration: BoxDecoration(
-                    color: kPrimaryColor.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(20)),
-                child: ProfileMenuWidget(
-                  title: 'Logout',
-                  icon: LineIcons.alternateSignOut,
-                  endIcon: false,
-                  onPress: () {},
-                ),
-              ),
-            ],
-          ),
-        ),
+        child: StreamBuilder(
+            stream: Stream.fromFuture(getUsername()),
+            builder: (context, snapshot) {
+              if (!snapshot.hasData) {
+                return Center(child: CircularProgressIndicator());
+              } else {
+                String username = snapshot.data!;
+                return Container(
+                  padding: EdgeInsets.all(defaultPadding),
+                  child: Column(
+                    children: [
+                      SizedBox(
+                        width: 120,
+                        height: 120,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(150),
+                          child:
+                              const Image(image: AssetImage(DefaultProfilePic)),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Text(
+                        // _user != null ? _user!.uid : 'No user found',
+                        username,
+                        style: TextStyle(
+                            fontSize: 20,
+                            color: Colors.black87,
+                            fontWeight: FontWeight.w700),
+                      ),
+                      Text(
+                        _user != null ? currUserEmail : 'No user found',
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                      SizedBox(
+                        height: 20,
+                      ),
+                      SizedBox(
+                          width: 200,
+                          child: elevButton(
+                              title: 'Edit Profile',
+                              onClicked: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: ((context) => EditProfile())));
+                                //separate page na dapat na naga fetch ug data from db
+                              })),
+                      SizedBox(
+                        height: 30,
+                      ),
+                      Divider(),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      //Menu
+                      ProfileMenuWidget(
+                        title: 'My Addresses',
+                        icon: LineIcons.locationArrow,
+                        onPress: () {},
+                      ),
+                      ProfileMenuWidget(
+                        title: 'Settings',
+                        icon: LineIcons.cog,
+                        onPress: () {},
+                      ),
+                      ProfileMenuWidget(
+                        title: 'Billing Details',
+                        icon: LineIcons.wallet,
+                        onPress: () {},
+                      ),
+                      ProfileMenuWidget(
+                        title: 'Booking Transactions',
+                        icon: LineIcons.calendar,
+                        onPress: () {},
+                      ),
+                      Divider(),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Container(
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                            color: kPrimaryColor.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(20)),
+                        child: ProfileMenuWidget(
+                          title: 'Logout',
+                          icon: LineIcons.alternateSignOut,
+                          endIcon: false,
+                          onPress: signUserOut,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }
+            }),
       ),
     );
   }

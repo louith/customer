@@ -49,6 +49,8 @@ dependencies:
   provider: ^6.1.2
   persistent_bottom_nav_bar: ^5.0.2
   flutter_rating_bar: ^4.0.1
+  get: ^4.6.6
+  toastification: ^1.2.1
 
 dev_dependencies:
   flutter_test:
@@ -89,6 +91,7 @@ flutter:
     - assets/svg/
     - assets/splash/
     - assets/ServiceCategories/
+    - assets/logo/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

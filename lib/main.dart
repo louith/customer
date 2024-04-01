@@ -1,5 +1,7 @@
 import 'package:customer/components/constants.dart';
 import 'package:customer/screens/Booking/EditEventComponents/event_provider.dart';
+import 'package:customer/screens/Homescreen/MainScreen.dart';
+import 'package:customer/screens/SignupLogin/Login.dart';
 import 'package:customer/screens/WelcomeScreen/CustWelcomeScreen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
@@ -24,43 +26,49 @@ class MyApp extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (context) => EventProvider(),
       child: MaterialApp(
-          debugShowCheckedModeBanner: false,
-          title: 'PampHere',
-          theme: ThemeData(
-            textTheme: TextTheme(
-                displayMedium: GoogleFonts.inter(
-                    fontWeight: FontWeight.bold, color: kPrimaryLightColor),
-                bodyLarge: GoogleFonts.inter()),
-            fontFamily: 'Inter',
-            primaryColor: kPrimaryColor,
-            scaffoldBackgroundColor: Colors.white,
-            elevatedButtonTheme: ElevatedButtonThemeData(
-                style: ElevatedButton.styleFrom(
-              elevation: 0,
-              backgroundColor: kPrimaryColor,
-              shape: const StadiumBorder(),
-              maximumSize: const Size(double.infinity, 56),
-              minimumSize: const Size(double.infinity, 56),
-            )),
-            inputDecorationTheme: const InputDecorationTheme(
-              errorStyle: TextStyle(color: Colors.red),
-              errorBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.red),
-              ),
-              filled: true,
-              fillColor: kPrimaryLightColor,
-              iconColor: kPrimaryColor,
-              prefixIconColor: kPrimaryColor,
-              contentPadding: EdgeInsets.symmetric(
-                  horizontal: defaultPadding, vertical: defaultPadding),
-              border: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(30)),
-                  borderSide: BorderSide.none),
+        debugShowCheckedModeBanner: false,
+        title: 'PampHere',
+        theme: ThemeData(
+          textTheme: TextTheme(
+              displayMedium: GoogleFonts.inter(
+                  fontWeight: FontWeight.bold, color: kPrimaryLightColor),
+              bodyLarge: GoogleFonts.inter()),
+          fontFamily: 'Inter',
+          primaryColor: kPrimaryColor,
+          scaffoldBackgroundColor: Colors.white,
+          elevatedButtonTheme: ElevatedButtonThemeData(
+              style: ElevatedButton.styleFrom(
+            elevation: 0,
+            backgroundColor: kPrimaryColor,
+            shape: const StadiumBorder(),
+            maximumSize: const Size(double.infinity, 56),
+            minimumSize: const Size(double.infinity, 56),
+          )),
+          inputDecorationTheme: const InputDecorationTheme(
+            errorStyle: TextStyle(color: Colors.red),
+            errorBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: Colors.red),
             ),
+            filled: true,
+            fillColor: kPrimaryLightColor,
+            iconColor: kPrimaryColor,
+            prefixIconColor: kPrimaryColor,
+            contentPadding: EdgeInsets.symmetric(
+                horizontal: defaultPadding, vertical: defaultPadding),
+            border: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(30)),
+                borderSide: BorderSide.none),
           ),
+        ),
 
-          //legit first page
-          home: const CustWelcome()),
+        //legit first page
+        // home: '/',
+        initialRoute: '/',
+        routes: {
+          '/': (context) => CustWelcome(),
+          '/login': (context) => LoginScreen(),
+        },
+      ),
     );
   }
 }
