@@ -1,5 +1,6 @@
+import 'package:customer/components/constants.dart';
 import 'package:customer/screens/FreelancerCategoryScreens/components/getVerified.dart';
-import 'package:customer/screens/indivProfile/indivWorkerProfile.dart';
+import 'package:customer/screens/indivProfile/indiv_profile.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -72,14 +73,17 @@ class _LashesFreelancersState extends State<LashesFreelancers> {
       stream: Stream.fromFuture(getLashes()), // Convert the Future to a Stream
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
-          return Text('loading');
+          return const Center(
+              child: CircularProgressIndicator(
+            color: kPrimaryColor,
+          ));
         } else {
           List<LashesWorkerCard> lashWorkers = snapshot.data!;
           return ListView.builder(
               itemCount: lashWorkers.length,
               itemBuilder: (context, index) {
                 return Container(
-                  margin: EdgeInsets.fromLTRB(0, 0, 0, 4),
+                  margin: const EdgeInsets.fromLTRB(0, 0, 0, 4),
                   decoration: const BoxDecoration(
                     color: Colors.white,
                     //boxshadow code/styling
@@ -104,7 +108,7 @@ class _LashesFreelancersState extends State<LashesFreelancers> {
                             style: const TextStyle(fontWeight: FontWeight.w300))
                       ],
                     ),
-                    shape: RoundedRectangleBorder(),
+                    shape: const RoundedRectangleBorder(),
                     onTap: () {
                       Navigator.push(
                         context,
@@ -137,7 +141,7 @@ class SubCategoriesRow extends StatelessWidget {
         children: List.generate(
           itemList.length,
           (index) => Container(
-            padding: EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
             decoration: BoxDecoration(
                 color: Colors.purple[100],
                 borderRadius: BorderRadius.circular(100)),

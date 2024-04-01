@@ -1,8 +1,5 @@
-import 'dart:developer';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:customer/components/constants.dart';
-import 'package:customer/screens/FreelancerCategoryScreens/components/getVerified.dart';
 import 'package:customer/screens/ServicesOffered/specificServices.dart';
 import 'package:flutter/material.dart';
 
@@ -39,8 +36,8 @@ class _ServicesListState extends State<ServicesList> {
               onPressed: () {
                 Navigator.pop(context);
               },
-              icon: Icon(Icons.arrow_back_ios)),
-          title: Text(
+              icon: const Icon(Icons.arrow_back_ios)),
+          title: const Text(
             'Services Offered',
             style: TextStyle(color: kPrimaryLightColor),
           ),
@@ -49,12 +46,12 @@ class _ServicesListState extends State<ServicesList> {
             stream: Stream.fromFuture(getServiceCategories()),
             builder: (context, snapshot) {
               if (!snapshot.hasData || snapshot.data == null) {
-                return Center(
+                return const Center(
                   child: Text('No data found'),
                 );
               }
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return Center(
+                return const Center(
                     child: CircularProgressIndicator(
                   color: kPrimaryColor,
                 ));
@@ -62,13 +59,13 @@ class _ServicesListState extends State<ServicesList> {
 
               var serviceCategories = snapshot.data!;
               return Padding(
-                padding: EdgeInsets.all(defaultPadding),
+                padding: const EdgeInsets.all(defaultPadding),
                 child: ListView.builder(
                     itemCount: serviceCategories.length,
                     itemBuilder: (context, index) {
                       return Container(
                         width: double.infinity,
-                        margin: EdgeInsets.fromLTRB(0, 0, 0, 16),
+                        margin: const EdgeInsets.fromLTRB(0, 0, 0, 16),
                         decoration: const BoxDecoration(
                             color: Colors.white,
                             boxShadow: [
@@ -84,7 +81,7 @@ class _ServicesListState extends State<ServicesList> {
                             ),
                         child: ListTile(
                           hoverColor: kPrimaryLightColor,
-                          shape: RoundedRectangleBorder(),
+                          shape: const RoundedRectangleBorder(),
                           title: Column(
                             children: [
                               if (serviceCategories[index] == 'Hair' ||

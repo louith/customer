@@ -41,7 +41,7 @@ class _AfterSignupState extends State<AfterSignup> {
           leading: IconButton(
               onPressed: () {
                 Navigator.push(context,
-                    MaterialPageRoute(builder: ((context) => MyProfile())));
+                    MaterialPageRoute(builder: ((context) => const MyProfile())));
               },
               icon: const Icon(Icons.arrow_back)),
           title: const Text(
@@ -210,20 +210,19 @@ class _CustProfileState extends State<CustProfile> {
     _username.dispose();
     super.dispose();
   }
-
   String dropdownvalue = 'Male';
   List<String> items = ['Male', 'Female', 'Rather not say'];
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
-    return Container(
+    return SizedBox(
       height: screenHeight,
       width: screenWidth,
       child: Scrollbar(
         child: SingleChildScrollView(
             scrollDirection: Axis.vertical,
-            padding: EdgeInsets.all(defaultPadding),
+            padding: const EdgeInsets.all(defaultPadding),
             child: Column(children: [
               Text(
                 'Customer Profile'.toUpperCase(),
@@ -263,7 +262,7 @@ class _CustProfileState extends State<CustProfile> {
                 child: Form(
                     key: _formKey,
                     child: Column(children: [
-                      SizedBox(
+                      const SizedBox(
                         height: defaultformspacing,
                       ),
                       Column(
@@ -282,7 +281,7 @@ class _CustProfileState extends State<CustProfile> {
                                   : null),
                         ],
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: defaultformspacing,
                       ),
                       Column(
@@ -301,7 +300,7 @@ class _CustProfileState extends State<CustProfile> {
                                   : null),
                         ],
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: defaultformspacing,
                       ),
                       Column(
@@ -320,28 +319,28 @@ class _CustProfileState extends State<CustProfile> {
                                   : null),
                         ],
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: defaultformspacing,
                       ),
                       DropdownButtonFormField(
                         // dropdownColor: kPrimaryColor.withOpacity(.35),
-                        hint: Text("Gender"),
+                        hint: const Text("Gender"),
                         decoration: InputDecoration(
                             fillColor: kPrimaryColor.withOpacity(0.35),
                             filled: true,
-                            focusedBorder: OutlineInputBorder(
+                            focusedBorder: const OutlineInputBorder(
                                 borderSide: BorderSide(color: Colors.white)),
                             enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10),
-                              borderSide: BorderSide(
+                              borderSide: const BorderSide(
                                 color: kPrimaryColor,
                                 width: 1,
                               ),
                             )),
 
-                        style: TextStyle(color: Colors.black45),
+                        style: const TextStyle(color: Colors.black45),
                         value: dropdownvalue,
-                        icon: Icon(Icons.keyboard_arrow_down),
+                        icon: const Icon(Icons.keyboard_arrow_down),
                         items: items.map((String items) {
                           return DropdownMenuItem(
                             value: items,
@@ -355,7 +354,7 @@ class _CustProfileState extends State<CustProfile> {
                           });
                         },
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: defaultformspacing,
                       ),
                       Column(
@@ -374,7 +373,7 @@ class _CustProfileState extends State<CustProfile> {
                                   : null),
                         ],
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: defaultformspacing,
                       ),
                       Column(
@@ -393,14 +392,14 @@ class _CustProfileState extends State<CustProfile> {
                                   : null),
                         ],
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 25,
                       ),
                       Text(
                         'Address'.toUpperCase(),
                         // style: TextStyle(fontSize: defTitleFontSize),
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 10,
                       ),
                       Column(
@@ -419,7 +418,7 @@ class _CustProfileState extends State<CustProfile> {
                                   : null),
                         ],
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: defaultformspacing,
                       ),
                       Column(
@@ -438,7 +437,7 @@ class _CustProfileState extends State<CustProfile> {
                                   : null),
                         ],
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: defaultformspacing,
                       ),
                       Column(
@@ -457,7 +456,7 @@ class _CustProfileState extends State<CustProfile> {
                                   : null),
                         ],
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: defaultformspacing,
                       ),
                       Column(
@@ -478,14 +477,14 @@ class _CustProfileState extends State<CustProfile> {
                                   : null),
                         ],
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 25,
                       ),
                       Text(
                         'Login Information'.toUpperCase(),
                         // style: TextStyle(fontSize: defTitleFontSize),
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 10,
                       ),
                       // Text(widget.email),
@@ -505,7 +504,7 @@ class _CustProfileState extends State<CustProfile> {
                                   : null),
                         ],
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: defaultformspacing,
                       ),
                       Column(
@@ -524,7 +523,7 @@ class _CustProfileState extends State<CustProfile> {
                                   : null),
                         ],
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 30,
                       ),
                       ElevatedButton(

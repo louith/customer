@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:customer/components/assets_strings.dart';
 import 'package:customer/components/constants.dart';
 import 'package:customer/components/widgets.dart';
-import 'package:customer/screens/Homescreen/Homescreen.dart';
 import 'package:customer/screens/Homescreen/MainScreen.dart';
 import 'package:customer/screens/WelcomeScreen/CustWelcomeScreen.dart';
 import 'package:customer/screens/customerProfile/custprofile.dart';
@@ -63,10 +62,10 @@ class _MyProfileState extends State<MyProfile> {
         leading: IconButton(
             onPressed: () {
               Navigator.push(context,
-                  MaterialPageRoute(builder: ((context) => CustMainScreen())));
+                  MaterialPageRoute(builder: ((context) => const CustMainScreen())));
             },
-            icon: Icon(LineIcons.angleLeft)),
-        title: Text(
+            icon: const Icon(LineIcons.angleLeft)),
+        title: const Text(
           'My Profile',
         ),
       ),
@@ -217,7 +216,7 @@ class ProfileMenuWidget extends StatelessWidget {
               decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(100),
                   color: kPrimaryColor.withOpacity(0.1)),
-              child: Icon(LineIcons.angleRight, size: 18, color: kPrimaryColor),
+              child: const Icon(LineIcons.angleRight, size: 18, color: kPrimaryColor),
             )
           : null,
     );

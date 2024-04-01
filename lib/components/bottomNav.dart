@@ -18,7 +18,7 @@ class BottomNavBar extends StatefulWidget {
 
 class _BottomNavBarState extends State<BottomNavBar> {
   int index = 0;
-  final screens = [CustHome(), Center(child: Text('CHAT YWERDS')), MyProfile()];
+  final screens = [const CustHome(), const Center(child: Text('CHAT YWERDS')), const MyProfile()];
   @override
   Widget build(BuildContext context) {
     return NavigationBarTheme(

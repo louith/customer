@@ -1,10 +1,9 @@
 import 'dart:async';
-import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:customer/components/constants.dart';
 import 'package:customer/screens/FreelancerCategoryScreens/components/getVerified.dart';
-import 'package:customer/screens/indivProfile/indivWorkerProfile.dart';
+import 'package:customer/screens/indivProfile/indiv_profile.dart';
 import 'package:flutter/material.dart';
 
 final db = FirebaseFirestore.instance;
@@ -21,9 +20,6 @@ class WorkerCard {
       required this.address,
       required this.subcategories});
 }
-
-// List<dynamic> hairSubCats = [];
-// List<dynamic> hairList = [];
 
 class HairFreelancers extends StatefulWidget {
   const HairFreelancers({super.key});
@@ -84,7 +80,7 @@ class _HairFreelancersState extends State<HairFreelancers> {
       stream: Stream.fromFuture(getHairs()), // Convert the Future to a Stream
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
-          return Center(
+          return const Center(
               child: CircularProgressIndicator(
             color: kPrimaryColor,
           ));
@@ -94,7 +90,7 @@ class _HairFreelancersState extends State<HairFreelancers> {
               itemCount: hairWorkers.length,
               itemBuilder: (context, index) {
                 return Container(
-                  margin: EdgeInsets.fromLTRB(0, 0, 0, 4),
+                  margin: const EdgeInsets.fromLTRB(0, 0, 0, 4),
                   decoration: const BoxDecoration(
                     color: Colors.white,
                     //boxshadow code/styling
@@ -121,7 +117,7 @@ class _HairFreelancersState extends State<HairFreelancers> {
                         // Text(hairWorkers[index].id.toString())
                       ],
                     ),
-                    shape: RoundedRectangleBorder(),
+                    shape: const RoundedRectangleBorder(),
                     onTap: () {
                       Navigator.push(
                         context,
@@ -154,7 +150,7 @@ class SubCategoriesRow extends StatelessWidget {
         children: List.generate(
           itemList.length,
           (index) => Container(
-            padding: EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
             decoration: BoxDecoration(
                 color: Colors.purple[100],
                 borderRadius: BorderRadius.circular(100)),

@@ -1,4 +1,3 @@
-import 'package:customer/screens/Homescreen/Homescreen.dart';
 // import 'package:customer/screens/Homescreen/components/ServiceCategories.dart';00
 import 'package:flutter/material.dart';
 
@@ -10,7 +9,7 @@ class LocationHome extends StatefulWidget {
 }
 
 class _LocationHomeState extends State<LocationHome> {
-  TextEditingController _searchController = TextEditingController();
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +19,7 @@ class _LocationHomeState extends State<LocationHome> {
       // padding: EdgeInsets.fromLTRB(8, 4, 8, 4),
       child: Column(
         children: [
-          Row(children: [
+          const Row(children: [
             Icon(Icons.pin_drop),
             SizedBox(
               width: 16,
@@ -48,17 +47,17 @@ class _LocationHomeState extends State<LocationHome> {
             children: [
               IconButton(
                 onPressed: () {},
-                icon: Icon(Icons.menu),
+                icon: const Icon(Icons.menu),
               ),
-              SizedBox(
+              const SizedBox(
                 width: 10,
               ),
-              Container(
+              SizedBox(
                 height: 40,
                 width: 200,
                 child: TextField(
                   controller: _searchController,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     hintText: 'Search...',
                     border: InputBorder.none,
                   ),

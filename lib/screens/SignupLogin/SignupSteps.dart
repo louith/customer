@@ -1,6 +1,5 @@
 import 'package:customer/screens/SignupLogin/components/ImagePicker.dart';
 import 'package:flutter/material.dart';
-import 'dart:io';
 
 class CustPersonalInfo extends StatefulWidget {
   const CustPersonalInfo({super.key});
@@ -14,7 +13,7 @@ class _CustPersonalInfoState extends State<CustPersonalInfo> {
   Widget build(BuildContext context) {
     return Expanded(
       child: Container(
-          child: Column(
+          child: const Column(
         children: [
           ImgSubmission(),
         ],

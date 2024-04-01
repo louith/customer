@@ -187,7 +187,7 @@ Widget elevButton({
         onPressed: onClicked,
         child: Text(
           title,
-          style: TextStyle(
+          style: const TextStyle(
             color: Colors.white,
             fontSize: 13,
             fontFamily: 'Inter',

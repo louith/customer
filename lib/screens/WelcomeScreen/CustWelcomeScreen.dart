@@ -8,7 +8,7 @@ class CustWelcome extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Background(
+    return const Background(
         child: SingleChildScrollView(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,

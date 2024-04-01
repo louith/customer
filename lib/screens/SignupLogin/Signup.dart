@@ -5,9 +5,6 @@ import 'package:customer/components/already_have_an_account_check.dart';
 import 'package:customer/components/assets_strings.dart';
 import 'package:customer/components/widgets.dart';
 import 'package:customer/components/constants.dart';
-import 'package:customer/main.dart';
-import 'package:customer/screens/Homescreen/Homescreen.dart';
-import 'package:customer/screens/Homescreen/MainScreen.dart';
 import 'package:customer/screens/SignupLogin/Login.dart';
 import 'package:customer/screens/SignupLogin/components/signup_topimg.dart';
 import 'package:customer/screens/customerProfile/custprofile.dart';
@@ -16,7 +13,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:toastification/toastification.dart';
 // import 'package:firebase_auth/';
-import '../../components/background.dart';
 
 //Jasper's code-----------------------------------------
 // class CustSignup extends StatefulWidget {
@@ -122,14 +118,7 @@ import '../../components/background.dart';
 // }
 
 //Loys' code
-import 'package:customer/components/already_have_an_account_check.dart';
-import 'package:customer/components/background.dart';
 import 'package:customer/components/form_container_widget.dart';
-import 'package:customer/components/widgets.dart';
-import 'package:customer/components/constants.dart';
-import 'package:customer/screens/SignupLogin/components/login_topimg.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 //loys' code
 class CustSignUp extends StatefulWidget {
@@ -143,9 +132,9 @@ class _CustSignUpState extends State<CustSignUp> {
   final FirebaseAuthService _auth = FirebaseAuthService();
   final _formKey = GlobalKey<FormState>();
 
-  TextEditingController _usernameController = TextEditingController();
-  TextEditingController _emailController = TextEditingController();
-  TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
 
   @override
   void dispose() {
@@ -212,6 +201,7 @@ class _CustSignUpState extends State<CustSignUp> {
                         )),
                     SizedBox(height: 20),
                     GestureDetector(
+   
                       onTap: _signUp,
                       // () {
                       //   Navigator.push(context,

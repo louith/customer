@@ -33,10 +33,11 @@ class _ImgSubmissionState extends State<ImgSubmission> {
       ElevatedButton(
         style: ElevatedButton.styleFrom(
           foregroundColor: kPrimaryColor,
-          minimumSize: Size.fromHeight(56),
+          minimumSize: const Size.fromHeight(56),
           backgroundColor: kPrimaryLightColor,
-          textStyle: TextStyle(fontSize: 20),
+          textStyle: const TextStyle(fontSize: 20),
         ),
+        onPressed: onClicked,
         child: Row(children: [
           Icon(icon, size: 28),
           const SizedBox(
@@ -44,16 +45,15 @@ class _ImgSubmissionState extends State<ImgSubmission> {
           ),
           Text(title)
         ]),
-        onPressed: onClicked,
       );
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(32),
+      padding: const EdgeInsets.all(32),
       child: Column(
         children: [
-          Spacer(),
+          const Spacer(),
           image != null
               ? Image.file(
                   image!,
@@ -61,13 +61,13 @@ class _ImgSubmissionState extends State<ImgSubmission> {
                   height: 160,
                   fit: BoxFit.cover,
                 )
-              : FlutterLogo(size: 160),
-          SizedBox(height: 24),
+              : const FlutterLogo(size: 160),
+          const SizedBox(height: 24),
           buildButton(
               title: 'Pick from Gallery',
               icon: Icons.image_outlined,
               onClicked: () => pickImage(ImageSource.gallery)),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
           buildButton(
               title: "Open Camera",
               icon: Icons.camera_alt_outlined,

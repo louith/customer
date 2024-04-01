@@ -92,7 +92,7 @@ Future<void> showAlertDialog(
             onPressed: () {
               Navigator.of(context).pop(); // Close the dialog
             },
-            child: Text('OK'),
+            child: const Text('OK'),
           ),
         ],
       );

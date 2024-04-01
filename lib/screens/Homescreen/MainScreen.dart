@@ -4,7 +4,9 @@ import 'package:customer/screens/FreelancerCategoryScreens/allWorkers.dart';
 import 'package:customer/screens/Homescreen/Homescreen.dart';
 // import 'package:customer/screens/Homescreen/components/ServiceCategories.dart';
 import 'package:customer/screens/Homescreen/my_profile.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
 
 class CustMainScreen extends StatefulWidget {
   const CustMainScreen({super.key});
@@ -15,64 +17,116 @@ class CustMainScreen extends StatefulWidget {
 
 class _CustMainScreenState extends State<CustMainScreen> {
   int index = 0;
-  final screens = [CustHome(), AllWorkers(), GeneralChatPage(), MyProfile()];
+
+  PersistentTabController persistentTabController =
+      PersistentTabController(initialIndex: 0);
+
+  void _showBackDialog() {
+    showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Are you sure?'),
+          content: const Text(
+            'Leaving this page will log you out',
+          ),
+          actions: <Widget>[
+            TextButton(
+              style: TextButton.styleFrom(
+                textStyle: Theme.of(context).textTheme.labelLarge,
+              ),
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+            TextButton(
+              style: TextButton.styleFrom(
+                textStyle: Theme.of(context).textTheme.labelLarge,
+              ),
+              child: const Text('Log Out'),
+              onPressed: () async {
+                await FirebaseAuth.instance.signOut();
+                if (mounted) {
+                  Navigator.pop(context);
+                  Navigator.pop(context);
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: screens[index],
-      bottomNavigationBar: NavigationBarTheme(
-        data: NavigationBarThemeData(
-            height: 80,
-            indicatorColor: kPrimaryColor,
-            labelTextStyle: MaterialStateProperty.all(
-                const TextStyle(fontSize: 14, fontWeight: FontWeight.w500))
-            //u can add text style shits din
-            //u can add bg color din
-            ),
-        child: NavigationBar(
-            selectedIndex: index,
-            onDestinationSelected: (index) =>
-                setState(() => this.index = index),
-            backgroundColor: kPrimaryLightColor,
-            destinations: const [
-              NavigationDestination(
-                icon: Icon(
-                  Icons.home_outlined,
-                ),
-                label: 'Home',
-                selectedIcon: Icon(
-                  Icons.home,
-                  color: kLoysPrimaryIconColor,
-                ),
-              ),
-              NavigationDestination(
-                icon: Icon(
-                  Icons.search_outlined,
-                ),
-                label: 'Search',
-                selectedIcon: Icon(
-                  Icons.search_rounded,
-                  color: kLoysPrimaryIconColor,
-                ),
-              ),
-              NavigationDestination(
-                  icon: Icon(Icons.chat_outlined),
-                  label: 'Chat',
-                  selectedIcon: Icon(
-                    Icons.chat,
-                    color: kLoysPrimaryIconColor,
-                  )),
-              NavigationDestination(
-                  icon: Icon(
-                    Icons.person_2_outlined,
-                  ),
-                  label: 'My Profile',
-                  selectedIcon: Icon(
-                    Icons.person_2,
-                    color: kLoysPrimaryIconColor,
-                  )),
-            ]),
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (didPop) {
+        if (didPop) {
+          return;
+        }
+        _showBackDialog();
+      },
+      child: Scaffold(
+        bottomNavigationBar: PersistentTabView(
+          context,
+          controller: persistentTabController,
+          stateManagement: true,
+          screens: screens(),
+          items: navbarItems(),
+          confineInSafeArea: true,
+          hideNavigationBarWhenKeyboardShows: true,
+          decoration: NavBarDecoration(
+            borderRadius: BorderRadius.circular(10),
+            colorBehindNavBar: Colors.white,
+          ),
+          screenTransitionAnimation: const ScreenTransitionAnimation(
+              animateTabTransition: true,
+              curve: Curves.ease,
+              duration: Duration(milliseconds: 100)),
+          navBarStyle: NavBarStyle.style9,
+        ),
       ),
     );
   }
+
+  List<Widget> screens() {
+    return [
+      const CustHome(),
+      const AllWorkers(),
+      const GeneralChatPage(),
+      const MyProfile(),
+    ];
+  }
+}
+
+List<PersistentBottomNavBarItem> navbarItems() {
+  return [
+    PersistentBottomNavBarItem(
+      icon: const Icon(Icons.home),
+      title: 'Home',
+      activeColorPrimary: kPrimaryColor,
+      inactiveColorPrimary: kPrimaryLightColor,
+    ),
+    PersistentBottomNavBarItem(
+      icon: const Icon(Icons.search),
+      title: 'Search',
+      activeColorPrimary: kPrimaryColor,
+      inactiveColorPrimary: kPrimaryLightColor,
+    ),
+    PersistentBottomNavBarItem(
+      icon: const Icon(Icons.chat),
+      title: 'Chat',
+      activeColorPrimary: kPrimaryColor,
+      inactiveColorPrimary: kPrimaryLightColor,
+    ),
+    PersistentBottomNavBarItem(
+      icon: const Icon(Icons.person),
+      title: 'Profile',
+      activeColorPrimary: kPrimaryColor,
+      inactiveColorPrimary: kPrimaryLightColor,
+    ),
+  ];
 }

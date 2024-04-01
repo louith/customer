@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:customer/components/constants.dart';
 import 'package:customer/screens/ServicesOffered/IndivService.dart';
@@ -59,7 +61,7 @@ class _SpecificServicesState extends State<SpecificServices> {
     return Service(name: widget.serviceCategory, subservices: subServices);
   }
 
-  Future<List<Service>> getServices() async {
+  Future<List<Service>> getServiceType() async {
     final QuerySnapshot servicesQuery = await db
         .collection('users')
         .doc(widget.userID)
@@ -83,57 +85,39 @@ class _SpecificServicesState extends State<SpecificServices> {
         foregroundColor: kPrimaryLightColor,
       ),
       body: StreamBuilder(
-          stream: Stream.fromFuture(getServices()),
-          builder: (context, snapshot) {
-            if (!snapshot.hasData) {
-              return Center(
+          stream: Stream.fromFuture(getServiceType()),
+          builder: (context, servicetype) {
+            if (!servicetype.hasData) {
+              return const Center(
                   child: CircularProgressIndicator(color: kPrimaryColor));
             } else {
-              List<Service> serve = snapshot.data!;
-
-              return Padding(
-                padding: const EdgeInsets.all(defaultPadding),
-                child: ListView.builder(
-                    itemCount: serve.length,
-                    itemBuilder: (context, index) {
-                      return Container(
-                        margin: EdgeInsets.fromLTRB(0, 0, 0, 16),
-                        decoration: const BoxDecoration(
-                            color: Colors.white,
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black12,
-                                spreadRadius: 2,
-                                blurRadius: 5,
-                                offset: Offset(0, 3), // changes po
-                              ),
-                            ]
-                            //boxshadow code/styling
-                            ),
-                        child: ListTile(
-                          onTap: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => IndivServicePage(
-                                        subserviceID: serve[index]
-                                            .subservices[index]
-                                            .subService)));
-                          },
-                          title: Column(children: [
-                            Text(
-                              serve[index].subservices[index].subService,
-                              style: TextStyle(
-                                  fontSize: 20, fontWeight: FontWeight.bold),
-                            ),
-                            Text(serve[index].subservices[index].duration),
-                            Text(
-                                'Php ${serve[index].subservices[index].price}'),
-                          ]),
+              List<Service> type = servicetype.data!;
+              log(type[0].subservices.length.toString());
+              // return Container();
+              return ListView.builder(
+                  itemCount: type.length,
+                  itemBuilder: (context, index) {
+                    return ListTile(
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => IndivServicePage(
+                                    subserviceID: type[index]
+                                        .subservices[index]
+                                        .subService)));
+                      },
+                      title: Column(children: [
+                        Text(
+                          type[index].subservices[index].subService,
+                          style: const TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold),
                         ),
-                      );
-                    }),
-              );
+                        Text(type[index].subservices[index].duration),
+                        Text('Php ${type[index].subservices[index].price}'),
+                      ]),
+                    );
+                  });
             }
           }),
     );
