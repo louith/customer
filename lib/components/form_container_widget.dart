@@ -62,7 +62,7 @@ class _FormContainerWidgetState extends State<FormContainerWidget> {
               fontWeight: FontWeight.w500),
           cursorColor: kPrimaryColor,
           controller: widget.controller,
-          keyboardType: widget.inputType,
+          // keyboardType: widget.inputType,
           key: widget.fieldKey,
           obscureText: widget.isPasswordField == true ? _obscureText : false,
           onSaved: widget.onSaved,
