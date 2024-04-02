@@ -40,8 +40,10 @@ class _AfterSignupState extends State<AfterSignup> {
           backgroundColor: kPrimaryColor,
           leading: IconButton(
               onPressed: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: ((context) => const MyProfile())));
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: ((context) => const MyProfile())));
               },
               icon: const Icon(Icons.arrow_back)),
           title: const Text(
@@ -73,6 +75,7 @@ class CustProfile extends StatefulWidget {
 }
 
 class _CustProfileState extends State<CustProfile> {
+  bool isDefaultAddress = false;
   File? image;
   UploadTask? uploadTask;
   Future pickImage(ImageSource source) async {
@@ -110,6 +113,7 @@ class _CustProfileState extends State<CustProfile> {
   final TextEditingController _gender = TextEditingController();
   final TextEditingController _age = TextEditingController();
   final TextEditingController _phonenum = TextEditingController();
+  final TextEditingController _addressName = TextEditingController();
   final TextEditingController _province = TextEditingController();
   final TextEditingController _city = TextEditingController();
   final TextEditingController _brgy = TextEditingController();
@@ -139,6 +143,7 @@ class _CustProfileState extends State<CustProfile> {
         String gender = _gender.text;
         String age = _age.text;
         String phonenum = _phonenum.text;
+        String addressName = _addressName.text;
         String prov = _province.text;
         String city = _city.text;
         String brgy = _brgy.text;
@@ -166,12 +171,14 @@ class _CustProfileState extends State<CustProfile> {
             .collection('users')
             .doc(currentUser!.uid)
             .collection('addresses')
-            .doc('Address 1');
+            .doc(addressName);
         Map<String, dynamic> addressData = {
+          'Address Name': addressName,
           'Province': prov,
           'City': city,
           'Barangay': brgy,
           'Extended Address': extAddress,
+          'Default Address': isDefaultAddress,
         };
         await addressCol.set(addressData);
         toastification.show(
@@ -202,6 +209,7 @@ class _CustProfileState extends State<CustProfile> {
     _gender.dispose();
     _age.dispose();
     _phonenum.dispose();
+    _addressName.dispose();
     _province.dispose();
     _city.dispose();
     _brgy.dispose();
@@ -210,6 +218,7 @@ class _CustProfileState extends State<CustProfile> {
     _username.dispose();
     super.dispose();
   }
+
   String dropdownvalue = 'Male';
   List<String> items = ['Male', 'Female', 'Rather not say'];
   @override
@@ -406,6 +415,25 @@ class _CustProfileState extends State<CustProfile> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
+                            'Address Name',
+                            style: TextStyle(color: kPrimaryColor),
+                          ),
+                          FormContainerWidget(
+                              hintText: 'Home',
+                              controller: _city,
+                              labelText: 'City',
+                              validator: (value) => value!.isEmpty
+                                  ? 'Field cannot be empty'
+                                  : null),
+                        ],
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
                             'Province',
                             style: TextStyle(color: kPrimaryColor),
                           ),
@@ -478,6 +506,26 @@ class _CustProfileState extends State<CustProfile> {
                         ],
                       ),
                       const SizedBox(
+                        height: defaultformspacing,
+                      ),
+                      Row(
+                        children: [
+                          Checkbox(
+                            value: isDefaultAddress,
+                            onChanged: (val) {
+                              setState(() {
+                                isDefaultAddress = val!;
+                              });
+                            },
+                            checkColor: kPrimaryLightColor,
+                          ),
+                          Text(
+                            'Default Address',
+                            style: TextStyle(color: kPrimaryColor),
+                          )
+                        ],
+                      ),
+                      const SizedBox(
                         height: 25,
                       ),
                       Text(
@@ -487,7 +535,6 @@ class _CustProfileState extends State<CustProfile> {
                       const SizedBox(
                         height: 10,
                       ),
-                      // Text(widget.email),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [

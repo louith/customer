@@ -110,6 +110,7 @@ class _CustHomeState extends State<CustHome> {
               'Current Address',
               style: TextStyle(color: kPrimaryLightColor),
             ),
+            // title: StreamBuilder(stream: stream, builder: (build, context)),
             backgroundColor: kPrimaryColor,
           ),
           body: TabBarView(children: [
