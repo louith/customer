@@ -6,12 +6,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:customer/components/background.dart';
 import 'package:customer/components/constants.dart';
 import 'package:customer/models/service.dart';
-import 'package:customer/screens/Booking/map_page.dart';
+import 'package:customer/screens/Booking/payment_screen.dart';
+import 'package:customer/screens/customerProfile/custprofile.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 import 'package:badges/badges.dart' as badges;
+import 'package:toastification/toastification.dart';
 
 class BookingAppointment extends StatefulWidget {
   String userID;
@@ -35,13 +37,21 @@ class _BookingAppointmentState extends State<BookingAppointment> {
   DateTime timeFrom = DateTime.now();
   DateTime timeTo = DateTime.now();
   FirebaseFirestore db = FirebaseFirestore.instance;
-  Map<String, ClientService> addedServices = {};
-  List<ClientService> cart = [];
+  Map<String, ClientService> addedService = {};
+  String username = '';
+
   User? currentUser = FirebaseAuth.instance.currentUser;
 
   String formatDouble(double value) {
     final format = NumberFormat('#,##0.00');
     return format.format(value);
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getUsername();
   }
 
   @override
@@ -58,7 +68,7 @@ class _BookingAppointmentState extends State<BookingAppointment> {
                 badgeStyle:
                     const badges.BadgeStyle(badgeColor: kPrimaryLightColor),
                 showBadge: true,
-                badgeContent: Text(cart.length.toString()),
+                badgeContent: Text(addedService.length.toString()),
                 child: IconButton(
                     onPressed: () {
                       showModalBottomSheet(
@@ -73,14 +83,16 @@ class _BookingAppointmentState extends State<BookingAppointment> {
                                 const SizedBox(height: defaultPadding),
                                 ListView.builder(
                                   shrinkWrap: true,
-                                  itemCount: cart.isEmpty ? 1 : cart.length + 1,
+                                  itemCount: addedService.isEmpty
+                                      ? 1
+                                      : addedService.length + 1,
                                   itemBuilder: (context, index) {
-                                    if (cart.isEmpty) {
+                                    if (addedService.isEmpty) {
                                       return const Center(
                                           child: Text('Cart is Empty'));
-                                    } else if (index == cart.length) {
+                                    } else if (index == addedService.length) {
                                       List<int> prices = [];
-                                      for (var price in cart) {
+                                      for (var price in addedService.values) {
                                         prices.add(int.parse(price.price));
                                       }
                                       var total =
@@ -116,13 +128,15 @@ class _BookingAppointmentState extends State<BookingAppointment> {
                                         ],
                                       );
                                     } else {
+                                      final mapToList =
+                                          addedService.values.toList();
                                       return Row(
                                         mainAxisAlignment:
                                             MainAxisAlignment.spaceBetween,
                                         children: [
-                                          Text(cart[index].serviceName),
+                                          Text(mapToList[index].serviceName),
                                           Text(
-                                              "PHP ${formatDouble(double.parse(cart[index].price))}"),
+                                              "PHP ${formatDouble(double.parse(mapToList[index].price))}"),
                                         ],
                                       );
                                     }
@@ -275,15 +289,7 @@ class _BookingAppointmentState extends State<BookingAppointment> {
                       const SizedBox(height: defaultPadding),
                       widget.role == 'salon'
                           ? Text(widget.address)
-                          : TextButton(
-                              onPressed: () {
-                                Navigator.push(context, MaterialPageRoute(
-                                  builder: (context) {
-                                    return MapPage();
-                                  },
-                                ));
-                              },
-                              child: const Text('Get my Location'))
+                          : Text('Enter Location'),
                     ],
                   ),
                 );
@@ -310,8 +316,8 @@ class _BookingAppointmentState extends State<BookingAppointment> {
 
   DateTime addDuration(DateTime from) {
     List<String> serviceDurations = [];
-    if (cart.isNotEmpty) {
-      for (var timeTo in cart) {
+    if (addedService.isNotEmpty) {
+      for (var timeTo in addedService.values) {
         String duration = timeTo.duration;
         serviceDurations.add(duration);
       }
@@ -381,11 +387,12 @@ class _BookingAppointmentState extends State<BookingAppointment> {
                         if (services.hasData) {
                           try {
                             return ServicesBookingList(
+                              customerUsername: username,
                               serviceTypes: serviceTypes.data!,
                               services: services.data!,
                               serviceTypeIndex: index,
                               updateCart: updateCart,
-                              cart: cart,
+                              cart: addedService,
                             );
                           } catch (e) {
                             return Text(e.toString());
@@ -408,17 +415,21 @@ class _BookingAppointmentState extends State<BookingAppointment> {
     );
   }
 
-  //FIX BUG
-  void updateCart(ClientService service, bool added) {
-    if (!addedServices.keys.contains(service.serviceName) &&
-        !cart.contains(service)) {
-      addedServices[service.serviceName] = service;
-      cart.add(service);
+  void updateCart(ClientService service) {
+    if (!addedService.keys.contains(service.serviceName)) {
+      addedService[service.serviceName] = service;
     } else {
-      addedServices.remove(service.serviceName);
-      cart.remove(service);
+      addedService.remove(service.serviceName);
     }
     setState(() {});
+  }
+
+  getUsername() async {
+    DocumentSnapshot docRef =
+        await db.collection('users').doc(currentUser!.uid).get();
+    setState(() {
+      username = docRef['Username'];
+    });
   }
 
   Future<void> finishDialog() {
@@ -428,6 +439,8 @@ class _BookingAppointmentState extends State<BookingAppointment> {
       builder: (context) {
         return AlertDialog(
           title: const Text('Finish Booking?'),
+          content: const Text(
+              'Customers will need to pay 50% of the total amount if the chosen payment method is online to secure appointment schedule'),
           actions: [
             TextButton(
               onPressed: () {
@@ -437,21 +450,28 @@ class _BookingAppointmentState extends State<BookingAppointment> {
             ),
             TextButton(
               onPressed: () {
-                if (cart.isEmpty || timeFrom.isBefore(DateTime.now())) {
+                if (addedService.isEmpty || timeTo.isBefore(DateTime.now())) {
                   Navigator.of(context).pop();
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: const Text('Invalid Booking'),
-                    action: SnackBarAction(
-                      label: 'Close',
-                      onPressed: () {},
-                    ),
-                  ));
+                  toastification.show(
+                    type: ToastificationType.error,
+                    context: context,
+                    title: const Text('Invalid Booking'),
+                    autoCloseDuration: const Duration(seconds: 5),
+                  );
                 } else {
-                  addAppointmentToFirestore();
-                  Navigator.of(context).pop();
-                  Navigator.of(context).pop();
-                  log('added');
-                  //save to firestore
+                  //insert method if appointment has conflict
+                  Navigator.push(context, MaterialPageRoute(
+                    builder: (context) {
+                      return PaymentScreen(
+                        clientID: widget.userID,
+                        customerUsername: username,
+                        address: widget.address,
+                        dateTimeFrom: timeFrom,
+                        dateTimeTo: addDuration(timeTo),
+                        cart: addedService,
+                      );
+                    },
+                  ));
                 }
               },
               child: const Text('BOOK'),
@@ -460,36 +480,6 @@ class _BookingAppointmentState extends State<BookingAppointment> {
         );
       },
     );
-  }
-
-  Future<void> addAppointmentToFirestore() async {
-    List<Map<String, dynamic>> services = cart
-        .map((e) => {
-              'serviceName': e.serviceName,
-              'duration': e.duration,
-              'price': e.price,
-              'description': e.description,
-            })
-        .toList();
-    try {
-      await db
-          .collection('users')
-          .doc(widget.userID)
-          .collection('bookings')
-          .add({
-        'customerID': currentUser!.uid,
-        'clientID': widget.userID,
-        'status': 'pending',
-        'dateFrom': timeFrom,
-        'dateTo': addDuration(timeFrom),
-        'worker': '',
-        'paymentMethod': '',
-        'location': widget.address,
-        'services': services,
-      });
-    } catch (e) {
-      log('error adding appointment $e');
-    }
   }
 
   Future<DateTime?> pickDate(DateTime dateTime) => showDatePicker(
@@ -538,8 +528,9 @@ class ServicesBookingList extends StatefulWidget {
   List<String> serviceTypes;
   List<ClientService> services;
   int serviceTypeIndex;
-  Function(ClientService, bool) updateCart;
-  List<ClientService> cart;
+  Function(ClientService) updateCart;
+  Map<String, dynamic> cart;
+  String customerUsername;
 
   ServicesBookingList({
     super.key,
@@ -548,6 +539,7 @@ class ServicesBookingList extends StatefulWidget {
     required this.serviceTypeIndex,
     required this.updateCart,
     required this.cart,
+    required this.customerUsername,
   });
 
   @override
@@ -594,8 +586,9 @@ class _ServicesBookingListState extends State<ServicesBookingList> {
               setState(() {
                 checkboxvalues[widget.serviceTypeIndex][index] =
                     value!; //checks for each card
-                widget.updateCart(widget.services[index],
-                    checkboxvalues[widget.serviceTypeIndex][index]);
+                widget.updateCart(
+                  widget.services[index],
+                );
               });
             },
           ),

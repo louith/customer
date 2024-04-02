@@ -40,7 +40,7 @@ dependencies:
   firebase_auth: ^4.12.0
   firebase_storage: ^11.4.0
   image_picker: ^1.0.7
-  google_fonts: ^6.1.0
+  google_fonts: ^4.0.4
   flutter_native_splash: ^2.3.5
   line_icons: ^2.0.3
   badges: ^3.1.2
@@ -51,9 +51,7 @@ dependencies:
   flutter_rating_bar: ^4.0.1
   get: ^4.6.6
   toastification: ^1.2.1
-  google_maps_flutter: ^2.6.0
-  flutter_polyline_points: ^2.0.0
-  location: ^5.0.3
+  paymongo_sdk: ^1.6.1
 
 dev_dependencies:
   flutter_test:
