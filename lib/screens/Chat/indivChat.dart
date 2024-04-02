@@ -64,31 +64,35 @@ class _IndivChatState extends State<IndivChat> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          backgroundColor: kPrimaryColor,
-          leading: IconButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              icon: const Icon(
-                Icons.arrow_back_ios,
-                color: Colors.white,
-              )),
-          title: Text(
-            'Chat ${widget.userName}',
-            style: const TextStyle(color: Colors.white),
-          ),
-        ),
-        body: SafeArea(
-            child: Center(
-          child: Column(children: [
-            Expanded(
-              child: builderMessageList(),
+    return Container(
+      color: kPrimaryColor,
+      padding: const EdgeInsets.only(top: 45),
+      child: Scaffold(
+          appBar: AppBar(
+            backgroundColor: kPrimaryColor,
+            leading: IconButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                icon: const Icon(
+                  Icons.arrow_back_ios,
+                  color: Colors.white,
+                )),
+            title: Text(
+              'Chat ${widget.userName}',
+              style: const TextStyle(color: Colors.white),
             ),
-            messageInput(),
-          ]),
-        )));
+          ),
+          body: SafeArea(
+              child: Center(
+            child: Column(children: [
+              Expanded(
+                child: builderMessageList(),
+              ),
+              messageInput(),
+            ]),
+          ))),
+    );
   }
 
   Widget builderMessageList() {

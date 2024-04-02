@@ -99,99 +99,103 @@ class _AllWorkersState extends State<AllWorkers> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-          elevation: 0,
-          backgroundColor: kPrimaryColor,
-          leading: IconButton(
-              onPressed: () {},
-              icon: const Icon(
-                Icons.arrow_back,
-                color: kPrimaryLightColor,
-              )),
-          title: TextField(
-            controller: searchController,
-            onChanged: (value) {
-              setState(() {
-                searchSubcat = value;
-              });
-              //perform ur search here
-              searchFunc(value);
-            },
-            // onSubmitted: ,
-            decoration: InputDecoration(
-              hintText: 'Search',
-              border: const OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(25.0)),
+    return Container(
+      color: kPrimaryColor,
+      padding: const EdgeInsets.only(top: 45),
+      child: Scaffold(
+        appBar: AppBar(
+            elevation: 0,
+            backgroundColor: kPrimaryColor,
+            leading: IconButton(
+                onPressed: () {},
+                icon: const Icon(
+                  Icons.arrow_back,
+                  color: kPrimaryLightColor,
+                )),
+            title: TextField(
+              controller: searchController,
+              onChanged: (value) {
+                setState(() {
+                  searchSubcat = value;
+                });
+                //perform ur search here
+                searchFunc(value);
+              },
+              // onSubmitted: ,
+              decoration: InputDecoration(
+                hintText: 'Search',
+                border: const OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(25.0)),
+                ),
+                prefixIcon: IconButton(
+                  icon: const Icon(Icons.search),
+                  onPressed: () {
+                    print('icon is pressed');
+                  },
+                ),
               ),
-              prefixIcon: IconButton(
-                icon: const Icon(Icons.search),
-                onPressed: () {
-                  print('icon is pressed');
-                },
-              ),
-            ),
-          )),
-      body: StreamBuilder<List<AllWorkerCard>>(
-          stream: Stream.fromFuture(searchFunc(searchSubcat)),
-          builder: (context, snapshot) {
-            if (!snapshot.hasData) {
-              return const Center(
-                  child: CircularProgressIndicator(
-                color: kPrimaryColor,
-              ));
-            } else {
-              List<AllWorkerCard> allWorkers = snapshot.data!;
-              return ListView.builder(
-                  itemCount: allWorkers.length,
-                  itemBuilder: (context, index) {
-                    var data = allWorkers[index];
-                    return Container(
-                      margin: const EdgeInsets.fromLTRB(0, 0, 0, 4),
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
-                        //boxshadow code/styling
-                      ),
-                      child: ListTile(
-                        leading: Image.asset(
-                          'assets/images/suzy.jpg',
-                          width: 50,
-                          height: 50,
+            )),
+        body: StreamBuilder<List<AllWorkerCard>>(
+            stream: Stream.fromFuture(searchFunc(searchSubcat)),
+            builder: (context, snapshot) {
+              if (!snapshot.hasData) {
+                return const Center(
+                    child: CircularProgressIndicator(
+                  color: kPrimaryColor,
+                ));
+              } else {
+                List<AllWorkerCard> allWorkers = snapshot.data!;
+                return ListView.builder(
+                    itemCount: allWorkers.length,
+                    itemBuilder: (context, index) {
+                      var data = allWorkers[index];
+                      return Container(
+                        margin: const EdgeInsets.fromLTRB(0, 0, 0, 4),
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                          //boxshadow code/styling
                         ),
-                        title: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              allWorkers[index].name,
-                              style: const TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.bold),
-                            ),
-                            CategoriesRow(
-                                itemList: allWorkers[index].subcategories),
-                            Text(allWorkers[index].address,
+                        child: ListTile(
+                          leading: Image.asset(
+                            'assets/images/suzy.jpg',
+                            width: 50,
+                            height: 50,
+                          ),
+                          title: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                allWorkers[index].name,
                                 style: const TextStyle(
-                                    fontWeight: FontWeight.w300)),
-                            // Text(hairWorkers[index].id.toString())
-                          ],
+                                    fontSize: 16, fontWeight: FontWeight.bold),
+                              ),
+                              CategoriesRow(
+                                  itemList: allWorkers[index].subcategories),
+                              Text(allWorkers[index].address,
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.w300)),
+                              // Text(hairWorkers[index].id.toString())
+                            ],
+                          ),
+                          trailing: const Text('4 stars'),
+                          shape: const RoundedRectangleBorder(),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => IndivWorkerProfile(
+                                        userID: allWorkers[index].id.toString(),
+                                        userName:
+                                            allWorkers[index].name.toString(),
+                                      )),
+                            );
+                          },
                         ),
-                        trailing: const Text('4 stars'),
-                        shape: const RoundedRectangleBorder(),
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => IndivWorkerProfile(
-                                      userID: allWorkers[index].id.toString(),
-                                      userName:
-                                          allWorkers[index].name.toString(),
-                                    )),
-                          );
-                        },
-                      ),
-                    );
-                  });
-            }
-          }),
+                      );
+                    });
+              }
+            }),
+      ),
     );
   }
 }

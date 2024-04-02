@@ -201,7 +201,6 @@ class _CustSignUpState extends State<CustSignUp> {
                         )),
                     SizedBox(height: 20),
                     GestureDetector(
-   
                       onTap: _signUp,
                       // () {
                       //   Navigator.push(context,
@@ -285,6 +284,7 @@ class _CustSignUpState extends State<CustSignUp> {
     String error = "";
 
     User? user = await _auth.signUpWithEmailAndPassword(email, password);
+    postEmailToFireStore();
 
     if (_formKey.currentState!.validate()) {
       print("User successfully created");

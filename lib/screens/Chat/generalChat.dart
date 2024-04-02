@@ -8,7 +8,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class GeneralChatPage extends StatefulWidget {
-  const GeneralChatPage({super.key});
+  String username;
+  GeneralChatPage({super.key, required this.username});
 
   @override
   State<GeneralChatPage> createState() => _GeneralChatPageState();
@@ -30,26 +31,22 @@ class _GeneralChatPageState extends State<GeneralChatPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: kPrimaryColor,
-        title: const Text(
-          'General Chat Page',
-          style: TextStyle(color: Colors.white),
+    return Container(
+      color: kPrimaryColor,
+      padding: const EdgeInsets.only(top: 45),
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: kPrimaryColor,
+          title: const Text(
+            'Chat',
+            style: TextStyle(color: Colors.white),
+          ),
         ),
-        leading: IconButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            icon: const Icon(
-              Icons.arrow_back_ios,
-              color: Colors.white,
-            )),
+        body: Background(
+            child: Container(
+          child: usersChatList(),
+        )),
       ),
-      body: Background(
-          child: Container(
-        child: usersChatList(),
-      )),
     );
   }
 

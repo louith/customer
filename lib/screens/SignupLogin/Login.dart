@@ -1,4 +1,3 @@
-
 import 'package:customer/components/already_have_an_account_check.dart';
 import 'package:customer/components/assets_strings.dart';
 import 'package:customer/components/background.dart';
@@ -79,10 +78,10 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Background(
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(15, 30, 15, 0),
-            child: Form(
+          child: Center(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(15, 30, 15, 0),
+          child: Form(
               key: _formKey,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -94,7 +93,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     controller: _emailController,
                     isPasswordField: false,
                     validator: (value) =>
-                        value!.isEmpty ? "Please enter your Email" : null,
+                        value!.isEmpty ? 'Please enter you Email' : null,
                   ),
                   const SizedBox(height: defaultPadding),
                   FormContainerWidget(
@@ -102,7 +101,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     controller: _passwordController,
                     isPasswordField: true,
                     validator: (value) =>
-                        value!.isEmpty ? 'Type your password' : null,
+                        value!.isEmpty ? 'Please enter password' : null,
                   ),
                   const SizedBox(height: defaultPadding),
                   GestureDetector(
@@ -115,92 +114,120 @@ class _LoginScreenState extends State<LoginScreen> {
                         borderRadius: BorderRadius.circular(90),
                       ),
                       child: const Center(
-                          child: Text(
-                        "LOGIN",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 13,
-                          fontFamily: 'Inter',
-                          fontWeight: FontWeight.w500,
-                        ),
-                      )),
-                    ),
-                  ),
-                  const SizedBox(height: defaultPadding),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Text("Don't have an account?"),
-                      const SizedBox(width: 5),
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: ((context) => const CustSignUp())));
-                        },
-                        child: const Text(
-                          "Sign Up",
+                        child: Text(
+                          'LOGIN',
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 13,
                             fontFamily: 'Inter',
                             fontWeight: FontWeight.w500,
                           ),
-                        )),
+                        ),
                       ),
                     ),
-                    SizedBox(height: 5),
-                    Text('OR'),
-                    SizedBox(height: 5),
-                    SizedBox(
-                        width: double.infinity,
-                        height: 60,
-                        child: OutlinedButton.icon(
-                            style: OutlinedButton.styleFrom(
-                              side: BorderSide(color: kPrimaryColor),
-                            ),
-                            onPressed: () {},
-                            icon: Image(
-                              image: AssetImage(GoogleLogoImg),
-                              width: 20.0,
-                            ),
-                            label: Text('Sign-in with Google'))),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text("Don't have an account?"),
-                        SizedBox(
-                          width: 5,
+                  ),
+                  const SizedBox(height: defaultPadding),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text('Dont have an account?'),
+                      const SizedBox(width: 5),
+                      InkWell(
+                        onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const CustSignUp(),
+                            )),
+                        child: Text(
+                          'Sign Up',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: kPrimaryColor),
                         ),
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: ((context) => CustSignUp())));
-                          },
-                          child: Text(
-                            "Sign Up",
-                            style: TextStyle(
-                                color: kPrimaryColor,
-                                fontWeight: FontWeight.bold),
-                          ),
-                        )
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
+                      )
+                    ],
+                  )
+                ],
+              )),
         ),
-      ),
+      )),
     );
   }
+  //                 const SizedBox(height: defaultPadding),
+  //                 Row(
+  //                   mainAxisAlignment: MainAxisAlignment.center,
+  //                   children: [
+  //                     const Text("Don't have an account?"),
+  //                     const SizedBox(width: 5),
+  //                     GestureDetector(
+  //                       onTap: () {
+  //                         Navigator.push(
+  //                             context,
+  //                             MaterialPageRoute(
+  //                                 builder: ((context) => const CustSignUp())));
+  //                       },
+  //                       child: const Text(
+  //                         "Sign Up",
+  //                         style: TextStyle(
+  //                           color: Colors.white,
+  //                           fontSize: 13,
+  //                           fontFamily: 'Inter',
+  //                           fontWeight: FontWeight.w500,
+  //                         ),
+  //                       )),
+  //                     ),
+  //                   ),
+  //                   SizedBox(height: 5),
+  //                   Text('OR'),
+  //                   SizedBox(height: 5),
+  //                   SizedBox(
+  //                       width: double.infinity,
+  //                       height: 60,
+  //                       child: OutlinedButton.icon(
+  //                           style: OutlinedButton.styleFrom(
+  //                             side: BorderSide(color: kPrimaryColor),
+  //                           ),
+  //                           onPressed: () {},
+  //                           icon: Image(
+  //                             image: AssetImage(GoogleLogoImg),
+  //                             width: 20.0,
+  //                           ),
+  //                           label: Text('Sign-in with Google'))),
+  //                   SizedBox(
+  //                     height: 20,
+  //                   ),
+  //                   Row(
+  //                     mainAxisAlignment: MainAxisAlignment.center,
+  //                     children: [
+  //                       Text("Don't have an account?"),
+  //                       SizedBox(
+  //                         width: 5,
+  //                       ),
+  //                       GestureDetector(
+  //                         onTap: () {
+  //                           Navigator.push(
+  //                               context,
+  //                               MaterialPageRoute(
+  //                                   builder: ((context) => CustSignUp())));
+  //                         },
+  //                         child: Text(
+  //                           "Sign Up",
+  //                           style: TextStyle(
+  //                               color: kPrimaryColor,
+  //                               fontWeight: FontWeight.bold),
+  //                         ),
+  //                       )
+  //                     ],
+  //                   ),
+  //                 ],
+  //               ),
+  //             ),
+  //           ),
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
 
   // void _signIn() async {
   //   String email = _emailController.text;

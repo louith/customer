@@ -40,8 +40,10 @@ class _AfterSignupState extends State<AfterSignup> {
           backgroundColor: kPrimaryColor,
           leading: IconButton(
               onPressed: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: ((context) => const MyProfile())));
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: ((context) => const MyProfile())));
               },
               icon: const Icon(Icons.arrow_back)),
           title: const Text(
@@ -210,6 +212,7 @@ class _CustProfileState extends State<CustProfile> {
     _username.dispose();
     super.dispose();
   }
+
   String dropdownvalue = 'Male';
   List<String> items = ['Male', 'Female', 'Rather not say'];
   @override

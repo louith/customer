@@ -6,6 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:customer/components/background.dart';
 import 'package:customer/components/constants.dart';
 import 'package:customer/models/service.dart';
+import 'package:customer/screens/Booking/map_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -15,11 +16,15 @@ import 'package:badges/badges.dart' as badges;
 class BookingAppointment extends StatefulWidget {
   String userID;
   String username;
+  String role;
+  String address;
 
   BookingAppointment({
     super.key,
     required this.userID,
     required this.username,
+    required this.role,
+    required this.address,
   });
 
   @override
@@ -41,240 +46,265 @@ class _BookingAppointmentState extends State<BookingAppointment> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        actions: [
-          badges.Badge(
-              position: badges.BadgePosition.topEnd(top: 1, end: 4),
-              badgeStyle: const badges.BadgeStyle(
-                badgeColor: kPrimaryLightColor,
-              ),
-              showBadge: true,
-              badgeContent: Text(addedServices.length.toString()),
-              child: IconButton(
-                  onPressed: () {
-                    showModalBottomSheet(
-                      context: context,
-                      builder: (context) {
-                        return Container(
-                          padding: const EdgeInsets.all(defaultPadding),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Text('Services Cart - ${widget.username}'),
-                              ListView.builder(
-                                shrinkWrap: true,
-                                itemCount: cart.isEmpty ? 1 : cart.length + 1,
-                                itemBuilder: (context, index) {
-                                  if (cart.isEmpty) {
-                                    return const Center(
-                                        child: Text('Cart is Empty'));
-                                  } else if (index == cart.length) {
-                                    List<int> prices = [];
-                                    for (var price in cart) {
-                                      prices.add(int.parse(price.price));
+    return Container(
+      color: kPrimaryColor,
+      padding: const EdgeInsets.only(top: 45),
+      child: Scaffold(
+        appBar: AppBar(
+          centerTitle: true,
+          actions: [
+            badges.Badge(
+                position: badges.BadgePosition.topEnd(top: 1, end: 4),
+                badgeStyle:
+                    const badges.BadgeStyle(badgeColor: kPrimaryLightColor),
+                showBadge: true,
+                badgeContent: Text(cart.length.toString()),
+                child: IconButton(
+                    onPressed: () {
+                      showModalBottomSheet(
+                        context: context,
+                        builder: (context) {
+                          return Container(
+                            padding: const EdgeInsets.all(defaultPadding),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Text('Services Cart - ${widget.username}'),
+                                const SizedBox(height: defaultPadding),
+                                ListView.builder(
+                                  shrinkWrap: true,
+                                  itemCount: cart.isEmpty ? 1 : cart.length + 1,
+                                  itemBuilder: (context, index) {
+                                    if (cart.isEmpty) {
+                                      return const Center(
+                                          child: Text('Cart is Empty'));
+                                    } else if (index == cart.length) {
+                                      List<int> prices = [];
+                                      for (var price in cart) {
+                                        prices.add(int.parse(price.price));
+                                      }
+                                      var total =
+                                          double.parse(getServiceFee(prices)) +
+                                              prices.reduce((value, element) =>
+                                                  value + element);
+                                      return Column(
+                                        children: [
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              const Text('Service Fee'),
+                                              Text(
+                                                  "PHP ${getServiceFee(prices)}"),
+                                            ],
+                                          ),
+                                          const Divider(),
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              const Text('Total',
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold)),
+                                              Text("PHP ${formatDouble(total)}",
+                                                  style: const TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold)),
+                                            ],
+                                          ),
+                                        ],
+                                      );
+                                    } else {
+                                      return Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(cart[index].serviceName),
+                                          Text(
+                                              "PHP ${formatDouble(double.parse(cart[index].price))}"),
+                                        ],
+                                      );
                                     }
-                                    var total =
-                                        double.parse(getServiceFee(prices)) +
-                                            prices.reduce((value, element) =>
-                                                value + element);
-                                    return Column(
-                                      children: [
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            const Text('Service Fee'),
-                                            Text(
-                                                "PHP ${getServiceFee(prices)}"),
-                                          ],
-                                        ),
-                                        const Divider(),
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            const Text('Total',
-                                                style: TextStyle(
-                                                    fontWeight:
-                                                        FontWeight.bold)),
-                                            Text("PHP ${formatDouble(total)}",
-                                                style: const TextStyle(
-                                                    fontWeight:
-                                                        FontWeight.bold)),
-                                          ],
-                                        ),
-                                      ],
-                                    );
+                                  },
+                                )
+                              ],
+                            ),
+                          );
+                        },
+                      );
+                    },
+                    icon: const Icon(
+                      Icons.list_alt_rounded,
+                      size: 28,
+                    )))
+          ],
+          backgroundColor: kPrimaryColor,
+          foregroundColor: kPrimaryLightColor,
+          title: const Column(
+            children: [
+              Text(
+                'Services Booking',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              Text(
+                'Make sure Service Provider\nhas no Appointment Conflicts',
+                style: TextStyle(fontSize: 12, fontStyle: FontStyle.italic),
+                textAlign: TextAlign.center,
+              )
+              // SizedBox(height: defaultPadding,)
+            ],
+          ),
+        ),
+        body: Background(
+            child: Container(
+          margin: const EdgeInsets.fromLTRB(15, 30, 15, 0),
+          child: FutureBuilder<List<Appointment>>(
+            future: getAppointmentsTime(),
+            builder: (context, snapshot) {
+              //enclosed in this builder since it needs the snapshot data of the future method
+              bool hasOverlap(Appointment newAppointment) {
+                for (Appointment existingAppointment in snapshot.data!) {
+                  if (newAppointment.startTime
+                          .isBefore(existingAppointment.endTime) &&
+                      newAppointment.endTime
+                          .isAfter(existingAppointment.startTime)) {
+                    return true; //has overlap
+                  }
+                }
+                return false; // has no overlap
+              }
+
+              if (snapshot.hasData) {
+                return SingleChildScrollView(
+                  padding: const EdgeInsets.only(bottom: 100),
+                  child: Column(
+                    children: [
+                      const Text(
+                        'Select Service(s)',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: defaultPadding),
+                      SizedBox(
+                        width: double.infinity,
+                        height: MediaQuery.of(context).size.height * .55,
+                        child: ServicesList(widget.userID),
+                      ),
+                      const SizedBox(height: defaultPadding),
+                      //list of services by client here
+                      const Text(
+                        'Select Date & Time of Appointment',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: defaultPadding),
+                      //scheduling method
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          Column(
+                            children: [
+                              const Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text('From'),
+                                  Text(
+                                    '*',
+                                    style: TextStyle(color: Colors.red),
+                                  )
+                                ],
+                              ),
+                              TextButton(
+                                onPressed: () async {
+                                  final date = await pickDate(timeFrom);
+                                  if (date == null)
+                                    return; // when pressed cancel
+                                  final time = await pickTime(
+                                      TimeOfDay.fromDateTime(timeFrom));
+                                  if (time == null)
+                                    return; // when pressed cancel
+                                  final dateTimeSet = DateTime(
+                                    date.year,
+                                    date.month,
+                                    date.day,
+                                    time.hour,
+                                    time.minute,
+                                  );
+                                  if (dateTimeSet.isAfter(DateTime.now())) {
+                                    setState(() {
+                                      timeFrom = dateTimeSet;
+                                      timeTo = dateTimeSet;
+                                    });
                                   } else {
-                                    return Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(cart[index].serviceName),
-                                        Text(
-                                            "PHP ${formatDouble(double.parse(cart[index].price))}"),
-                                      ],
-                                    );
+                                    ScaffoldMessenger.of(context)
+                                        .showSnackBar(SnackBar(
+                                      content: const Text('Invalid Date'),
+                                      action: SnackBarAction(
+                                          label: 'Close', onPressed: () {}),
+                                    ));
+                                    return;
                                   }
                                 },
-                              )
+                                child: Text(
+                                  '${DateFormat.MMMEd().format(timeFrom)}, ${DateFormat.jm().format(timeFrom)}',
+                                  style: const TextStyle(color: kPrimaryColor),
+                                ),
+                              ),
                             ],
                           ),
-                        );
-                      },
-                    );
-                  },
-                  icon: const Icon(
-                    Icons.list_alt_rounded,
-                    size: 28,
-                  )))
-        ],
-        backgroundColor: kPrimaryColor,
-        foregroundColor: kPrimaryLightColor,
-        title: const Column(
-          children: [
-            Text(
-              'Services Booking',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            Text(
-              'Make sure Service Provider\nhas no Appointment Conflicts',
-              style: TextStyle(fontSize: 12, fontStyle: FontStyle.italic),
-              textAlign: TextAlign.center,
-            )
-            // SizedBox(height: defaultPadding,)
-          ],
-        ),
-      ),
-      body: Background(
-          child: Container(
-        margin: const EdgeInsets.fromLTRB(15, 30, 15, 0),
-        child: FutureBuilder<List<Appointment>>(
-          future: getAppointmentsTime(),
-          builder: (context, snapshot) {
-            //enclosed in this builder since it needs the snapshot data of the future method
-            bool hasOverlap(Appointment newAppointment) {
-              for (Appointment existingAppointment in snapshot.data!) {
-                if (newAppointment.startTime
-                        .isBefore(existingAppointment.endTime) &&
-                    newAppointment.endTime
-                        .isAfter(existingAppointment.startTime)) {
-                  return true; //has overlap
-                }
-              }
-              return false; // has no overlap
-            }
-
-            if (snapshot.hasData) {
-              return Column(
-                children: [
-                  const Text(
-                    'Select Service(s)',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: defaultPadding),
-                  SizedBox(
-                    width: double.infinity,
-                    height: MediaQuery.of(context).size.height * .55,
-                    child: ServicesList(widget.userID),
-                  ),
-                  const SizedBox(height: defaultPadding),
-                  //list of services by client here
-                  const Text(
-                    'Select Date & Time of Appointment',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: defaultPadding),
-                  //scheduling method
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      Column(
-                        children: [
-                          const Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text('From'),
-                              Text(
-                                '*',
-                                style: TextStyle(color: Colors.red),
-                              )
-                            ],
-                          ),
-                          TextButton(
-                            onPressed: () async {
-                              final date = await pickDate(timeFrom);
-                              if (date == null) return; // when pressed cancel
-                              final time = await pickTime(
-                                  TimeOfDay.fromDateTime(timeFrom));
-                              if (time == null) return; // when pressed cancel
-                              final dateTimeSet = DateTime(
-                                date.year,
-                                date.month,
-                                date.day,
-                                time.hour,
-                                time.minute,
-                              );
-                              if (dateTimeSet.isAfter(DateTime.now())) {
-                                setState(() {
-                                  timeFrom = dateTimeSet;
-                                  timeTo = dateTimeSet;
-                                });
-                              } else {
-                                ScaffoldMessenger.of(context)
-                                    .showSnackBar(SnackBar(
-                                  content: const Text('Invalid Date'),
-                                  action: SnackBarAction(
-                                      label: 'Close', onPressed: () {}),
-                                ));
-                                return;
-                              }
-                            },
-                            child: Text(
-                              '${DateFormat.MMMEd().format(timeFrom)}, ${DateFormat.jm().format(timeFrom)}',
-                              style: const TextStyle(color: kPrimaryColor),
-                            ),
-                          ),
+                          //will show after appointment from is after datetime now
+                          if (timeFrom.isAfter(DateTime.now())) const Text('-'),
+                          if (timeFrom.isAfter(DateTime.now()))
+                            Column(
+                              children: [
+                                const Text('To'),
+                                TextButton(
+                                    onPressed: null,
+                                    child: Text(
+                                        //DAY, DATE                            TIME:00 @ PM
+                                        '${DateFormat.MMMEd().format(addDuration(timeFrom))}, ${DateFormat.jm().format(addDuration(timeFrom))}',
+                                        style: const TextStyle(
+                                            color: kPrimaryColor))),
+                              ],
+                            )
                         ],
                       ),
-                      //will show after appointment from is after datetime now
-                      if (timeFrom.isAfter(DateTime.now())) const Text('-'),
-                      if (timeFrom.isAfter(DateTime.now()))
-                        Column(
-                          children: [
-                            const Text('To'),
-                            TextButton(
-                                onPressed: null,
-                                child: Text(
-                                    //DAY, DATE                            TIME:00 @ PM
-                                    '${DateFormat.MMMEd().format(addDuration(timeFrom))}, ${DateFormat.jm().format(addDuration(timeFrom))}',
-                                    style:
-                                        const TextStyle(color: kPrimaryColor))),
-                          ],
-                        )
+                      const Text(
+                        'Address',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: defaultPadding),
+                      widget.role == 'salon'
+                          ? Text(widget.address)
+                          : TextButton(
+                              onPressed: () {
+                                Navigator.push(context, MaterialPageRoute(
+                                  builder: (context) {
+                                    return MapPage();
+                                  },
+                                ));
+                              },
+                              child: const Text('Get my Location'))
                     ],
                   ),
-                ],
-              );
-              //test out function first by adding datettime pickers for datefrom and dateto
-              //get services duration once checked and add the duration of each services to the datefrom time variable
-            } else {
-              return const Center(
-                child: CircularProgressIndicator(color: kPrimaryColor),
-              );
-            }
-          },
-        ),
-      )),
-      floatingActionButton: FloatingActionButton(
-          onPressed: finishDialog,
-          backgroundColor: kPrimaryColor,
-          child: const Icon(
-            Icons.check,
-            color: kPrimaryLightColor,
-          )),
+                );
+                //test out function first by adding datettime pickers for datefrom and dateto
+                //get services duration once checked and add the duration of each services to the datefrom time variable
+              } else {
+                return const Center(
+                  child: CircularProgressIndicator(color: kPrimaryColor),
+                );
+              }
+            },
+          ),
+        )),
+        floatingActionButton: FloatingActionButton(
+            onPressed: finishDialog,
+            backgroundColor: kPrimaryColor,
+            child: const Icon(
+              Icons.check,
+              color: kPrimaryLightColor,
+            )),
+      ),
     );
   }
 
@@ -379,7 +409,7 @@ class _BookingAppointmentState extends State<BookingAppointment> {
   }
 
   //FIX BUG
-  void updateCart(ClientService service) {
+  void updateCart(ClientService service, bool added) {
     if (!addedServices.keys.contains(service.serviceName) &&
         !cart.contains(service)) {
       addedServices[service.serviceName] = service;
@@ -454,7 +484,7 @@ class _BookingAppointmentState extends State<BookingAppointment> {
         'dateTo': addDuration(timeFrom),
         'worker': '',
         'paymentMethod': '',
-        'location': '',
+        'location': widget.address,
         'services': services,
       });
     } catch (e) {
@@ -508,7 +538,7 @@ class ServicesBookingList extends StatefulWidget {
   List<String> serviceTypes;
   List<ClientService> services;
   int serviceTypeIndex;
-  Function(ClientService) updateCart;
+  Function(ClientService, bool) updateCart;
   List<ClientService> cart;
 
   ServicesBookingList({
@@ -564,7 +594,8 @@ class _ServicesBookingListState extends State<ServicesBookingList> {
               setState(() {
                 checkboxvalues[widget.serviceTypeIndex][index] =
                     value!; //checks for each card
-                widget.updateCart(widget.services[index]);
+                widget.updateCart(widget.services[index],
+                    checkboxvalues[widget.serviceTypeIndex][index]);
               });
             },
           ),

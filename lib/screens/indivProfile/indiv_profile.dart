@@ -8,6 +8,7 @@ import 'package:customer/screens/Chat/indivChat.dart';
 import 'package:customer/screens/ServicesOffered/servicesList.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:intl/intl.dart';
 
 class WorkerDetailsCard {
   final String id;
@@ -76,7 +77,6 @@ class IndivWorkerProfile extends StatelessWidget {
           await db.collection('users').doc(userID).collection('services').get();
       querySnapshot.docs.forEach((element) {
         mainCategories.add(element.id);
-        log(element.id);
       });
       return mainCategories;
     } catch (e) {
@@ -87,6 +87,8 @@ class IndivWorkerProfile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final format = NumberFormat('#,##0.00');
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: kPrimaryColor,
@@ -206,6 +208,8 @@ class IndivWorkerProfile extends StatelessWidget {
                                               return BookingScreen(
                                                 userID: userID,
                                                 username: userName,
+                                                role: clientData.role,
+                                                address: clientData.address,
                                               );
                                             },
                                           ));
@@ -223,7 +227,15 @@ class IndivWorkerProfile extends StatelessWidget {
                                         )),
                                   )
                                 ],
-                              )
+                              ),
+                              InkWell(
+                                  onTap: () {},
+                                  child: const Text(
+                                    'More Info',
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: kPrimaryColor),
+                                  ))
                             ],
                           ),
                         ),
@@ -242,6 +254,8 @@ class IndivWorkerProfile extends StatelessWidget {
                       ),
                       onRatingUpdate: (value) => {},
                     ),
+                    const SizedBox(height: defaultPadding),
+
                     Expanded(
                       child: FutureBuilder<List<String>>(
                           future: getServiceCategories(),
@@ -274,9 +288,52 @@ class IndivWorkerProfile extends StatelessWidget {
                                               itemCount: service.data!.length,
                                               itemBuilder:
                                                   (context, serviceIndex) {
-                                                return Text(service
-                                                    .data![serviceIndex]
-                                                    .serviceName);
+                                                var serviceData = service.data!;
+                                                return Container(
+                                                  width: double.infinity,
+                                                  height: 75,
+                                                  padding: const EdgeInsets.all(
+                                                      defaultPadding),
+                                                  decoration: const BoxDecoration(
+                                                      color:
+                                                          kPrimaryLightColor),
+                                                  margin: const EdgeInsets.only(
+                                                      bottom: defaultPadding),
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    children: [
+                                                      Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Row(
+                                                            children: [
+                                                              Text(
+                                                                serviceData[
+                                                                        serviceIndex]
+                                                                    .serviceName,
+                                                                style: const TextStyle(
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold),
+                                                              ),
+                                                              Text(
+                                                                  ' - ${serviceData[serviceIndex].duration}')
+                                                            ],
+                                                          ),
+                                                          Text(serviceData[
+                                                                  serviceIndex]
+                                                              .description),
+                                                        ],
+                                                      ),
+                                                      Text(
+                                                          "PHP ${format.format(double.parse(serviceData[serviceIndex].price))}"),
+                                                    ],
+                                                  ),
+                                                );
                                               },
                                             );
                                           } else {
