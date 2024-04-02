@@ -1,4 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
     <application
         android:label="customer"
         android:name="${applicationName}"
@@ -29,5 +31,7 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+            <meta-data android:name="com.google.android.geo.AIzaSyCIXnl1V_t590uwnnUuC7zhqk6QYBHoFXA"
+               android:value="AIzaSyCIXnl1V_t590uwnnUuC7zhqk6QYBHoFXA"/>
     </application>
 </manifest>

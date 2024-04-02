@@ -11,8 +11,16 @@ import 'package:syncfusion_flutter_calendar/calendar.dart';
 class BookingScreen extends StatefulWidget {
   String username;
   String userID;
+  String role;
+  String address;
 
-  BookingScreen({super.key, required this.username, required this.userID});
+  BookingScreen({
+    super.key,
+    required this.username,
+    required this.userID,
+    required this.role,
+    required this.address,
+  });
 
   @override
   State<BookingScreen> createState() => _BookingScreenState();
@@ -29,54 +37,62 @@ class _BookingScreenState extends State<BookingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: kPrimaryColor,
-        foregroundColor: kPrimaryLightColor,
-        title: Text(widget.username),
-      ),
-      body: Column(
-        children: [
-          FutureBuilder(
-            future: getAppointments(),
-            builder: (context, appointments) {
-              if (appointments.hasData) {
-                return Expanded(
-                  child: SfCalendar(
-                    view: CalendarView.month,
-                    dataSource: MeetingDataSource(appointments.data!),
-                    allowedViews: const [
-                      CalendarView.month,
-                      CalendarView.week,
-                      CalendarView.day,
-                      CalendarView.schedule,
-                    ],
-                  ),
-                );
-              } else {
-                return const Center(
-                  child: CircularProgressIndicator(color: kPrimaryColor),
-                );
-              }
-            },
+    return Container(
+      color: kPrimaryColor,
+      padding: const EdgeInsets.only(top: 45),
+      child: SafeArea(
+        child: Scaffold(
+          appBar: AppBar(
+            backgroundColor: kPrimaryColor,
+            foregroundColor: kPrimaryLightColor,
+            title: Text(widget.username),
           ),
-        ],
+          body: Column(
+            children: [
+              FutureBuilder(
+                future: getAppointments(),
+                builder: (context, appointments) {
+                  if (appointments.hasData) {
+                    return Expanded(
+                      child: SfCalendar(
+                        view: CalendarView.month,
+                        dataSource: MeetingDataSource(appointments.data!),
+                        allowedViews: const [
+                          CalendarView.month,
+                          CalendarView.week,
+                          CalendarView.day,
+                          CalendarView.schedule,
+                        ],
+                      ),
+                    );
+                  } else {
+                    return const Center(
+                      child: CircularProgressIndicator(color: kPrimaryColor),
+                    );
+                  }
+                },
+              ),
+            ],
+          ),
+          floatingActionButton: FloatingActionButton(
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => BookingAppointment(
+                              userID: widget.userID,
+                              username: widget.username,
+                              role: widget.role,
+                              address: widget.address,
+                            )));
+              },
+              backgroundColor: kPrimaryColor,
+              child: const Icon(
+                Icons.add,
+                color: kPrimaryLightColor,
+              )),
+        ),
       ),
-      floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => BookingAppointment(
-                          userID: widget.userID,
-                          username: widget.username,
-                        )));
-          },
-          backgroundColor: kPrimaryColor,
-          child: const Icon(
-            Icons.add,
-            color: kPrimaryLightColor,
-          )),
     );
   }
 

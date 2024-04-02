@@ -180,6 +180,7 @@ class _CustSignUpState extends State<CustSignUp> {
     String error = "";
 
     User? user = await _auth.signUpWithEmailAndPassword(email, password);
+    postEmailToFireStore();
 
     if (_formKey.currentState!.validate()) {
       print("User successfully created");

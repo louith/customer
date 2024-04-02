@@ -1,3 +1,6 @@
+import 'dart:developer';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:customer/components/constants.dart';
 import 'package:customer/screens/Chat/generalChat.dart';
 import 'package:customer/screens/FreelancerCategoryScreens/allWorkers.dart';
@@ -17,6 +20,8 @@ class CustMainScreen extends StatefulWidget {
 
 class _CustMainScreenState extends State<CustMainScreen> {
   int index = 0;
+  User? currentUser = FirebaseAuth.instance.currentUser;
+  String username = '';
 
   PersistentTabController persistentTabController =
       PersistentTabController(initialIndex: 0);
@@ -59,6 +64,28 @@ class _CustMainScreenState extends State<CustMainScreen> {
     );
   }
 
+  Future<void> getUsername() async {
+    try {
+      DocumentSnapshot query =
+          await db.collection('users').doc(currentUser!.uid).get();
+      if (query.exists) {
+        setState(() {
+          username = query['Username'];
+        });
+      }
+      log(username);
+    } catch (e) {
+      log(e.toString());
+    }
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getUsername();
+  }
+
   @override
   Widget build(BuildContext context) {
     return PopScope(
@@ -96,7 +123,9 @@ class _CustMainScreenState extends State<CustMainScreen> {
     return [
       const CustHome(),
       const AllWorkers(),
-      const GeneralChatPage(),
+      GeneralChatPage(
+        username: username,
+      ),
       const MyProfile(),
     ];
   }
