@@ -3,6 +3,7 @@ import 'package:customer/components/assets_strings.dart';
 import 'package:customer/components/constants.dart';
 import 'package:customer/components/widgets.dart';
 import 'package:customer/screens/Homescreen/Homescreen.dart';
+import 'package:customer/screens/Homescreen/Homescreen.dart';
 import 'package:customer/screens/Homescreen/MainScreen.dart';
 import 'package:customer/screens/WelcomeScreen/CustWelcomeScreen.dart';
 import 'package:customer/screens/customerProfile/custprofile.dart';
@@ -57,24 +58,23 @@ class _MyProfileState extends State<MyProfile> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          centerTitle: true,
-          backgroundColor: kPrimaryColor,
-          leading: IconButton(
-              onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: ((context) => const CustHome())));
-              },
-              icon: const Icon(LineIcons.angleLeft)),
-          title: const Text(
-            'My Profile',
-          ),
+    return SafeArea(
+        child: Scaffold(
+      appBar: AppBar(
+        centerTitle: true,
+        backgroundColor: kPrimaryColor,
+        leading: IconButton(
+            onPressed: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: ((context) => const CustHome())));
+            },
+            icon: const Icon(LineIcons.angleLeft)),
+        title: const Text(
+          'My Profile',
         ),
-        body: SingleChildScrollView(
-            child: Container(
+      ),
+      body: SingleChildScrollView(
+        child: Container(
           padding: EdgeInsets.all(defaultPadding),
           child: Column(
             children: [
@@ -87,22 +87,22 @@ class _MyProfileState extends State<MyProfile> {
                 ),
               ),
               SizedBox(
-                height: 10,
+                height: 15,
               ),
               StreamBuilder(
                   stream: Stream.fromFuture(getUsername()),
                   builder: (context, snapshot) {
                     if (!snapshot.hasData) {
-                      return Text(
-                        'No username',
-                        style: TextStyle(
-                            fontSize: 20,
-                            color: Colors.red,
-                            fontWeight: FontWeight.w700),
-                      );
+                      return Center(
+                          child: Text('No Name',
+                              style: TextStyle(
+                                  fontSize: 20,
+                                  color: Colors.black87,
+                                  fontWeight: FontWeight.w700)));
                     } else {
                       String username = snapshot.data!;
                       return Text(
+                        // _user != null ? _user!.uid : 'No user found',
                         username,
                         style: TextStyle(
                             fontSize: 20,
@@ -176,7 +176,9 @@ class _MyProfileState extends State<MyProfile> {
               ),
             ],
           ),
-        )));
+        ),
+      ),
+    ));
   }
 }
 

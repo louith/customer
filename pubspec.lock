@@ -272,7 +272,11 @@ packages:
       sha256: "7bf66872f490c8c8bf61d8db89f1c6d96d5ed38ce988047d4840c90a145f0fc7"
       url: "https://pub.dev"
     source: hosted
+<<<<<<< Updated upstream
     version: "3.8.1"
+=======
+    version: "3.7.3"
+>>>>>>> Stashed changes
   fixnum:
     dependency: transitive
     description:
@@ -982,5 +986,10 @@ packages:
     source: hosted
     version: "3.1.2"
 sdks:
+<<<<<<< Updated upstream
   dart: ">=3.3.0 <4.0.0"
   flutter: ">=3.19.2"
+=======
+  dart: ">=3.2.3 <4.0.0"
+  flutter: ">=3.16.6"
+>>>>>>> Stashed changes
