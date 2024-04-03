@@ -387,6 +387,7 @@ class _BookingAppointmentState extends State<BookingAppointment> {
                         if (services.hasData) {
                           try {
                             return ServicesBookingList(
+                              clientUsername: widget.username,
                               customerUsername: username,
                               serviceTypes: serviceTypes.data!,
                               services: services.data!,
@@ -463,6 +464,7 @@ class _BookingAppointmentState extends State<BookingAppointment> {
                   Navigator.push(context, MaterialPageRoute(
                     builder: (context) {
                       return PaymentScreen(
+                        clientUsername: widget.username,
                         clientID: widget.userID,
                         customerUsername: username,
                         address: widget.address,
@@ -531,9 +533,11 @@ class ServicesBookingList extends StatefulWidget {
   Function(ClientService) updateCart;
   Map<String, dynamic> cart;
   String customerUsername;
+  String clientUsername;
 
   ServicesBookingList({
     super.key,
+    required this.clientUsername,
     required this.serviceTypes,
     required this.services,
     required this.serviceTypeIndex,

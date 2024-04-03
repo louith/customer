@@ -1,6 +1,9 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:customer/components/constants.dart';
 import 'package:customer/components/widgets.dart';
+import 'package:customer/screens/Homescreen/booking_transcations.dart';
 import 'package:customer/screens/WelcomeScreen/CustWelcomeScreen.dart';
 import 'package:customer/screens/customerProfile/editProfile.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -61,9 +64,13 @@ class _MyProfileState extends State<MyProfile> {
   }
 
   void signUserOut() {
-    FirebaseAuth.instance.signOut();
-    Navigator.push(context,
-        MaterialPageRoute(builder: ((context) => const CustWelcome())));
+    try {
+      FirebaseAuth.instance.signOut();
+      Navigator.push(context,
+          MaterialPageRoute(builder: ((context) => const CustWelcome())));
+    } catch (e) {
+      log('error signing out $e');
+    }
   }
 
   @override
@@ -111,8 +118,6 @@ class _MyProfileState extends State<MyProfile> {
                           Text(profileData.email)
                         ],
                       );
-                    } else if (profile.hasError) {
-                      return Text(profile.error.toString());
                     } else {
                       return const CircularProgressIndicator(
                           color: kPrimaryColor);
@@ -154,7 +159,13 @@ class _MyProfileState extends State<MyProfile> {
                 ProfileMenuWidget(
                   title: 'Booking Transactions',
                   icon: LineIcons.calendar,
-                  onPress: () {},
+                  onPress: () {
+                    Navigator.push(context, MaterialPageRoute(
+                      builder: (context) {
+                        return BookingTransactions();
+                      },
+                    ));
+                  },
                 ),
                 const Divider(),
                 const SizedBox(height: defaultPadding),

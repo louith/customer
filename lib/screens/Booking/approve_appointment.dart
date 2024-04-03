@@ -4,6 +4,7 @@ import 'package:customer/components/background.dart';
 import 'package:customer/components/constants.dart';
 import 'package:customer/models/service.dart';
 import 'package:customer/screens/customerProfile/custprofile.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
@@ -16,10 +17,12 @@ class ApproveAppointment extends StatefulWidget {
   DateTime dateTimeFrom;
   DateTime dateTimeTo;
   String paymentMethod;
+  String clientUsername;
 
   ApproveAppointment({
     super.key,
     required this.clientID,
+    required this.clientUsername,
     required this.customerUsername,
     required this.cart,
     required this.address,
@@ -33,6 +36,7 @@ class ApproveAppointment extends StatefulWidget {
 }
 
 class _ApproveAppointmentState extends State<ApproveAppointment> {
+  User? currentUser = FirebaseAuth.instance.currentUser;
   late List<ClientService> cart;
   final format = NumberFormat('#,##0.00');
 
@@ -240,22 +244,46 @@ class _ApproveAppointmentState extends State<ApproveAppointment> {
         'price': double.parse(element.price),
       });
     });
-    Map<String, dynamic> booking = {
-      'customerUsername': widget.customerUsername,
-      'clientID': widget.clientID,
-      'services': services,
-      'dateFrom': widget.dateTimeFrom,
-      'dateTo': widget.dateTimeTo,
-      'status': 'pending',
-      'paymentMethod': widget.paymentMethod,
-      'location': widget.address,
-    };
+    var newDocRef = db
+        .collection('users')
+        .doc(widget.clientID)
+        .collection('bookings')
+        .doc();
     try {
+      //add appointment to client db
       await db
           .collection('users')
           .doc(widget.clientID)
           .collection('bookings')
-          .add(booking);
+          .doc(newDocRef.id)
+          .set({
+        'customerUsername': widget.customerUsername,
+        'clientUsername': widget.clientUsername,
+        'services': services,
+        'dateFrom': widget.dateTimeFrom,
+        'dateTo': widget.dateTimeTo,
+        'status': 'pending',
+        'paymentMethod': widget.paymentMethod,
+        'location': widget.address,
+        'reference': newDocRef.id,
+      });
+      //add appointment to customer
+      await db
+          .collection('users')
+          .doc(currentUser!.uid)
+          .collection('bookings')
+          .doc(newDocRef.id)
+          .set({
+        'customerUsername': widget.customerUsername,
+        'clientID': widget.clientUsername,
+        'services': services,
+        'dateFrom': widget.dateTimeFrom,
+        'dateTo': widget.dateTimeTo,
+        'status': 'pending',
+        'paymentMethod': widget.paymentMethod,
+        'location': widget.address,
+        'reference': newDocRef.id,
+      });
     } catch (e) {
       log('error uploading appointment $e');
     }

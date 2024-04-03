@@ -9,6 +9,7 @@ import 'package:intl/intl.dart';
 
 class PaymentScreen extends StatefulWidget {
   String clientID;
+  String clientUsername;
   String customerUsername;
   Map<String, ClientService> cart;
   String address;
@@ -17,6 +18,7 @@ class PaymentScreen extends StatefulWidget {
 
   PaymentScreen({
     super.key,
+    required this.clientUsername,
     required this.clientID,
     required this.customerUsername,
     required this.cart,
@@ -63,6 +65,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
     Navigator.push(context, MaterialPageRoute(
       builder: (context) {
         return ApproveAppointment(
+          clientUsername: widget.clientUsername,
           clientID: widget.clientID,
           customerUsername: widget.customerUsername,
           cart: widget.cart,
