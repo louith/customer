@@ -1,15 +1,26 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:customer/components/assets_strings.dart';
 import 'package:customer/components/constants.dart';
 import 'package:customer/components/widgets.dart';
-import 'package:customer/screens/Homescreen/Homescreen.dart';
-import 'package:customer/screens/Homescreen/MainScreen.dart';
+import 'package:customer/screens/Homescreen/booking_transcations.dart';
 import 'package:customer/screens/WelcomeScreen/CustWelcomeScreen.dart';
-import 'package:customer/screens/customerProfile/custprofile.dart';
 import 'package:customer/screens/customerProfile/editProfile.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:line_icons/line_icons.dart';
+
+class Profile {
+  String username;
+  String email;
+  String profilePicture;
+
+  Profile({
+    required this.username,
+    required this.email,
+    required this.profilePicture,
+  });
+}
 
 class MyProfile extends StatefulWidget {
   const MyProfile({super.key});
@@ -39,144 +50,141 @@ class _MyProfileState extends State<MyProfile> {
     });
   }
 
-  Future<String> getUsername() async {
+  Future<Profile> getUserProfile() async {
     DocumentSnapshot<Map<String, dynamic>> userDoc = await FirebaseFirestore
         .instance
         .collection('users')
         .doc(currUserID)
         .get();
 
-    return userDoc.data()!['Username'];
+    return Profile(
+        username: userDoc['Username'],
+        email: userDoc['Email'],
+        profilePicture: userDoc['Profile Picture']);
   }
 
   void signUserOut() {
-    FirebaseAuth.instance.signOut();
-    Navigator.push(context,
-        MaterialPageRoute(builder: ((context) => const CustWelcome())));
+    try {
+      FirebaseAuth.instance.signOut();
+      Navigator.push(context,
+          MaterialPageRoute(builder: ((context) => const CustWelcome())));
+    } catch (e) {
+      log('error signing out $e');
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          centerTitle: true,
-          backgroundColor: kPrimaryColor,
-          leading: IconButton(
-              onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: ((context) => const CustHome())));
-              },
-              icon: const Icon(LineIcons.angleLeft)),
-          title: const Text(
-            'My Profile',
+    return Container(
+      color: kPrimaryColor,
+      padding: const EdgeInsets.only(top: 45),
+      child: Scaffold(
+          appBar: AppBar(
+            centerTitle: true,
+            backgroundColor: kPrimaryColor,
+            title: const Text(
+              'My Profile',
+              style: TextStyle(color: kPrimaryLightColor),
+            ),
           ),
-        ),
-        body: SingleChildScrollView(
-            child: Container(
-          padding: EdgeInsets.all(defaultPadding),
-          child: Column(
-            children: [
-              SizedBox(
-                width: 120,
-                height: 120,
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(150),
-                  child: const Image(image: AssetImage(DefaultProfilePic)),
-                ),
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              StreamBuilder(
-                  stream: Stream.fromFuture(getUsername()),
-                  builder: (context, snapshot) {
-                    if (!snapshot.hasData) {
-                      return Text(
-                        'No username',
-                        style: TextStyle(
-                            fontSize: 20,
-                            color: Colors.red,
-                            fontWeight: FontWeight.w700),
+          body: SingleChildScrollView(
+              child: Container(
+            padding: const EdgeInsets.all(defaultPadding),
+            child: Column(
+              children: [
+                FutureBuilder(
+                  future: getUserProfile(),
+                  builder: (context, profile) {
+                    if (profile.hasData) {
+                      var profileData = profile.data!;
+                      return Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          profileData.profilePicture.isNotEmpty
+                              ? CircleAvatar(
+                                  radius: 60,
+                                  backgroundImage:
+                                      NetworkImage(profileData.profilePicture))
+                              : const CircleAvatar(
+                                  radius: 60,
+                                  child: Text('Profile Picture'),
+                                ),
+                          const SizedBox(height: defaultPadding),
+                          Text(
+                            profileData.username,
+                            style: const TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 20),
+                          ),
+                          Text(profileData.email)
+                        ],
                       );
                     } else {
-                      String username = snapshot.data!;
-                      return Text(
-                        username,
-                        style: TextStyle(
-                            fontSize: 20,
-                            color: Colors.black87,
-                            fontWeight: FontWeight.w700),
-                      );
+                      return const CircularProgressIndicator(
+                          color: kPrimaryColor);
                     }
-                  }),
-
-              Text(
-                _user != null ? currUserEmail : 'No user found',
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
-              SizedBox(
-                height: 20,
-              ),
-              SizedBox(
-                  width: 200,
-                  child: elevButton(
-                      title: 'Edit Profile',
-                      onClicked: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: ((context) => EditProfile())));
-                        //separate page na dapat na naga fetch ug data from db
-                      })),
-              SizedBox(
-                height: 30,
-              ),
-              Divider(),
-              SizedBox(
-                height: 10,
-              ),
-              //Menu
-              ProfileMenuWidget(
-                title: 'My Addresses',
-                icon: LineIcons.locationArrow,
-                onPress: () {},
-              ),
-              ProfileMenuWidget(
-                title: 'Settings',
-                icon: LineIcons.cog,
-                onPress: () {},
-              ),
-              ProfileMenuWidget(
-                title: 'Billing Details',
-                icon: LineIcons.wallet,
-                onPress: () {},
-              ),
-              ProfileMenuWidget(
-                title: 'Booking Transactions',
-                icon: LineIcons.calendar,
-                onPress: () {},
-              ),
-              Divider(),
-              SizedBox(
-                height: 10,
-              ),
-              Container(
-                width: double.infinity,
-                decoration: BoxDecoration(
-                    color: kPrimaryColor.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(20)),
-                child: ProfileMenuWidget(
-                  title: 'Logout',
-                  icon: LineIcons.alternateSignOut,
-                  endIcon: false,
-                  onPress: signUserOut,
+                  },
                 ),
-              ),
-            ],
-          ),
-        )));
+                const SizedBox(height: 20),
+                SizedBox(
+                    width: 200,
+                    height: 45,
+                    child: elevButton(
+                        title: 'Edit Profile',
+                        onClicked: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: ((context) => EditProfile())));
+                          //separate page na dapat na naga fetch ug data from db
+                        })),
+                const SizedBox(height: defaultPadding),
+                const Divider(),
+                const SizedBox(height: defaultPadding),
+                //Menu
+                ProfileMenuWidget(
+                  title: 'My Addresses',
+                  icon: LineIcons.locationArrow,
+                  onPress: () {},
+                ),
+                ProfileMenuWidget(
+                  title: 'Settings',
+                  icon: LineIcons.cog,
+                  onPress: () {},
+                ),
+                ProfileMenuWidget(
+                  title: 'Billing Details',
+                  icon: LineIcons.wallet,
+                  onPress: () {},
+                ),
+                ProfileMenuWidget(
+                  title: 'Booking Transactions',
+                  icon: LineIcons.calendar,
+                  onPress: () {
+                    Navigator.push(context, MaterialPageRoute(
+                      builder: (context) {
+                        return BookingTransactions();
+                      },
+                    ));
+                  },
+                ),
+                const Divider(),
+                const SizedBox(height: defaultPadding),
+                Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                      color: kPrimaryColor.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(20)),
+                  child: ProfileMenuWidget(
+                    title: 'Logout',
+                    icon: LineIcons.alternateSignOut,
+                    endIcon: false,
+                    onPress: signUserOut,
+                  ),
+                ),
+              ],
+            ),
+          ))),
+    );
   }
 }
 
