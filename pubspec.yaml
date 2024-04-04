@@ -52,6 +52,10 @@ dependencies:
   get: ^4.6.6
   toastification: ^1.2.1
   paymongo_sdk: ^1.6.1
+  geolocator: ^11.0.0
+  url_launcher: ^6.2.5
+  geocode: ^1.0.3
+  http: ^0.13.6
 
 dev_dependencies:
   flutter_test:

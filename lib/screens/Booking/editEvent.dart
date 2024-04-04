@@ -10,10 +10,13 @@ import 'package:customer/screens/Booking/payment_screen.dart';
 import 'package:customer/screens/customerProfile/custprofile.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:geocode/geocode.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 import 'package:badges/badges.dart' as badges;
 import 'package:toastification/toastification.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 class BookingAppointment extends StatefulWidget {
   String userID;
@@ -39,6 +42,9 @@ class _BookingAppointmentState extends State<BookingAppointment> {
   FirebaseFirestore db = FirebaseFirestore.instance;
   Map<String, ClientService> addedService = {};
   String username = '';
+  late String lat;
+  late String long;
+  GeoCode geoCode = GeoCode();
 
   User? currentUser = FirebaseAuth.instance.currentUser;
 
@@ -286,10 +292,40 @@ class _BookingAppointmentState extends State<BookingAppointment> {
                         'Address',
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
-                      const SizedBox(height: defaultPadding),
                       widget.role == 'salon'
                           ? Text(widget.address)
-                          : Text('Enter Location'),
+                          : Column(
+                              children: [
+                                Text(location),
+                                InkWell(
+                                    onTap: () {
+                                      getCurrentLocation().then((value) {
+                                        lat = '${value.latitude}';
+                                        long = '${value.longitude}';
+                                        geocodeAddress(lat, long);
+                                      });
+                                    },
+                                    child: const Text(
+                                      'Get Location',
+                                      style: TextStyle(
+                                        color: kPrimaryColor,
+                                        decoration: TextDecoration.underline,
+                                      ),
+                                    )),
+                                InkWell(
+                                  onTap: () {
+                                    openMap(lat, long);
+                                  },
+                                  child: const Text(
+                                    'Open Map',
+                                    style: TextStyle(
+                                      color: kPrimaryColor,
+                                      decoration: TextDecoration.underline,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
                     ],
                   ),
                 );
@@ -312,6 +348,56 @@ class _BookingAppointmentState extends State<BookingAppointment> {
             )),
       ),
     );
+  }
+
+  geocodeAddress(String latitude, String longitude) async {
+    try {
+      Address address = await geoCode.reverseGeocoding(
+          latitude: double.parse(latitude), longitude: double.parse(longitude));
+      String locationNow =
+          '${address.streetAddress}, ${address.city}, ${address.countryName}';
+      log(address.toString());
+      setState(() {
+        location = locationNow;
+      });
+    } catch (e) {
+      log(e.toString());
+    }
+  }
+
+  Future<void> openMap(String lat, String long) async {
+    try {
+      String googleUrl =
+          'https://www.google.com/maps/search/?api=1&query=$lat,$long';
+      log(googleUrl);
+
+      await canLaunchUrlString(googleUrl)
+          ? await launchUrlString(googleUrl)
+          : throw 'cannot launch $googleUrl';
+    } catch (e) {
+      log(e.toString());
+    }
+  }
+
+  String location = "My Location";
+  Future<Position> getCurrentLocation() async {
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      return Future.error('Location services are disabled');
+    }
+
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      log('Location permission denied');
+      return Future.error('Location permission denied');
+    }
+    if (permission == LocationPermission.deniedForever) {
+      log('Location permission permanently denied, cannot get location');
+      return Future.error(
+          'Location permission permanently denied, cannot get location');
+    }
+
+    return await Geolocator.getCurrentPosition();
   }
 
   DateTime addDuration(DateTime from) {
@@ -463,15 +549,27 @@ class _BookingAppointmentState extends State<BookingAppointment> {
                   //insert method if appointment has conflict
                   Navigator.push(context, MaterialPageRoute(
                     builder: (context) {
-                      return PaymentScreen(
-                        clientUsername: widget.username,
-                        clientID: widget.userID,
-                        customerUsername: username,
-                        address: widget.address,
-                        dateTimeFrom: timeFrom,
-                        dateTimeTo: addDuration(timeTo),
-                        cart: addedService,
-                      );
+                      if (widget.role == 'salon') {
+                        return PaymentScreen(
+                          clientUsername: widget.username,
+                          clientID: widget.userID,
+                          customerUsername: username,
+                          address: widget.address,
+                          dateTimeFrom: timeFrom,
+                          dateTimeTo: addDuration(timeTo),
+                          cart: addedService,
+                        );
+                      } else {
+                        return PaymentScreen(
+                          clientUsername: widget.username,
+                          clientID: widget.userID,
+                          customerUsername: username,
+                          address: location,
+                          dateTimeFrom: timeFrom,
+                          dateTimeTo: addDuration(timeTo),
+                          cart: addedService,
+                        );
+                      }
                     },
                   ));
                 }
