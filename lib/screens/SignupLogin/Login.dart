@@ -140,7 +140,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         image: AssetImage(GoogleLogoImg),
                         width: 20.0,
                       ),
-                      label: Text('Sign-in with Google'))),
+                      label: Text('Login-in with Google'))),
               SizedBox(
                 height: 20,
               ),
