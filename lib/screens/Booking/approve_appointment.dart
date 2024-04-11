@@ -1,12 +1,13 @@
 import 'dart:developer';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:customer/components/background.dart';
 import 'package:customer/components/constants.dart';
+import 'package:customer/components/widgets.dart';
 import 'package:customer/models/service.dart';
 import 'package:customer/screens/customerProfile/custprofile.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 
 class ApproveAppointment extends StatefulWidget {
@@ -18,6 +19,7 @@ class ApproveAppointment extends StatefulWidget {
   DateTime dateTimeTo;
   String paymentMethod;
   String clientUsername;
+  String role;
 
   ApproveAppointment({
     super.key,
@@ -29,16 +31,31 @@ class ApproveAppointment extends StatefulWidget {
     required this.dateTimeFrom,
     required this.dateTimeTo,
     required this.paymentMethod,
+    required this.role,
   });
 
   @override
   State<ApproveAppointment> createState() => _ApproveAppointmentState();
 }
 
+class Staff {
+  String name;
+  String role;
+  String contact;
+
+  Staff({
+    required this.name,
+    required this.role,
+    required this.contact,
+  });
+}
+
 class _ApproveAppointmentState extends State<ApproveAppointment> {
   User? currentUser = FirebaseAuth.instance.currentUser;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   late List<ClientService> cart;
   final format = NumberFormat('#,##0.00');
+  String? dropdownValue;
 
   @override
   void initState() {
@@ -65,7 +82,7 @@ class _ApproveAppointmentState extends State<ApproveAppointment> {
               ),
             ),
             const SizedBox(height: defaultPadding),
-            BookingCard(Column(
+            bookingCard(Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text('Customer Name'),
@@ -106,7 +123,7 @@ class _ApproveAppointmentState extends State<ApproveAppointment> {
               ],
             )),
             const SizedBox(height: defaultPadding),
-            BookingCard(Column(
+            bookingCard(Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 RowDetails([
@@ -145,6 +162,32 @@ class _ApproveAppointmentState extends State<ApproveAppointment> {
                 ),
               ],
             )),
+            const SizedBox(height: defaultPadding),
+            //NGANO DILI MUPAKITA AND DROPDOWN
+            widget.role == 'salon'
+                ? StreamBuilder<List<String>>(
+                    stream: Stream.fromFuture(getStaffs()),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        final data = snapshot.data!;
+                        return bookingCard(DropdownButton(
+                            hint: Text('Preferred Stylist'),
+                            value: dropdownValue,
+                            items: data.map((e) {
+                              return DropdownMenuItem<String>(
+                                  value: e, child: Text(e));
+                            }).toList(),
+                            onChanged: (String? newValue) {
+                              setState(() {
+                                dropdownValue = newValue!;
+                              });
+                            }));
+                      } else {
+                        return Container();
+                      }
+                    },
+                  )
+                : Container(),
           ],
         ),
         Column(
@@ -170,6 +213,26 @@ class _ApproveAppointmentState extends State<ApproveAppointment> {
     ));
   }
 
+  Future<List<String>> getStaffs() async {
+    List<String> staffList = [];
+    try {
+      QuerySnapshot querySnapshot = await _firestore
+          .collection('users')
+          .doc(widget.clientID)
+          .collection('staff')
+          .get();
+      if (querySnapshot.docs.isNotEmpty) {
+        querySnapshot.docs.forEach((element) {
+          staffList.add(element['name']);
+        });
+      }
+      return staffList;
+    } catch (e) {
+      log('error getting staff $e');
+      return [];
+    }
+  }
+
   double getTotal() {
     List<int> prices = [];
 
@@ -189,27 +252,6 @@ class _ApproveAppointmentState extends State<ApproveAppointment> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: children,
-    );
-  }
-
-  Container BookingCard(Widget child) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(
-          vertical: defaultPadding, horizontal: defaultPadding * 2),
-      margin: const EdgeInsets.symmetric(horizontal: defaultPadding),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.all(Radius.circular(10)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey,
-            blurRadius: 8,
-            offset: Offset(8, 8),
-          )
-        ],
-      ),
-      child: child,
     );
   }
 
@@ -267,7 +309,7 @@ class _ApproveAppointmentState extends State<ApproveAppointment> {
         'location': widget.address,
         'reference': newDocRef.id,
       });
-      //add appointment to customer
+      //add appointment to customer db
       await db
           .collection('users')
           .doc(currentUser!.uid)
@@ -284,6 +326,27 @@ class _ApproveAppointmentState extends State<ApproveAppointment> {
         'location': widget.address,
         'reference': newDocRef.id,
       });
+      //add preferred stylist
+      if (dropdownValue != null) {
+        //client db
+        await db
+            .collection('users')
+            .doc(widget.clientID)
+            .collection('bookings')
+            .doc(newDocRef.id)
+            .update({
+          'worker': dropdownValue,
+        });
+        //customer db
+        await db
+            .collection('users')
+            .doc(currentUser!.uid)
+            .collection('bookings')
+            .doc(newDocRef.id)
+            .update({
+          'worker': dropdownValue,
+        });
+      }
     } catch (e) {
       log('error uploading appointment $e');
     }

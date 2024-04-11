@@ -6,6 +6,7 @@ import 'package:customer/components/constants.dart';
 import 'package:customer/screens/customerProfile/custprofile.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class Transactions {
   String clientID;
@@ -16,6 +17,7 @@ class Transactions {
   String reference;
   String status;
   List<dynamic> services;
+  String? preferredWorker;
 
   Transactions({
     required this.clientID,
@@ -26,6 +28,7 @@ class Transactions {
     required this.reference,
     required this.status,
     required this.services,
+    this.preferredWorker,
   });
 }
 
@@ -101,7 +104,9 @@ class _BookingTransactionsState extends State<BookingTransactions> {
                                   ? Colors.green
                                   : data[index].status == 'complete'
                                       ? kPrimaryColor
-                                      : Colors.black;
+                                      : data[index].status == 'denied'
+                                          ? Colors.red
+                                          : Colors.black;
                           return transaction(
                             Column(
                               children: [
@@ -109,11 +114,20 @@ class _BookingTransactionsState extends State<BookingTransactions> {
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text(
-                                      data[index].clientID,
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.bold),
+                                    Row(
+                                      children: [
+                                        //client name
+                                        Text(
+                                          data[index].clientID,
+                                          style: const TextStyle(
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        //date from and date to of appointment
+                                        Text(
+                                            ' - ${DateFormat.MMMEd().format(data[index].dateFrom)}'),
+                                      ],
                                     ),
+                                    //status
                                     Text(
                                       data[index].status.toUpperCase(),
                                       style: TextStyle(
@@ -123,7 +137,7 @@ class _BookingTransactionsState extends State<BookingTransactions> {
                                   ],
                                 ),
                                 const SizedBox(height: defaultPadding),
-                                Text(data[index].location),
+                                Text(data[index].location), //address
                               ],
                             ),
                           );
@@ -148,6 +162,7 @@ class _BookingTransactionsState extends State<BookingTransactions> {
     return InkWell(
       onTap: () {},
       child: Container(
+        margin: const EdgeInsets.only(bottom: defaultPadding),
         decoration: const BoxDecoration(
             color: kPrimaryLightColor,
             borderRadius: BorderRadius.all(Radius.circular(8))),

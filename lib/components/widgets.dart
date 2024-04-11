@@ -169,6 +169,27 @@ SizedBox logOutButton(BuildContext context) {
   );
 }
 
+Container bookingCard(Widget child) {
+  return Container(
+    width: double.infinity,
+    padding: const EdgeInsets.symmetric(
+        vertical: defaultPadding, horizontal: defaultPadding * 2),
+    margin: const EdgeInsets.symmetric(horizontal: defaultPadding),
+    decoration: const BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.all(Radius.circular(10)),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.grey,
+          blurRadius: 8,
+          offset: Offset(8, 8),
+        )
+      ],
+    ),
+    child: child,
+  );
+}
+
 //Loys' constant elevated button
 
 Widget elevButton({

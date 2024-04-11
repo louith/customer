@@ -15,6 +15,7 @@ class PaymentScreen extends StatefulWidget {
   String address;
   DateTime dateTimeFrom;
   DateTime dateTimeTo;
+  String role;
 
   PaymentScreen({
     super.key,
@@ -25,6 +26,7 @@ class PaymentScreen extends StatefulWidget {
     required this.address,
     required this.dateTimeFrom,
     required this.dateTimeTo,
+    required this.role,
   });
 
   @override
@@ -73,6 +75,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
           dateTimeFrom: widget.dateTimeFrom,
           dateTimeTo: widget.dateTimeTo,
           paymentMethod: 'Payment Method',
+          role: widget.role,
         );
       },
     ));

@@ -558,6 +558,7 @@ class _BookingAppointmentState extends State<BookingAppointment> {
                           dateTimeFrom: timeFrom,
                           dateTimeTo: addDuration(timeTo),
                           cart: addedService,
+                          role: widget.role,
                         );
                       } else {
                         return PaymentScreen(
@@ -568,6 +569,7 @@ class _BookingAppointmentState extends State<BookingAppointment> {
                           dateTimeFrom: timeFrom,
                           dateTimeTo: addDuration(timeTo),
                           cart: addedService,
+                          role: widget.role,
                         );
                       }
                     },
