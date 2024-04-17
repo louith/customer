@@ -169,6 +169,27 @@ SizedBox logOutButton(BuildContext context) {
   );
 }
 
+Row RowDetails(List<Widget> children) {
+  return Row(
+    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    children: children,
+  );
+}
+
+Container ServiceCard(String service) {
+  return Container(
+    margin: const EdgeInsets.fromLTRB(0, 0, 8, 0),
+    decoration: const BoxDecoration(
+        color: kPrimaryLightColor,
+        borderRadius: BorderRadius.all(Radius.circular(30))),
+    padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+    child: Text(
+      service,
+      style: const TextStyle(fontWeight: FontWeight.bold),
+    ),
+  );
+}
+
 Container bookingCard(Widget child) {
   return Container(
     width: double.infinity,

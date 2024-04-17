@@ -172,21 +172,4 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
     ));
   }
-
-  // void _signIn() async {
-  //   String email = _emailController.text;
-  //   String password = _passwordController.text;
-  //   String error = '';
-
-  //   User? user = await _auth.signInWithEmailAndPassword(email, password);
-
-  //   if (_formKey.currentState!.validate()) {
-  //     print("User successfully LOGGED IN");
-  //     // Navigator.pushNamed(context, "/home");
-  //     Navigator.push(context,
-  //         MaterialPageRoute(builder: ((context) => const CustMainScreen())));
-  //   } else {
-  //     print("Some error happened");
-  //   }
-  // }
 }

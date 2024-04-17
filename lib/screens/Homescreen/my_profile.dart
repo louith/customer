@@ -50,17 +50,22 @@ class _MyProfileState extends State<MyProfile> {
     });
   }
 
-  Future<Profile> getUserProfile() async {
-    DocumentSnapshot<Map<String, dynamic>> userDoc = await FirebaseFirestore
-        .instance
-        .collection('users')
-        .doc(currUserID)
-        .get();
+  Future<Profile?> getUserProfile() async {
+    try {
+      DocumentSnapshot<Map<String, dynamic>> userDoc = await FirebaseFirestore
+          .instance
+          .collection('users')
+          .doc(currUserID)
+          .get();
 
-    return Profile(
-        username: userDoc['Username'],
-        email: userDoc['Email'],
-        profilePicture: userDoc['Profile Picture']);
+      return Profile(
+          username: userDoc['Username'],
+          email: userDoc['Email'],
+          profilePicture: userDoc['Profile Picture']);
+    } catch (e) {
+      log(e.toString());
+      return null;
+    }
   }
 
   void signUserOut() {

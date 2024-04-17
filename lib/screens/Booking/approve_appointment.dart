@@ -1,3 +1,5 @@
+// ignore_for_file: must_be_immutable
+
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -5,38 +7,11 @@ import 'package:customer/components/background.dart';
 import 'package:customer/components/constants.dart';
 import 'package:customer/components/widgets.dart';
 import 'package:customer/models/service.dart';
+import 'package:customer/screens/Booking/added_appointment.dart';
 import 'package:customer/screens/customerProfile/custprofile.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-
-class ApproveAppointment extends StatefulWidget {
-  String clientID;
-  String customerUsername;
-  Map<String, ClientService> cart;
-  String address;
-  DateTime dateTimeFrom;
-  DateTime dateTimeTo;
-  String paymentMethod;
-  String clientUsername;
-  String role;
-
-  ApproveAppointment({
-    super.key,
-    required this.clientID,
-    required this.clientUsername,
-    required this.customerUsername,
-    required this.cart,
-    required this.address,
-    required this.dateTimeFrom,
-    required this.dateTimeTo,
-    required this.paymentMethod,
-    required this.role,
-  });
-
-  @override
-  State<ApproveAppointment> createState() => _ApproveAppointmentState();
-}
 
 class Staff {
   String name;
@@ -50,19 +25,51 @@ class Staff {
   });
 }
 
+class ApproveAppointment extends StatefulWidget {
+  String clientID;
+  String customerUsername;
+  Map<String, ClientService> cart;
+  String address;
+  DateTime dateTimeFrom;
+  DateTime dateTimeTo;
+  String paymentMethod;
+  String clientUsername;
+  String role;
+  String serviceFee;
+
+  ApproveAppointment({
+    super.key,
+    required this.clientID,
+    required this.clientUsername,
+    required this.customerUsername,
+    required this.cart,
+    required this.address,
+    required this.dateTimeFrom,
+    required this.dateTimeTo,
+    required this.paymentMethod,
+    required this.role,
+    required this.serviceFee,
+  });
+
+  @override
+  State<ApproveAppointment> createState() => _ApproveAppointmentState();
+}
+
 class _ApproveAppointmentState extends State<ApproveAppointment> {
   User? currentUser = FirebaseAuth.instance.currentUser;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   late List<ClientService> cart;
   final format = NumberFormat('#,##0.00');
   String? dropdownValue;
+  String ref = '';
+  List<int> prices = [];
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     cart = widget.cart.values.toList();
     getTotal();
+    log(widget.serviceFee);
   }
 
   @override
@@ -142,14 +149,12 @@ class _ApproveAppointmentState extends State<ApproveAppointment> {
                   itemCount: cart.length + 1,
                   itemBuilder: (context, index) {
                     if (index == cart.length) {
-                      List<int> prices = [];
                       cart.forEach((element) {
                         prices.add(int.parse(element.price));
                       });
                       return RowDetails([
                         const Text('Service Fee'),
-                        Text(
-                            'PHP ${format.format(double.parse(getServiceFee(prices)))}')
+                        Text('PHP ${widget.serviceFee}')
                       ]);
                     } else {
                       return RowDetails([
@@ -163,7 +168,6 @@ class _ApproveAppointmentState extends State<ApproveAppointment> {
               ],
             )),
             const SizedBox(height: defaultPadding),
-            //NGANO DILI MUPAKITA AND DROPDOWN
             widget.role == 'salon'
                 ? StreamBuilder<List<String>>(
                     stream: Stream.fromFuture(getStaffs()),
@@ -171,7 +175,7 @@ class _ApproveAppointmentState extends State<ApproveAppointment> {
                       if (snapshot.hasData) {
                         final data = snapshot.data!;
                         return bookingCard(DropdownButton(
-                            hint: Text('Preferred Stylist'),
+                            hint: const Text('Preferred Stylist'),
                             value: dropdownValue,
                             items: data.map((e) {
                               return DropdownMenuItem<String>(
@@ -196,10 +200,20 @@ class _ApproveAppointmentState extends State<ApproveAppointment> {
                 margin: const EdgeInsets.symmetric(horizontal: defaultPadding),
                 child: ElevatedButton(
                     onPressed: () {
-                      bookingToFirestore().then((value) {
-                        Navigator.of(context).pop();
-                        Navigator.of(context).pop();
-                        Navigator.of(context).pop();
+                      bookingToFirestore(format.format(
+                              double.parse(getServiceFeeFromList(prices))))
+                          .then((value) {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => AddedAppointment(
+                                reference: ref,
+                                amountPaid: getTotal().toStringAsFixed(2),
+                                paymentMethod: widget.paymentMethod,
+                                date:
+                                    '${DateFormat.jm().format(widget.dateTimeFrom)} - ${DateFormat.jm().format(widget.dateTimeTo)} | ${DateFormat('MMMMd').format(widget.dateTimeTo)}',
+                              ),
+                            ));
                       });
                     },
                     child: const Text(
@@ -248,28 +262,7 @@ class _ApproveAppointmentState extends State<ApproveAppointment> {
     return total + (total * 0.05);
   }
 
-  Row RowDetails(List<Widget> children) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: children,
-    );
-  }
-
-  Container ServiceCard(String service) {
-    return Container(
-      margin: const EdgeInsets.fromLTRB(0, 0, 8, 0),
-      decoration: const BoxDecoration(
-          color: kPrimaryLightColor,
-          borderRadius: BorderRadius.all(Radius.circular(30))),
-      padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-      child: Text(
-        service,
-        style: const TextStyle(fontWeight: FontWeight.bold),
-      ),
-    );
-  }
-
-  String getServiceFee(List<int> list) {
+  String getServiceFeeFromList(List<int> list) {
     if (list.isEmpty) {
       return '0.00';
     }
@@ -277,7 +270,7 @@ class _ApproveAppointmentState extends State<ApproveAppointment> {
     return (sum * .05).toStringAsFixed(2);
   }
 
-  Future<void> bookingToFirestore() async {
+  Future<void> bookingToFirestore(String serviceFee) async {
     List<Map<String, dynamic>> services = [];
     cart.forEach((element) {
       services.add({
@@ -291,6 +284,9 @@ class _ApproveAppointmentState extends State<ApproveAppointment> {
         .doc(widget.clientID)
         .collection('bookings')
         .doc();
+    setState(() {
+      ref = newDocRef.id;
+    });
     try {
       //add appointment to client db
       await db
@@ -299,6 +295,9 @@ class _ApproveAppointmentState extends State<ApproveAppointment> {
           .collection('bookings')
           .doc(newDocRef.id)
           .set({
+        'serviceFee': widget.serviceFee,
+        'totalAmount': format.format(getTotal()),
+        'clientId': widget.clientID,
         'customerUsername': widget.customerUsername,
         'clientUsername': widget.clientUsername,
         'services': services,
@@ -316,8 +315,11 @@ class _ApproveAppointmentState extends State<ApproveAppointment> {
           .collection('bookings')
           .doc(newDocRef.id)
           .set({
+        'serviceFee': widget.serviceFee,
+        'totalAmount': format.format(getTotal()),
+        'clientId': widget.clientID,
         'customerUsername': widget.customerUsername,
-        'clientID': widget.clientUsername,
+        'clientUsername': widget.clientUsername,
         'services': services,
         'dateFrom': widget.dateTimeFrom,
         'dateTo': widget.dateTimeTo,
