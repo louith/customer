@@ -270,6 +270,7 @@ class IndivWorkerProfile extends StatelessWidget {
                                         CrossAxisAlignment.start,
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
+                                      //returns the main category
                                       Text(
                                         serviceType.data![serviceTypeIndex],
                                         style: const TextStyle(
