@@ -7,7 +7,6 @@ import 'package:customer/components/background.dart';
 import 'package:customer/components/constants.dart';
 import 'package:customer/models/service.dart';
 import 'package:customer/screens/Booking/payment_screen.dart';
-import 'package:customer/screens/customerProfile/custprofile.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:geocode/geocode.dart';
@@ -45,6 +44,7 @@ class _BookingAppointmentState extends State<BookingAppointment> {
   late String lat;
   late String long;
   GeoCode geoCode = GeoCode();
+  String location = '';
 
   User? currentUser = FirebaseAuth.instance.currentUser;
 
@@ -62,6 +62,7 @@ class _BookingAppointmentState extends State<BookingAppointment> {
 
   @override
   Widget build(BuildContext context) {
+    List<int> prices = [];
     return Container(
       color: kPrimaryColor,
       padding: const EdgeInsets.only(top: 45),
@@ -77,6 +78,7 @@ class _BookingAppointmentState extends State<BookingAppointment> {
                 badgeContent: Text(addedService.length.toString()),
                 child: IconButton(
                     onPressed: () {
+                      /////////////////////////RAAAAAAAGHHHHHH///////////////////////////
                       showModalBottomSheet(
                         context: context,
                         builder: (context) {
@@ -97,12 +99,15 @@ class _BookingAppointmentState extends State<BookingAppointment> {
                                       return const Center(
                                           child: Text('Cart is Empty'));
                                     } else if (index == addedService.length) {
-                                      List<int> prices = [];
                                       for (var price in addedService.values) {
                                         prices.add(int.parse(price.price));
                                       }
+                                      // setState(() {
+                                      //   serviceFee = getServiceFee(prices)!;
+                                      // });
+                                      // log(serviceFee);
                                       var total =
-                                          double.parse(getServiceFee(prices)) +
+                                          double.parse(getServiceFee(prices)!) +
                                               prices.reduce((value, element) =>
                                                   value + element);
                                       return Column(
@@ -296,7 +301,9 @@ class _BookingAppointmentState extends State<BookingAppointment> {
                           ? Text(widget.address)
                           : Column(
                               children: [
-                                Text(location),
+                                Text(location.isEmpty
+                                    ? 'My Location'
+                                    : location),
                                 InkWell(
                                     onTap: () {
                                       getCurrentLocation().then((value) {
@@ -314,7 +321,11 @@ class _BookingAppointmentState extends State<BookingAppointment> {
                                     )),
                                 InkWell(
                                   onTap: () {
-                                    openMap(lat, long);
+                                    try {
+                                      openMap(lat, long);
+                                    } catch (e) {
+                                      log(e.toString());
+                                    }
                                   },
                                   child: const Text(
                                     'Open Map',
@@ -356,7 +367,6 @@ class _BookingAppointmentState extends State<BookingAppointment> {
           latitude: double.parse(latitude), longitude: double.parse(longitude));
       String locationNow =
           '${address.streetAddress}, ${address.city}, ${address.countryName}';
-      log(address.toString());
       setState(() {
         location = locationNow;
       });
@@ -379,7 +389,6 @@ class _BookingAppointmentState extends State<BookingAppointment> {
     }
   }
 
-  String location = "My Location";
   Future<Position> getCurrentLocation() async {
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
@@ -427,14 +436,6 @@ class _BookingAppointmentState extends State<BookingAppointment> {
     } else {
       return DateTime.now();
     }
-  }
-
-  String getServiceFee(List<int> list) {
-    if (list.isEmpty) {
-      return '0.00';
-    }
-    int sum = list.reduce((value, element) => value + element);
-    return (sum * .05).toStringAsFixed(2);
   }
 
   Widget ServicesList(String id) {
@@ -537,7 +538,9 @@ class _BookingAppointmentState extends State<BookingAppointment> {
             ),
             TextButton(
               onPressed: () {
-                if (addedService.isEmpty || timeTo.isBefore(DateTime.now())) {
+                if (addedService.isEmpty ||
+                    timeTo.isBefore(DateTime.now()) ||
+                    (widget.role == 'freelancer' && location.isEmpty)) {
                   Navigator.of(context).pop();
                   toastification.show(
                     type: ToastificationType.error,
@@ -546,7 +549,7 @@ class _BookingAppointmentState extends State<BookingAppointment> {
                     autoCloseDuration: const Duration(seconds: 5),
                   );
                 } else {
-                  //insert method if appointment has conflict
+                  Navigator.of(context).pop();
                   Navigator.push(context, MaterialPageRoute(
                     builder: (context) {
                       if (widget.role == 'salon') {
@@ -558,8 +561,9 @@ class _BookingAppointmentState extends State<BookingAppointment> {
                           dateTimeFrom: timeFrom,
                           dateTimeTo: addDuration(timeTo),
                           cart: addedService,
+                          role: widget.role,
                         );
-                      } else {
+                      } else if (widget.role == 'freelancer') {
                         return PaymentScreen(
                           clientUsername: widget.username,
                           clientID: widget.userID,
@@ -568,7 +572,10 @@ class _BookingAppointmentState extends State<BookingAppointment> {
                           dateTimeFrom: timeFrom,
                           dateTimeTo: addDuration(timeTo),
                           cart: addedService,
+                          role: widget.role,
                         );
+                      } else {
+                        return Container();
                       }
                     },
                   ));
@@ -621,6 +628,14 @@ class _BookingAppointmentState extends State<BookingAppointment> {
       log('error getting start and end time $e');
       return [];
     }
+  }
+
+  String? getServiceFee(List<int> list) {
+    if (list.isEmpty) {
+      return null;
+    }
+    int sum = list.reduce((value, element) => value + element);
+    return (sum * .05).toStringAsFixed(2);
   }
 }
 

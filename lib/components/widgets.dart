@@ -169,6 +169,48 @@ SizedBox logOutButton(BuildContext context) {
   );
 }
 
+Row RowDetails(List<Widget> children) {
+  return Row(
+    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    children: children,
+  );
+}
+
+Container ServiceCard(String service) {
+  return Container(
+    margin: const EdgeInsets.fromLTRB(0, 0, 8, 0),
+    decoration: const BoxDecoration(
+        color: kPrimaryLightColor,
+        borderRadius: BorderRadius.all(Radius.circular(30))),
+    padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+    child: Text(
+      service,
+      style: const TextStyle(fontWeight: FontWeight.bold),
+    ),
+  );
+}
+
+Container bookingCard(Widget child) {
+  return Container(
+    width: double.infinity,
+    padding: const EdgeInsets.symmetric(
+        vertical: defaultPadding, horizontal: defaultPadding * 2),
+    margin: const EdgeInsets.symmetric(horizontal: defaultPadding),
+    decoration: const BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.all(Radius.circular(10)),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.grey,
+          blurRadius: 8,
+          offset: Offset(8, 8),
+        )
+      ],
+    ),
+    child: child,
+  );
+}
+
 //Loys' constant elevated button
 
 Widget elevButton({

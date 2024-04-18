@@ -141,7 +141,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         image: AssetImage(GoogleLogoImg),
                         width: 20.0,
                       ),
-                      label: Text('Sign-in with Google'))),
+                      label: Text('Login-in with Google'))),
               SizedBox(
                 height: 20,
               ),
@@ -266,21 +266,4 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
     ));
   }
-
-  // void _signIn() async {
-  //   String email = _emailController.text;
-  //   String password = _passwordController.text;
-  //   String error = '';
-
-  //   User? user = await _auth.signInWithEmailAndPassword(email, password);
-
-  //   if (_formKey.currentState!.validate()) {
-  //     print("User successfully LOGGED IN");
-  //     // Navigator.pushNamed(context, "/home");
-  //     Navigator.push(context,
-  //         MaterialPageRoute(builder: ((context) => const CustMainScreen())));
-  //   } else {
-  //     print("Some error happened");
-  //   }
-  // }
 }
