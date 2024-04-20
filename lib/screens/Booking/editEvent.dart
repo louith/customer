@@ -527,8 +527,8 @@ class _BookingAppointmentState extends State<BookingAppointment> {
       builder: (context) {
         return AlertDialog(
           title: const Text('Finish Booking?'),
-          content: const Text(
-              'Customers will need to pay 50% of the total amount if the chosen payment method is online to secure appointment schedule'),
+          content:
+              const Text("Appointment details can't be edited once submitted"),
           actions: [
             TextButton(
               onPressed: () {

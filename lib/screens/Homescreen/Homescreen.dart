@@ -5,6 +5,7 @@ import 'package:customer/components/constants.dart';
 import 'package:customer/features/parse.dart';
 import 'package:customer/screens/FreelancerCategoryScreens/Wax.dart';
 import 'package:customer/screens/FreelancerCategoryScreens/Hair.dart';
+import 'package:customer/screens/Homescreen/MainScreen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -22,7 +23,10 @@ class CustHome extends StatefulWidget {
   State<CustHome> createState() => _CustHomeState();
 }
 
+List<String> problems = ['Service provider did not show', 'Personal Emergency'];
+
 class _CustHomeState extends State<CustHome> {
+  String currentProblem = problems.first;
   User? currentUser = FirebaseAuth.instance.currentUser;
   final TextEditingController searchController = TextEditingController();
   final db = FirebaseFirestore.instance;
@@ -92,7 +96,6 @@ class _CustHomeState extends State<CustHome> {
                                     itemBuilder: (context, index) {
                                       if (index ==
                                           ongoing[0].services!.length) {
-                                        double serviceFee = 0;
                                         return Row(
                                           mainAxisAlignment:
                                               MainAxisAlignment.spaceBetween,
@@ -130,24 +133,102 @@ class _CustHomeState extends State<CustHome> {
                                 ],
                               ),
                               const Spacer(),
+                              InkWell(
+                                child: const Text(
+                                  'Report Problem',
+                                  style: TextStyle(
+                                      color: kPrimaryColor,
+                                      decoration: TextDecoration.underline),
+                                ),
+                                onTap: () {
+                                  //problem method
+                                  Navigator.of(context).pop();
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return StatefulBuilder(
+                                        builder: (context, setState) {
+                                          return AlertDialog(
+                                            title: const Text('Report Problem'),
+                                            content: Column(
+                                              children: [
+                                                RadioListTile(
+                                                  title: Text(problems[0]),
+                                                  value: problems[0],
+                                                  groupValue: currentProblem,
+                                                  onChanged: (value) =>
+                                                      setState(() {
+                                                    currentProblem =
+                                                        value.toString();
+                                                  }),
+                                                ),
+                                                RadioListTile(
+                                                  title: Text(problems[1]),
+                                                  value: problems[1],
+                                                  groupValue: currentProblem,
+                                                  onChanged: (value) =>
+                                                      setState(() {
+                                                    currentProblem =
+                                                        value.toString();
+                                                  }),
+                                                ),
+                                              ],
+                                            ),
+                                            actions: [
+                                              TextButton(
+                                                  onPressed: () async {
+                                                    await db
+                                                        .collection('users')
+                                                        .doc(adminUid)
+                                                        .collection('reports')
+                                                        .add({
+                                                      'customerID':
+                                                          currentUser!.uid,
+                                                      'referenceID':
+                                                          ongoing[0].reference,
+                                                      'problem': currentProblem,
+                                                      'clientID':
+                                                          ongoing[0].clientId,
+                                                      'paymentMethod':
+                                                          ongoing[0]
+                                                              .paymentMethod
+                                                    });
+                                                    Navigator.of(context).pop();
+                                                  },
+                                                  child: const Text('SUBMIT'))
+                                            ],
+                                          );
+                                        },
+                                      );
+                                    },
+                                  );
+                                },
+                              ),
                               Text(
                                 'ref: ${ongoing[0].reference}',
                                 style: const TextStyle(color: Colors.grey),
                               ),
                               SlideAction(
-                                onSubmit: () {
-                                  payService(ongoing[0].clientId,
-                                      ongoing[0].reference);
-                                  Navigator.of(context).pop();
-                                  setState(() {});
-                                  toastification.show(
-                                    type: ToastificationType.success,
-                                    context: context,
-                                    title: const Text('Services Paid'),
-                                    autoCloseDuration:
-                                        const Duration(seconds: 5),
-                                  );
-                                  return null;
+                                onSubmit: () async {
+                                  log(ongoing[0].reference);
+                                  // payService(ongoing[0].clientId,
+                                  //     ongoing[0].reference);
+                                  // await db
+                                  //     .collection('users')
+                                  //     .doc(currentUser!.uid)
+                                  //     .collection('transaction')
+                                  //     .doc(ongoing[0].reference)
+                                  //     .update({'description': 'payment'});
+                                  // Navigator.of(context).pop();
+                                  // setState(() {});
+                                  // toastification.show(
+                                  //   type: ToastificationType.success,
+                                  //   context: context,
+                                  //   title: const Text('Services Paid'),
+                                  //   autoCloseDuration:
+                                  //       const Duration(seconds: 5),
+                                  // );
+                                  // return null;
                                 },
                                 borderRadius: 8,
                                 elevation: 0,
@@ -282,6 +363,7 @@ class _CustHomeState extends State<CustHome> {
           .collection('bookings')
           .doc(reference)
           .update({'status': 'paid'});
+      // await db.collection('users').doc(currentUser!.uid).collection('transaction')
       //client
       await db
           .collection('users')
@@ -291,6 +373,23 @@ class _CustHomeState extends State<CustHome> {
           .update({'status': 'paid'});
     } catch (e) {
       log('error submitting payment $e');
+    }
+  }
+
+  Future<Customer?> getCustomerDetails() async {
+    try {
+      DocumentSnapshot query =
+          await db.collection('users').doc(currentUser!.uid).get();
+      return Customer(
+          fullName:
+              '${query['First Name']} ${query['Middle Name']} ${query['Last Name']}',
+          contactNum: query['Contact Number'],
+          gender: query['Gender'],
+          profilePicture: query['Profile Picture'],
+          username: query['Username']);
+    } catch (e) {
+      log(e.toString());
+      return null;
     }
   }
 

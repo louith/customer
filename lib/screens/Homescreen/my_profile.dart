@@ -5,6 +5,7 @@ import 'package:customer/components/constants.dart';
 import 'package:customer/components/widgets.dart';
 import 'package:customer/screens/Homescreen/Homescreen.dart';
 import 'package:customer/screens/Homescreen/booking_transcations.dart';
+import 'package:customer/screens/Homescreen/wallet_details.dart';
 import 'package:customer/screens/WelcomeScreen/CustWelcomeScreen.dart';
 import 'package:customer/screens/customerProfile/editProfile.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -15,11 +16,15 @@ class Profile {
   String username;
   String email;
   String profilePicture;
+  String uid;
+  dynamic wallet;
 
   Profile({
     required this.username,
     required this.email,
     required this.profilePicture,
+    required this.uid,
+    required this.wallet,
   });
 }
 
@@ -31,49 +36,37 @@ class MyProfile extends StatefulWidget {
 }
 
 class _MyProfileState extends State<MyProfile> {
-  User? _user;
-  String currUserEmail = '';
-  String currUserID = '';
+  User? currentUser = FirebaseAuth.instance.currentUser;
 
   @override
   void initState() {
     super.initState();
-    getCurrentUser();
-  }
-
-  void getCurrentUser() {
-    FirebaseAuth.instance.authStateChanges().listen((User? user) {
-      setState(() {
-        _user = user;
-        currUserEmail = _user!.email!;
-        currUserID = _user!.uid;
-      });
-    });
   }
 
   Future<Profile?> getUserProfile() async {
     try {
-      DocumentSnapshot<Map<String, dynamic>> userDoc = await FirebaseFirestore
-          .instance
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance
           .collection('users')
-          .doc(currUserID)
+          .doc(currentUser!.uid)
           .get();
-
       return Profile(
-          username: userDoc['Username'],
-          email: userDoc['Email'],
-          profilePicture: userDoc['Profile Picture']);
+        uid: userDoc.id,
+        username: userDoc['Username'],
+        email: userDoc['Email'],
+        profilePicture: userDoc['Profile Picture'],
+        wallet: userDoc['Wallet'],
+      );
     } catch (e) {
-      log(e.toString());
+      log("error getting profile data $e");
       return null;
     }
   }
 
-  void signUserOut() {
+  Future<void> signUserOut() async {
     try {
-      FirebaseAuth.instance.signOut();
-      Navigator.push(context,
-          MaterialPageRoute(builder: ((context) => const CustWelcome())));
+      await FirebaseAuth.instance.signOut();
+      Navigator.of(context, rootNavigator: true).pushReplacement(
+          MaterialPageRoute(builder: (context) => const CustWelcome()));
     } catch (e) {
       log('error signing out $e');
     }
@@ -121,71 +114,83 @@ class _MyProfileState extends State<MyProfile> {
                             style: const TextStyle(
                                 fontWeight: FontWeight.bold, fontSize: 20),
                           ),
-                          Text(profileData.email)
+                          Text(profileData.email),
+                          const SizedBox(height: 20),
+                          SizedBox(
+                              width: 200,
+                              height: 45,
+                              child: elevButton(
+                                  title: 'Edit Profile',
+                                  onClicked: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: ((context) =>
+                                                EditProfile())));
+                                    //separate page na dapat na naga fetch ug data from db
+                                  })),
+                          const SizedBox(height: defaultPadding),
+                          const Divider(),
+                          const SizedBox(height: defaultPadding),
+                          //Menu
+                          ProfileMenuWidget(
+                            title: 'My Addresses',
+                            icon: LineIcons.locationArrow,
+                            onPress: () {},
+                          ),
+                          ProfileMenuWidget(
+                            title: 'Settings',
+                            icon: LineIcons.cog,
+                            onPress: () {},
+                          ),
+                          ProfileMenuWidget(
+                            title: 'Wallet Details',
+                            icon: LineIcons.wallet,
+                            onPress: () {
+                              Navigator.push(context, MaterialPageRoute(
+                                builder: (context) {
+                                  return WalletDetails(
+                                    profile: profileData,
+                                  );
+                                },
+                              ));
+                            },
+                          ),
+                          ProfileMenuWidget(
+                            title: 'Booking Transactions',
+                            icon: LineIcons.calendar,
+                            onPress: () {
+                              Navigator.push(context, MaterialPageRoute(
+                                builder: (context) {
+                                  return BookingTransactions(
+                                    uid: profileData.uid,
+                                  );
+                                },
+                              ));
+                            },
+                          ),
+                          const Divider(),
+                          const SizedBox(height: defaultPadding),
+                          Container(
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                                color: kPrimaryColor.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(20)),
+                            child: ProfileMenuWidget(
+                              title: 'Logout',
+                              icon: LineIcons.alternateSignOut,
+                              endIcon: false,
+                              onPress: signUserOut,
+                            ),
+                          ),
                         ],
                       );
                     } else {
+                      // return Text('data');
                       return const CircularProgressIndicator(
                           color: kPrimaryColor);
                     }
                   },
-                ),
-                const SizedBox(height: 20),
-                SizedBox(
-                    width: 200,
-                    height: 45,
-                    child: elevButton(
-                        title: 'Edit Profile',
-                        onClicked: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: ((context) => EditProfile())));
-                          //separate page na dapat na naga fetch ug data from db
-                        })),
-                const SizedBox(height: defaultPadding),
-                const Divider(),
-                const SizedBox(height: defaultPadding),
-                //Menu
-                ProfileMenuWidget(
-                  title: 'My Addresses',
-                  icon: LineIcons.locationArrow,
-                  onPress: () {},
-                ),
-                ProfileMenuWidget(
-                  title: 'Settings',
-                  icon: LineIcons.cog,
-                  onPress: () {},
-                ),
-                ProfileMenuWidget(
-                  title: 'Billing Details',
-                  icon: LineIcons.wallet,
-                  onPress: () {},
-                ),
-                ProfileMenuWidget(
-                  title: 'Booking Transactions',
-                  icon: LineIcons.calendar,
-                  onPress: () {
-                    Navigator.push(context, MaterialPageRoute(
-                      builder: (context) {
-                        return BookingTransactions();
-                      },
-                    ));
-                  },
-                ),
-                const Divider(),
-                const SizedBox(height: defaultPadding),
-                Container(
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                      color: kPrimaryColor.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(20)),
-                  child: ProfileMenuWidget(
-                    title: 'Logout',
-                    icon: LineIcons.alternateSignOut,
-                    endIcon: false,
-                    onPress: signUserOut,
-                  ),
                 ),
               ],
             ),

@@ -1,10 +1,9 @@
-import 'dart:developer';
-
 import 'package:customer/components/background.dart';
 import 'package:customer/components/constants.dart';
 import 'package:customer/components/widgets.dart';
 import 'package:customer/screens/Homescreen/booking_transcations.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 
 class TransactionHistory extends StatelessWidget {
@@ -75,12 +74,16 @@ class TransactionHistory extends StatelessWidget {
                 const Text('Address'),
                 Text(transactions.location,
                     style: const TextStyle(fontWeight: FontWeight.bold)),
+                const SizedBox(height: defaultPadding),
                 transactions.preferredWorker != null
-                    ? Column(
+                    ? Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const SizedBox(height: defaultPadding),
                           const Text('Preferred Stylist'),
-                          Text(transactions.preferredWorker!)
+                          Text(
+                            transactions.preferredWorker!,
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          )
                         ],
                       )
                     : Container()
@@ -97,9 +100,13 @@ class TransactionHistory extends StatelessWidget {
                 const SizedBox(height: defaultPadding),
                 RowDetails([
                   const Text('Booked Provider'),
-                  Text(
-                    transactions.clientID,
-                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  const Spacer(),
+                  Flexible(
+                    child: Text(
+                      overflow: TextOverflow.ellipsis,
+                      transactions.clientID,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
                   )
                 ]),
                 RowDetails([
@@ -109,6 +116,12 @@ class TransactionHistory extends StatelessWidget {
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   )
                 ]),
+                if (transactions.status == 'denied' &&
+                    transactions.reason != null)
+                  RowDetails([
+                    const Text('Reason'),
+                    Text(transactions.reason!),
+                  ]),
               ],
             ))
           ],

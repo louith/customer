@@ -21,6 +21,7 @@ class Transactions {
   String serviceFee;
   List<dynamic> services;
   String? preferredWorker;
+  String? reason;
 
   Transactions({
     required this.clientID,
@@ -34,11 +35,16 @@ class Transactions {
     required this.serviceFee,
     required this.total,
     this.preferredWorker,
+    this.reason,
   });
 }
 
 class BookingTransactions extends StatefulWidget {
-  const BookingTransactions({super.key});
+  String uid;
+  BookingTransactions({
+    super.key,
+    required this.uid,
+  });
 
   @override
   State<BookingTransactions> createState() => _BookingTransactionsState();
@@ -52,21 +58,34 @@ class _BookingTransactionsState extends State<BookingTransactions> {
     try {
       QuerySnapshot querySnapshot = await db
           .collection('users')
-          .doc(currentUser!.uid)
+          .doc(widget.uid)
           .collection('bookings')
           .get();
-      querySnapshot.docs.forEach((element) {
+      querySnapshot.docs.forEach((doc) {
+        String? reason;
+        String? worker;
+        if ((doc.data() as Map<String, dynamic>).containsKey('reason')) {
+          reason = doc['reason'];
+        }
+        if ((doc.data() as Map<String, dynamic>).containsKey('worker')) {
+          worker = doc['worker'];
+        }
+
+        // String? worker = doc['worker'];
+        //add required fields
         transactionsList.add(Transactions(
-          serviceFee: element['serviceFee'],
-          total: element['totalAmount'],
-          clientID: element['clientUsername'],
-          dateFrom: element['dateFrom'].toDate(),
-          dateTo: element['dateTo'].toDate(),
-          location: element['location'],
-          paymentMethod: element['paymentMethod'],
-          reference: element['reference'],
-          status: element['status'],
-          services: element['services'],
+          serviceFee: doc['serviceFee'],
+          total: doc['totalAmount'],
+          clientID: doc['clientUsername'],
+          dateFrom: doc['dateFrom'].toDate(),
+          dateTo: doc['dateTo'].toDate(),
+          location: doc['location'],
+          paymentMethod: doc['paymentMethod'],
+          reference: doc['reference'],
+          status: doc['status'],
+          services: doc['services'],
+          preferredWorker: worker,
+          reason: reason,
         ));
       });
       return transactionsList;
@@ -133,16 +152,21 @@ class _BookingTransactionsState extends State<BookingTransactions> {
                                     ],
                                   ),
                                   //status
+                                ],
+                              ),
+                              const SizedBox(height: defaultPadding),
+                              Text(data[index].location), //address
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
                                   Text(
                                     data[index].status.toUpperCase(),
                                     style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         color: statusColor),
-                                  )
+                                  ),
                                 ],
-                              ),
-                              const SizedBox(height: defaultPadding),
-                              Text(data[index].location), //address
+                              )
                             ],
                           ),
                           TransactionHistory(transactions: data[index]));

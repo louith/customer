@@ -31,7 +31,7 @@ TextFormField textField(
 }
 
 TextField flatTextField(String text, TextEditingController controller,
-    {void Function(String)? onchanged}) {
+    {void Function(String)? onchanged, dynamic numberfield}) {
   return TextField(
     onChanged: onchanged,
     style: const TextStyle(
@@ -43,6 +43,7 @@ TextField flatTextField(String text, TextEditingController controller,
     decoration: InputDecoration(
       hintText: text,
     ),
+    keyboardType: numberfield,
   );
 }
 

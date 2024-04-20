@@ -3,18 +3,13 @@ import 'package:customer/screens/Booking/EditEventComponents/event_provider.dart
 import 'package:customer/screens/SignupLogin/Login.dart';
 import 'package:customer/screens/WelcomeScreen/CustWelcomeScreen.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '.env';
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  Stripe.publishableKey = stripePublishableKey;
-  await Stripe.instance.applySettings();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
