@@ -7,6 +7,7 @@ const kPrimaryLightColor = Color(0xFFF1E6FF);
 const kLoysPrimaryIconColor = Color.fromARGB(255, 226, 211, 245);
 const successGreen = Color.fromARGB(217, 20, 92, 28);
 const toastBG = Color(0xE2D7ED);
+const grayText = Colors.black12;
 //E2D3F5
 const double defaultPadding = 16.0;
 const double defaultformspacing = 5;

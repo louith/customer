@@ -10,6 +10,13 @@ class EditProfile extends StatefulWidget {
 class _EditProfileState extends State<EditProfile> {
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Edit paking profile'),
+      ),
+      body: Center(
+        child: Text('ha? hatdog'),
+      ),
+    );
   }
 }
