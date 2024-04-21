@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:customer/components/assets_strings.dart';
@@ -162,7 +163,8 @@ class _CustProfileState extends State<CustProfile> {
           'Username': userName,
           'Password': password,
           'role': 'customer',
-          'Profile Picture': profpicURL
+          'Profile Picture': profpicURL,
+          "Wallet": 0.0,
         };
         // Add document to the collection
         await users.set(userData);
@@ -244,9 +246,13 @@ class _CustProfileState extends State<CustProfile> {
               child: const Text('Log Out'),
               onPressed: () async {
                 await FirebaseAuth.instance.signOut();
-                if (mounted) {
-                  Navigator.pop(context);
-                  Navigator.pop(context);
+                try {
+                  if (mounted) {
+                    Navigator.pop(context);
+                    Navigator.pop(context);
+                  }
+                } catch (e) {
+                  log(e.toString());
                 }
               },
             ),
@@ -459,13 +465,13 @@ class _CustProfileState extends State<CustProfile> {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
+                            const Text(
                               'Address Name',
                               style: TextStyle(color: kPrimaryColor),
                             ),
                             FormContainerWidget(
                                 hintText: 'Home',
-                                controller: _city,
+                                controller: _addressName,
                                 labelText: 'City',
                                 validator: (value) => value!.isEmpty
                                     ? 'Field cannot be empty'

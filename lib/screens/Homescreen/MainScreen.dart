@@ -21,7 +21,6 @@ class CustMainScreen extends StatefulWidget {
 class _CustMainScreenState extends State<CustMainScreen> {
   int index = 0;
   User? currentUser = FirebaseAuth.instance.currentUser;
-  String username = '';
 
   PersistentTabController persistentTabController =
       PersistentTabController(initialIndex: 0);
@@ -51,10 +50,14 @@ class _CustMainScreenState extends State<CustMainScreen> {
               ),
               child: const Text('Log Out'),
               onPressed: () async {
-                await FirebaseAuth.instance.signOut();
-                if (mounted) {
-                  Navigator.pop(context);
-                  Navigator.pop(context);
+                try {
+                  await FirebaseAuth.instance.signOut();
+                  if (mounted) {
+                    Navigator.pop(context);
+                    Navigator.pop(context);
+                  }
+                } catch (e) {
+                  log(e.toString());
                 }
               },
             ),
@@ -62,28 +65,6 @@ class _CustMainScreenState extends State<CustMainScreen> {
         );
       },
     );
-  }
-
-  Future<void> getUsername() async {
-    try {
-      DocumentSnapshot query =
-          await db.collection('users').doc(currentUser!.uid).get();
-      if (query.exists) {
-        setState(() {
-          username = query['Username'];
-        });
-      }
-      log(username);
-    } catch (e) {
-      log(e.toString());
-    }
-  }
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    getUsername();
   }
 
   @override
@@ -124,7 +105,7 @@ class _CustMainScreenState extends State<CustMainScreen> {
       const CustHome(),
       const AllWorkers(),
       GeneralChatPage(
-        username: username,
+        username: 'username',
       ),
       const MyProfile(),
     ];
@@ -158,4 +139,20 @@ List<PersistentBottomNavBarItem> navbarItems() {
       inactiveColorPrimary: kPrimaryLightColor,
     ),
   ];
+}
+
+class Customer {
+  String contactNum;
+  String fullName;
+  String gender;
+  String profilePicture;
+  String username;
+
+  Customer({
+    required this.contactNum,
+    required this.fullName,
+    required this.gender,
+    required this.profilePicture,
+    required this.username,
+  });
 }

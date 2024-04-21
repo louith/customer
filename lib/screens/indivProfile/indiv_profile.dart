@@ -6,6 +6,7 @@ import 'package:customer/models/service.dart';
 import 'package:customer/screens/Booking/bookingScreen.dart';
 import 'package:customer/screens/Chat/indivChat.dart';
 import 'package:customer/screens/ServicesOffered/servicesList.dart';
+import 'package:customer/screens/indivProfile/moreinfo_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:intl/intl.dart';
@@ -229,7 +230,16 @@ class IndivWorkerProfile extends StatelessWidget {
                                 ],
                               ),
                               InkWell(
-                                  onTap: () {},
+                                  onTap: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => MoreInfo(
+                                            clientId: snapshot.data!.id,
+                                            role: snapshot.data!.role,
+                                          ),
+                                        ));
+                                  },
                                   child: const Text(
                                     'More Info',
                                     style: TextStyle(

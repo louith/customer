@@ -1,12 +1,14 @@
 // ignore_for_file: must_be_immutable
 import 'dart:developer';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:customer/components/background.dart';
 import 'package:customer/components/constants.dart';
 import 'package:customer/screens/Booking/approve_appointment.dart';
+import 'package:customer/screens/Homescreen/MainScreen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:customer/models/service.dart';
-import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:intl/intl.dart';
 
 class PaymentScreen extends StatefulWidget {
@@ -37,7 +39,9 @@ class PaymentScreen extends StatefulWidget {
 
 class _PaymentScreenState extends State<PaymentScreen> {
   late String serviceFee;
-  List<int> prices = [];
+  List<num> prices = [];
+  final db = FirebaseFirestore.instance;
+  final currentUser = FirebaseAuth.instance.currentUser;
 
   @override
   void initState() {
@@ -53,38 +57,67 @@ class _PaymentScreenState extends State<PaymentScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Background(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            const Text(
-              'Select Payment Method',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                  color: kPrimaryColor),
-            ),
-            ListTile(
-              title: const Text('Cash'),
-              onTap: () {
-                approveAppointment(
-                    'Cash',
-                    ApproveAppointment(
-                      serviceFee: serviceFee,
-                      clientUsername: widget.clientUsername,
-                      clientID: widget.clientID,
-                      customerUsername: widget.customerUsername,
-                      cart: widget.cart,
-                      address: widget.address,
-                      dateTimeFrom: widget.dateTimeFrom,
-                      dateTimeTo: widget.dateTimeTo,
-                      paymentMethod: 'Cash',
-                      role: widget.role,
-                    ));
-              },
-            ),
-          ],
-        ),
+        child: StreamBuilder<Customer?>(
+            stream: Stream.fromFuture(getCustomerDetails()),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const Text(
+                      'Select Payment Method',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          color: kPrimaryColor),
+                    ),
+                    ListTile(
+                      title: const Text('Cash'),
+                      onTap: () {
+                        approveAppointment(
+                            'Cash',
+                            ApproveAppointment(
+                              customer: snapshot.data!,
+                              serviceFee: serviceFee,
+                              clientUsername: widget.clientUsername,
+                              clientID: widget.clientID,
+                              customerUsername: widget.customerUsername,
+                              cart: widget.cart,
+                              address: widget.address,
+                              dateTimeFrom: widget.dateTimeFrom,
+                              dateTimeTo: widget.dateTimeTo,
+                              paymentMethod: 'Cash',
+                              role: widget.role,
+                            ));
+                      },
+                    ),
+                    ListTile(
+                      title: const Text('Online Wallet'),
+                      onTap: () {
+                        approveAppointment(
+                            'Cash',
+                            ApproveAppointment(
+                              customer: snapshot.data!,
+                              serviceFee: serviceFee,
+                              clientUsername: widget.clientUsername,
+                              clientID: widget.clientID,
+                              customerUsername: widget.customerUsername,
+                              cart: widget.cart,
+                              address: widget.address,
+                              dateTimeFrom: widget.dateTimeFrom,
+                              dateTimeTo: widget.dateTimeTo,
+                              paymentMethod: 'Online Wallet',
+                              role: widget.role,
+                            ));
+                      },
+                    ),
+                  ],
+                );
+              } else {
+                return const CircularProgressIndicator();
+              }
+            }),
       ),
     );
   }
@@ -107,54 +140,21 @@ class _PaymentScreenState extends State<PaymentScreen> {
         cart.fold(0, (previousValue, element) => int.parse(element.price));
     return amount;
   }
-}
 
-class PayCard extends StatelessWidget {
-  PayCard({super.key});
-
-  final CardFormEditController cardFormEditController =
-      CardFormEditController();
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Background(
-          child: Container(
-        margin: EdgeInsets.fromLTRB(15, 0, 15, 0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            const Text(
-              'Pay with Card',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                  color: kPrimaryColor),
-            ),
-            const SizedBox(height: defaultPadding),
-            const Row(
-              children: [
-                Text(
-                  'Card Form',
-                  style: TextStyle(fontSize: 16),
-                  textAlign: TextAlign.left,
-                ),
-              ],
-            ),
-            CardFormField(
-              controller: cardFormEditController,
-            ),
-            const SizedBox(height: defaultPadding),
-            ElevatedButton(
-                onPressed: () {},
-                child: const Text(
-                  'Pay',
-                  style: TextStyle(color: kPrimaryLightColor),
-                )),
-          ],
-        ),
-      )),
-    );
+  Future<Customer?> getCustomerDetails() async {
+    try {
+      DocumentSnapshot query =
+          await db.collection('users').doc(currentUser!.uid).get();
+      return Customer(
+          fullName:
+              '${query['First Name']} ${query['Middle Name']} ${query['Last Name']}',
+          contactNum: query['Contact Number'],
+          gender: query['Gender'],
+          profilePicture: query['Profile Picture'],
+          username: query['Username']);
+    } catch (e) {
+      log(e.toString());
+      return null;
+    }
   }
 }

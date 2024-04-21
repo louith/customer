@@ -1,6 +1,8 @@
+
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'package:customer/components/background.dart';
 import 'package:customer/components/constants.dart';
 import 'package:customer/components/widgets.dart';
@@ -103,12 +105,25 @@ class _TransactionHistoryState extends State<TransactionHistory> {
                 const Text('Address'),
                 Text(widget.transactions.location,
                     style: const TextStyle(fontWeight: FontWeight.bold)),
+// <<<<<<< master
+//                 const SizedBox(height: defaultPadding),
+//                 transactions.preferredWorker != null
+//                     ? Row(
+//                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+// =======
                 widget.transactions.preferredWorker != null
                     ? Column(
+
                         children: [
-                          const SizedBox(height: defaultPadding),
                           const Text('Preferred Stylist'),
+// <<<<<<< master
+//                           Text(
+//                             transactions.preferredWorker!,
+//                             style: const TextStyle(fontWeight: FontWeight.bold),
+//                           )
+// =======
                           Text(widget.transactions.preferredWorker!)
+
                         ],
                       )
                     : Container()
@@ -125,6 +140,15 @@ class _TransactionHistoryState extends State<TransactionHistory> {
                 const SizedBox(height: defaultPadding),
                 RowDetails([
                   const Text('Booked Provider'),
+// <<<<<<< master
+//                   const Spacer(),
+//                   Flexible(
+//                     child: Text(
+//                       overflow: TextOverflow.ellipsis,
+//                       transactions.clientID,
+//                       style: const TextStyle(fontWeight: FontWeight.bold),
+//                     ),
+// =======
                   Text(
                     widget.transactions.clientID,
                     style: const TextStyle(fontWeight: FontWeight.bold),
@@ -137,6 +161,14 @@ class _TransactionHistoryState extends State<TransactionHistory> {
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   )
                 ]),
+
+                if (transactions.status == 'denied' &&
+                    transactions.reason != null)
+                  RowDetails([
+                    const Text('Reason'),
+                    Text(transactions.reason!),
+                  ]),
+
                 const SizedBox(height: defaultPadding),
                 FutureBuilder<bool>(
                     future: doesSubcollectionExist(),
@@ -185,6 +217,7 @@ class _TransactionHistoryState extends State<TransactionHistory> {
                             ]);
                       }
                     })
+
               ],
             ))
           ],

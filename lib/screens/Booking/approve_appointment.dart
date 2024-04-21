@@ -8,10 +8,13 @@ import 'package:customer/components/constants.dart';
 import 'package:customer/components/widgets.dart';
 import 'package:customer/models/service.dart';
 import 'package:customer/screens/Booking/added_appointment.dart';
+import 'package:customer/screens/Homescreen/MainScreen.dart';
+import 'package:customer/screens/Homescreen/wallet_details.dart';
 import 'package:customer/screens/customerProfile/custprofile.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:toastification/toastification.dart';
 
 class Staff {
   String name;
@@ -36,9 +39,11 @@ class ApproveAppointment extends StatefulWidget {
   String clientUsername;
   String role;
   String serviceFee;
+  Customer customer;
 
   ApproveAppointment({
     super.key,
+    required this.customer,
     required this.clientID,
     required this.clientUsername,
     required this.customerUsername,
@@ -93,6 +98,12 @@ class _ApproveAppointmentState extends State<ApproveAppointment> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text('Customer Name'),
+                Text(
+                  widget.customer.fullName,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: defaultPadding),
+                const Text('Customer Username'),
                 Text(
                   widget.customerUsername,
                   style: const TextStyle(fontWeight: FontWeight.bold),
@@ -199,22 +210,36 @@ class _ApproveAppointmentState extends State<ApproveAppointment> {
             Container(
                 margin: const EdgeInsets.symmetric(horizontal: defaultPadding),
                 child: ElevatedButton(
-                    onPressed: () {
-                      bookingToFirestore(format.format(
-                              double.parse(getServiceFeeFromList(prices))))
-                          .then((value) {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => AddedAppointment(
-                                reference: ref,
-                                amountPaid: getTotal().toStringAsFixed(2),
-                                paymentMethod: widget.paymentMethod,
-                                date:
-                                    '${DateFormat.jm().format(widget.dateTimeFrom)} - ${DateFormat.jm().format(widget.dateTimeTo)} | ${DateFormat('MMMMd').format(widget.dateTimeTo)}',
-                              ),
-                            ));
-                      });
+                    onPressed: () async {
+                      //if online payment
+                      if (widget.paymentMethod.toLowerCase() ==
+                          "online wallet") {
+                        //check wallet if has enough balance
+                        if (getTotal() > await computeBalance()) {
+                          toastification.show(
+                            type: ToastificationType.error,
+                            context: context,
+                            title: const Text('Not enough balace'),
+                            autoCloseDuration: const Duration(seconds: 5),
+                          );
+                        } else {
+                          await addBookingWithPayment();
+                          //add sa transaction collection
+                          await db
+                              .collection('users')
+                              .doc(currentUser!.uid)
+                              .collection('transaction')
+                              .doc(ref)
+                              .set({
+                            'amount': -getTotal(),
+                            'description': 'on hold',
+                            'timestamp': DateTime.now(),
+                          });
+                        }
+                        //if cash payment
+                      } else if (widget.paymentMethod.toLowerCase() == "cash") {
+                        addBookingWithPayment();
+                      }
                     },
                     child: const Text(
                       'BOOK',
@@ -225,6 +250,24 @@ class _ApproveAppointmentState extends State<ApproveAppointment> {
         )
       ],
     ));
+  }
+
+  Future<void> addBookingWithPayment() async {
+    bookingToFirestore(
+            format.format(double.parse(getServiceFeeFromList(prices))))
+        .then((value) {
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => AddedAppointment(
+              reference: ref,
+              amountPaid: getTotal().toStringAsFixed(2),
+              paymentMethod: widget.paymentMethod,
+              date:
+                  '${DateFormat.jm().format(widget.dateTimeFrom)} - ${DateFormat.jm().format(widget.dateTimeTo)} | ${DateFormat('MMMMd').format(widget.dateTimeTo)}',
+            ),
+          ));
+    });
   }
 
   Future<List<String>> getStaffs() async {
@@ -240,6 +283,7 @@ class _ApproveAppointmentState extends State<ApproveAppointment> {
           staffList.add(element['name']);
         });
       }
+      staffList.add('Any');
       return staffList;
     } catch (e) {
       log('error getting staff $e');
@@ -288,46 +332,34 @@ class _ApproveAppointmentState extends State<ApproveAppointment> {
       ref = newDocRef.id;
     });
     try {
+      Map<String, dynamic> booking = {
+        'serviceFee': widget.serviceFee,
+        'totalAmount': format.format(getTotal()),
+        'clientId': widget.clientID,
+        'customerUsername': widget.customerUsername,
+        'clientUsername': widget.clientUsername,
+        'services': services,
+        'dateFrom': widget.dateTimeFrom,
+        'dateTo': widget.dateTimeTo,
+        'status': 'pending',
+        'paymentMethod': widget.paymentMethod,
+        'location': widget.address,
+        'reference': newDocRef.id,
+      };
       //add appointment to client db
       await db
           .collection('users')
           .doc(widget.clientID)
           .collection('bookings')
           .doc(newDocRef.id)
-          .set({
-        'serviceFee': widget.serviceFee,
-        'totalAmount': format.format(getTotal()),
-        'clientId': widget.clientID,
-        'customerUsername': widget.customerUsername,
-        'clientUsername': widget.clientUsername,
-        'services': services,
-        'dateFrom': widget.dateTimeFrom,
-        'dateTo': widget.dateTimeTo,
-        'status': 'pending',
-        'paymentMethod': widget.paymentMethod,
-        'location': widget.address,
-        'reference': newDocRef.id,
-      });
+          .set(booking);
       //add appointment to customer db
       await db
           .collection('users')
           .doc(currentUser!.uid)
           .collection('bookings')
           .doc(newDocRef.id)
-          .set({
-        'serviceFee': widget.serviceFee,
-        'totalAmount': format.format(getTotal()),
-        'clientId': widget.clientID,
-        'customerUsername': widget.customerUsername,
-        'clientUsername': widget.clientUsername,
-        'services': services,
-        'dateFrom': widget.dateTimeFrom,
-        'dateTo': widget.dateTimeTo,
-        'status': 'pending',
-        'paymentMethod': widget.paymentMethod,
-        'location': widget.address,
-        'reference': newDocRef.id,
-      });
+          .set(booking);
       //add preferred stylist
       if (dropdownValue != null) {
         //client db
@@ -347,6 +379,25 @@ class _ApproveAppointmentState extends State<ApproveAppointment> {
             .doc(newDocRef.id)
             .update({
           'worker': dropdownValue,
+        });
+      } else {
+        //client db
+        await db
+            .collection('users')
+            .doc(widget.clientID)
+            .collection('bookings')
+            .doc(newDocRef.id)
+            .update({
+          'worker': "Any",
+        });
+        //customer db
+        await db
+            .collection('users')
+            .doc(currentUser!.uid)
+            .collection('bookings')
+            .doc(newDocRef.id)
+            .update({
+          'worker': "Any",
         });
       }
     } catch (e) {
