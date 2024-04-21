@@ -23,7 +23,8 @@ class AllWorkerCard {
   bool containsSearchVal(String searched) {
     return subcategories
             .any((element) => element.toLowerCase().contains(searched)) ||
-        name.toLowerCase().contains(searched);
+        name.toLowerCase().contains(searched) ||
+        address.toLowerCase().contains(searched);
   }
 }
 
