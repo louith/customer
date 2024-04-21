@@ -152,11 +152,11 @@ class _MyProfileState extends State<MyProfile> {
                   icon: LineIcons.locationArrow,
                   onPress: () {},
                 ),
-                ProfileMenuWidget(
-                  title: 'Settings',
-                  icon: LineIcons.cog,
-                  onPress: () {},
-                ),
+                // ProfileMenuWidget(
+                // title: 'Settings',
+                // icon: LineIcons.cog,
+                // onPress: () {},
+                // ),
                 ProfileMenuWidget(
                   title: 'Billing Details',
                   icon: LineIcons.wallet,

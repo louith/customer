@@ -154,7 +154,7 @@ class SubCategoriesRow extends StatelessWidget {
             decoration: BoxDecoration(
                 color: Colors.purple[100],
                 borderRadius: BorderRadius.circular(100)),
-            child: Text(itemList[index]),
+            child: Text(itemList[index].toString()),
           ),
         ),
       ),

@@ -1,19 +1,44 @@
 import 'dart:developer';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:customer/components/background.dart';
 import 'package:customer/components/constants.dart';
 import 'package:customer/components/widgets.dart';
 import 'package:customer/screens/Homescreen/booking_transcations.dart';
+import 'package:customer/screens/Rating/rating.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 
-class TransactionHistory extends StatelessWidget {
+// final db = FirebaseFirestore.instance;
+
+class TransactionHistory extends StatefulWidget {
   Transactions transactions;
 
   TransactionHistory({
     super.key,
     required this.transactions,
   });
+
+  @override
+  State<TransactionHistory> createState() => _TransactionHistoryState();
+}
+
+class _TransactionHistoryState extends State<TransactionHistory> {
+  User? currentUser = FirebaseAuth.instance.currentUser;
+  bool ratingIsExisting = false;
+  Future<bool> doesSubcollectionExist() async {
+    QuerySnapshot<Map<String, dynamic>> documentSnapshot =
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(currentUser!.uid)
+            .collection('bookings')
+            .doc(widget.transactions.clientID)
+            .collection('rating')
+            .get();
+    return documentSnapshot.docs.isNotEmpty;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +49,7 @@ class TransactionHistory extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text('ref: ${transactions.reference}'),
+            Text('ref: ${widget.transactions.reference}'),
             const SizedBox(height: defaultPadding),
             bookingCard(Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -36,23 +61,26 @@ class TransactionHistory extends StatelessWidget {
                 const SizedBox(height: defaultPadding),
                 RowDetails([
                   const Text('Payment Method'),
-                  Text(transactions.paymentMethod),
+                  Text(widget.transactions.paymentMethod),
                 ]),
-                RowDetails(
-                    [const Text('Total'), Text('PHP ${transactions.total}')]),
+                RowDetails([
+                  const Text('Total'),
+                  Text('PHP ${widget.transactions.total}')
+                ]),
                 const Divider(),
                 RowDetails([
                   const Text('Serivce Fee'),
-                  Text('PHP ${transactions.serviceFee}'),
+                  Text('PHP ${widget.transactions.serviceFee}'),
                 ]),
                 ListView.builder(
                   shrinkWrap: true,
-                  itemCount: transactions.services.length,
+                  itemCount: widget.transactions.services.length,
                   itemBuilder: (context, index) {
                     return RowDetails([
-                      Text('${transactions.services[index]['serviceName']}'),
                       Text(
-                          'PHP ${transactions.services[index]['price'].toStringAsFixed(2)}'),
+                          '${widget.transactions.services[index]['serviceName']}'),
+                      Text(
+                          'PHP ${widget.transactions.services[index]['price'].toStringAsFixed(2)}'),
                     ]);
                   },
                 ),
@@ -70,17 +98,17 @@ class TransactionHistory extends StatelessWidget {
                 const Text('Time & Date'),
                 Text(
                     style: const TextStyle(fontWeight: FontWeight.bold),
-                    '${DateFormat.jm().format(transactions.dateFrom)} - ${DateFormat.jm().format(transactions.dateTo)} | ${DateFormat('MMMMd').format(transactions.dateTo)}'),
+                    '${DateFormat.jm().format(widget.transactions.dateFrom)} - ${DateFormat.jm().format(widget.transactions.dateTo)} | ${DateFormat('MMMMd').format(widget.transactions.dateTo)}'),
                 const SizedBox(height: defaultPadding),
                 const Text('Address'),
-                Text(transactions.location,
+                Text(widget.transactions.location,
                     style: const TextStyle(fontWeight: FontWeight.bold)),
-                transactions.preferredWorker != null
+                widget.transactions.preferredWorker != null
                     ? Column(
                         children: [
                           const SizedBox(height: defaultPadding),
                           const Text('Preferred Stylist'),
-                          Text(transactions.preferredWorker!)
+                          Text(widget.transactions.preferredWorker!)
                         ],
                       )
                     : Container()
@@ -98,17 +126,65 @@ class TransactionHistory extends StatelessWidget {
                 RowDetails([
                   const Text('Booked Provider'),
                   Text(
-                    transactions.clientID,
+                    widget.transactions.clientID,
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   )
                 ]),
                 RowDetails([
                   const Text('Status'),
                   Text(
-                    transactions.status.toUpperCase(),
+                    widget.transactions.status.toUpperCase(),
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   )
                 ]),
+                const SizedBox(height: defaultPadding),
+                FutureBuilder<bool>(
+                    future: doesSubcollectionExist(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Center(
+                          child: Text(
+                            'loading Review button...',
+                            style: TextStyle(
+                                fontStyle: FontStyle.italic,
+                                color: grayText,
+                                fontSize: 12),
+                          ),
+                        );
+                      } else if (snapshot.hasError) {
+                        return Text('Error: ${snapshot.error}');
+                      } else {
+                        ratingIsExisting = snapshot.data!;
+
+                        return Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(ratingIsExisting
+                                  ? 'Rating'
+                                  : 'No rating yet'),
+                              TextButton(
+                                  onPressed: () {
+                                    // print(widget.transactions.reference);
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => Rating(
+                                                  // transactions:
+                                                  // widget.transactions,
+                                                  reference: widget
+                                                      .transactions.reference,
+                                                )));
+                                  },
+                                  child: Text(
+                                    ratingIsExisting
+                                        ? 'View rating'
+                                        : 'Leave a rating',
+                                    style: TextStyle(
+                                        decoration: TextDecoration.underline),
+                                  ))
+                            ]);
+                      }
+                    })
               ],
             ))
           ],

@@ -60,6 +60,7 @@ dependencies:
   flutter_bloc: ^8.1.5
   equatable: ^2.0.5
   slide_to_act: ^2.0.2
+  simple_accordion: ^0.1.4
 
 dev_dependencies:
   flutter_test:
