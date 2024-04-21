@@ -2,6 +2,26 @@ import 'package:customer/components/constants.dart';
 import 'package:customer/screens/WelcomeScreen/CustWelcomeScreen.dart';
 import 'package:flutter/material.dart';
 
+Container details(String title, String deets) {
+  return Container(
+    padding: const EdgeInsets.all(defaultPadding / 2),
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          title,
+          style: const TextStyle(
+              color: Colors.black45, fontWeight: FontWeight.w500),
+        ),
+        Text(
+          deets,
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+      ],
+    ),
+  );
+}
+
 TextFormField textField(
   String text,
   IconData icon,

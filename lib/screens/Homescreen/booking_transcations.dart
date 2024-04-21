@@ -122,13 +122,14 @@ class _BookingTransactionsState extends State<BookingTransactions> {
                     shrinkWrap: true,
                     itemCount: transactions.data!.length,
                     itemBuilder: (context, index) {
-                      Color statusColor = data[index].status == 'pending'
+                      Color statusColor = data[index].status.toLowerCase() ==
+                              'pending'
                           ? Colors.grey
-                          : data[index].status == 'confirmed'
+                          : data[index].status.toLowerCase() == 'confirmed'
                               ? Colors.green
-                              : data[index].status == 'complete'
+                              : data[index].status.toLowerCase() == 'complete'
                                   ? kPrimaryColor
-                                  : data[index].status == 'denied'
+                                  : data[index].status.toLowerCase() == 'denied'
                                       ? Colors.red
                                       : Colors.black;
                       return transaction(

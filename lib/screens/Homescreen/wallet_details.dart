@@ -54,7 +54,7 @@ class _WalletDetailsState extends State<WalletDetails> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      StreamBuilder<dynamic>(
+                      StreamBuilder<num>(
                           stream: Stream.fromFuture(computeBalance()),
                           builder: (context, snapshot) {
                             if (snapshot.hasData) {
@@ -205,14 +205,10 @@ Future<num> computeBalance() async {
         .collection('transaction')
         .get();
     querySnapshot.docs.forEach((element) {
-      if (element['amount'] is double || element['amount'] is int) {
-        values.add(element['amount']);
-        // log(element['amount'].runtimeType.toString());
-      }
+      values.add(element['amount']);
     });
     num balance = values.reduce((value, element) => value + element);
     return balance;
-    // return values.reduce((value, element) => value + element);
   } catch (e) {
     log('error computing balance $e');
     return 0;

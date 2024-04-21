@@ -1,5 +1,6 @@
 import 'package:customer/components/background.dart';
 import 'package:customer/components/constants.dart';
+import 'package:customer/components/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -114,23 +115,23 @@ class AddedAppointment extends StatelessWidget {
     );
   }
 
-  Container details(String title, String deets) {
-    return Container(
-      padding: const EdgeInsets.all(defaultPadding / 2),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            title,
-            style: const TextStyle(
-                color: Colors.black45, fontWeight: FontWeight.w500),
-          ),
-          Text(
-            deets,
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-        ],
-      ),
-    );
-  }
+  // Container details(String title, String deets) {
+  //   return Container(
+  //     padding: const EdgeInsets.all(defaultPadding / 2),
+  //     child: Row(
+  //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //       children: [
+  //         Text(
+  //           title,
+  //           style: const TextStyle(
+  //               color: Colors.black45, fontWeight: FontWeight.w500),
+  //         ),
+  //         Text(
+  //           deets,
+  //           style: TextStyle(fontWeight: FontWeight.bold),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 }

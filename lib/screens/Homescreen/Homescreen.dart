@@ -6,6 +6,7 @@ import 'package:customer/features/parse.dart';
 import 'package:customer/screens/FreelancerCategoryScreens/Wax.dart';
 import 'package:customer/screens/FreelancerCategoryScreens/Hair.dart';
 import 'package:customer/screens/Homescreen/MainScreen.dart';
+import 'package:customer/screens/Homescreen/finish_booking.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -72,7 +73,7 @@ class _CustHomeState extends State<CustHome> {
                   ongoing.add(doc);
                 }
               });
-              if (ongoing.isNotEmpty) {
+              if (ongoing.isNotEmpty && ongoing[0].status == 'approved') {
                 return FloatingActionButton.extended(
                   label: const Text('View Ongoing Service'),
                   onPressed: () {
@@ -210,7 +211,6 @@ class _CustHomeState extends State<CustHome> {
                               ),
                               SlideAction(
                                 onSubmit: () async {
-                                  log(ongoing[0].reference);
                                   // payService(ongoing[0].clientId,
                                   //     ongoing[0].reference);
                                   // await db
@@ -221,6 +221,13 @@ class _CustHomeState extends State<CustHome> {
                                   //     .update({'description': 'payment'});
                                   // Navigator.of(context).pop();
                                   // setState(() {});
+                                  Navigator.of(context).pop();
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => FinishBooking(
+                                            transaction: ongoing[0]),
+                                      ));
                                   // toastification.show(
                                   //   type: ToastificationType.success,
                                   //   context: context,
