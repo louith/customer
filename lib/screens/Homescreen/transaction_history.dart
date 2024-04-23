@@ -1,4 +1,3 @@
-
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -36,7 +35,7 @@ class _TransactionHistoryState extends State<TransactionHistory> {
             .collection('users')
             .doc(currentUser!.uid)
             .collection('bookings')
-            .doc(widget.transactions.clientID)
+            .doc(widget.transactions.clientUsername)
             .collection('rating')
             .get();
     return documentSnapshot.docs.isNotEmpty;
@@ -110,10 +109,10 @@ class _TransactionHistoryState extends State<TransactionHistory> {
 //                 transactions.preferredWorker != null
 //                     ? Row(
 //                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-// =======
+                const SizedBox(height: defaultPadding),
                 widget.transactions.preferredWorker != null
-                    ? Column(
-
+                    ? Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           const Text('Preferred Stylist'),
 // <<<<<<< master
@@ -123,7 +122,6 @@ class _TransactionHistoryState extends State<TransactionHistory> {
 //                           )
 // =======
                           Text(widget.transactions.preferredWorker!)
-
                         ],
                       )
                     : Container()
@@ -150,7 +148,7 @@ class _TransactionHistoryState extends State<TransactionHistory> {
 //                     ),
 // =======
                   Text(
-                    widget.transactions.clientID,
+                    widget.transactions.clientUsername,
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   )
                 ]),
@@ -161,63 +159,63 @@ class _TransactionHistoryState extends State<TransactionHistory> {
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   )
                 ]),
-
-                if (transactions.status == 'denied' &&
-                    transactions.reason != null)
+                if (widget.transactions.status == 'denied' &&
+                    widget.transactions.reason != null)
                   RowDetails([
                     const Text('Reason'),
-                    Text(transactions.reason!),
+                    Text(widget.transactions.reason!),
                   ]),
-
                 const SizedBox(height: defaultPadding),
-                FutureBuilder<bool>(
-                    future: doesSubcollectionExist(),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return Center(
-                          child: Text(
-                            'loading Review button...',
-                            style: TextStyle(
-                                fontStyle: FontStyle.italic,
-                                color: grayText,
-                                fontSize: 12),
-                          ),
-                        );
-                      } else if (snapshot.hasError) {
-                        return Text('Error: ${snapshot.error}');
-                      } else {
-                        ratingIsExisting = snapshot.data!;
+                if (widget.transactions.status == 'finished' ||
+                    widget.transactions.status == 'confirmed')
+                  FutureBuilder<bool>(
+                      future: doesSubcollectionExist(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return Center(
+                            child: Text(
+                              'loading Review button...',
+                              style: TextStyle(
+                                  fontStyle: FontStyle.italic,
+                                  color: grayText,
+                                  fontSize: 12),
+                            ),
+                          );
+                        } else if (snapshot.hasError) {
+                          return Text('Error: ${snapshot.error}');
+                        } else {
+                          ratingIsExisting = snapshot.data!;
 
-                        return Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(ratingIsExisting
-                                  ? 'Rating'
-                                  : 'No rating yet'),
-                              TextButton(
-                                  onPressed: () {
-                                    // print(widget.transactions.reference);
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) => Rating(
-                                                  // transactions:
-                                                  // widget.transactions,
-                                                  reference: widget
-                                                      .transactions.reference,
-                                                )));
-                                  },
-                                  child: Text(
-                                    ratingIsExisting
-                                        ? 'View rating'
-                                        : 'Leave a rating',
-                                    style: TextStyle(
-                                        decoration: TextDecoration.underline),
-                                  ))
-                            ]);
-                      }
-                    })
-
+                          return Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(ratingIsExisting
+                                    ? 'Rating'
+                                    : 'No rating yet'),
+                                TextButton(
+                                    onPressed: () {
+                                      // print(widget.transactions.reference);
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) => Rating(
+                                                    transactions:
+                                                        widget.transactions,
+                                                    reference: widget
+                                                        .transactions.reference,
+                                                  )));
+                                    },
+                                    child: Text(
+                                      ratingIsExisting
+                                          ? 'View rating'
+                                          : 'Leave a rating',
+                                      style: TextStyle(
+                                          decoration: TextDecoration.underline),
+                                    ))
+                              ]);
+                        }
+                      })
               ],
             ))
           ],

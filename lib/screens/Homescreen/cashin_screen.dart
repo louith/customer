@@ -112,7 +112,9 @@ class _CashInScreenState extends State<CashInScreen> {
         );
       }
       log('amount cashed in ${_amountController.text}');
-      Navigator.of(context).pop();
+      if (mounted) {
+        Navigator.of(context).pop();
+      }
       setState(() {});
     } catch (e) {
       log('error cashing in $e');

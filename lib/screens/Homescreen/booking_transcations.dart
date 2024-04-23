@@ -10,7 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class Transactions {
-  String clientID;
+  String clientUsername;
   DateTime dateFrom;
   DateTime dateTo;
   String location;
@@ -22,9 +22,10 @@ class Transactions {
   List<dynamic> services;
   String? preferredWorker;
   String? reason;
+  String customerUid;
 
   Transactions({
-    required this.clientID,
+    required this.clientUsername,
     required this.dateFrom,
     required this.dateTo,
     required this.location,
@@ -34,16 +35,17 @@ class Transactions {
     required this.services,
     required this.serviceFee,
     required this.total,
+    required this.customerUid,
     this.preferredWorker,
     this.reason,
   });
 }
 
 class BookingTransactions extends StatefulWidget {
-  String uid;
+  String customerUid;
   BookingTransactions({
     super.key,
-    required this.uid,
+    required this.customerUid,
   });
 
   @override
@@ -58,7 +60,7 @@ class _BookingTransactionsState extends State<BookingTransactions> {
     try {
       QuerySnapshot querySnapshot = await db
           .collection('users')
-          .doc(widget.uid)
+          .doc(widget.customerUid)
           .collection('bookings')
           .get();
       querySnapshot.docs.forEach((doc) {
@@ -76,7 +78,7 @@ class _BookingTransactionsState extends State<BookingTransactions> {
         transactionsList.add(Transactions(
           serviceFee: doc['serviceFee'],
           total: doc['totalAmount'],
-          clientID: doc['clientUsername'],
+          clientUsername: doc['clientUsername'],
           dateFrom: doc['dateFrom'].toDate(),
           dateTo: doc['dateTo'].toDate(),
           location: doc['location'],
@@ -84,6 +86,7 @@ class _BookingTransactionsState extends State<BookingTransactions> {
           reference: doc['reference'],
           status: doc['status'],
           services: doc['services'],
+          customerUid: widget.customerUid,
           preferredWorker: worker,
           reason: reason,
         ));
@@ -143,7 +146,7 @@ class _BookingTransactionsState extends State<BookingTransactions> {
                                     children: [
                                       //client name
                                       Text(
-                                        data[index].clientID,
+                                        data[index].clientUsername,
                                         style: const TextStyle(
                                             fontWeight: FontWeight.bold),
                                       ),

@@ -73,7 +73,7 @@ class _CustHomeState extends State<CustHome> {
                   ongoing.add(doc);
                 }
               });
-              if (ongoing.isNotEmpty && ongoing[0].status == 'approved') {
+              if (ongoing.isNotEmpty && ongoing[0].status == 'confirmed') {
                 return FloatingActionButton.extended(
                   label: const Text('View Ongoing Service'),
                   onPressed: () {
@@ -211,16 +211,14 @@ class _CustHomeState extends State<CustHome> {
                               ),
                               SlideAction(
                                 onSubmit: () async {
-                                  // payService(ongoing[0].clientId,
-                                  //     ongoing[0].reference);
-                                  // await db
-                                  //     .collection('users')
-                                  //     .doc(currentUser!.uid)
-                                  //     .collection('transaction')
-                                  //     .doc(ongoing[0].reference)
-                                  //     .update({'description': 'payment'});
-                                  // Navigator.of(context).pop();
-                                  // setState(() {});
+                                  payService(ongoing[0].clientId,
+                                      ongoing[0].reference);
+                                  await db
+                                      .collection('users')
+                                      .doc(currentUser!.uid)
+                                      .collection('transaction')
+                                      .doc(ongoing[0].reference)
+                                      .update({'description': 'payment'});
                                   Navigator.of(context).pop();
                                   Navigator.push(
                                       context,
@@ -228,14 +226,15 @@ class _CustHomeState extends State<CustHome> {
                                         builder: (context) => FinishBooking(
                                             transaction: ongoing[0]),
                                       ));
-                                  // toastification.show(
-                                  //   type: ToastificationType.success,
-                                  //   context: context,
-                                  //   title: const Text('Services Paid'),
-                                  //   autoCloseDuration:
-                                  //       const Duration(seconds: 5),
-                                  // );
-                                  // return null;
+                                  toastification.show(
+                                    type: ToastificationType.success,
+                                    context: context,
+                                    title: const Text('Services Paid'),
+                                    autoCloseDuration:
+                                        const Duration(seconds: 5),
+                                  );
+                                  setState(() {});
+                                  return null;
                                 },
                                 borderRadius: 8,
                                 elevation: 0,
