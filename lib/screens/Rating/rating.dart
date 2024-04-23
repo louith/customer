@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:customer/components/background.dart';
 import 'package:customer/components/constants.dart';
-import 'package:customer/components/form_container_widget.dart';
 import 'package:customer/components/widgets.dart';
 import 'package:customer/screens/FreelancerCategoryScreens/Hair.dart';
 import 'package:customer/screens/Homescreen/booking_transcations.dart';
