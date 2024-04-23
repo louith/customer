@@ -115,74 +115,6 @@ class _MyProfileState extends State<MyProfile> {
                                 fontWeight: FontWeight.bold, fontSize: 20),
                           ),
                           Text(profileData.email),
-                          const SizedBox(height: 20),
-                          SizedBox(
-                              width: 200,
-                              height: 45,
-                              child: elevButton(
-                                  title: 'Edit Profile',
-                                  onClicked: () {
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: ((context) =>
-                                                EditProfile())));
-                                    //separate page na dapat na naga fetch ug data from db
-                                  })),
-                          const SizedBox(height: defaultPadding),
-                          const Divider(),
-                          const SizedBox(height: defaultPadding),
-                          //Menu
-                          ProfileMenuWidget(
-                            title: 'My Addresses',
-                            icon: LineIcons.locationArrow,
-                            onPress: () {},
-                          ),
-                          ProfileMenuWidget(
-                            title: 'Settings',
-                            icon: LineIcons.cog,
-                            onPress: () {},
-                          ),
-                          ProfileMenuWidget(
-                            title: 'Wallet Details',
-                            icon: LineIcons.wallet,
-                            onPress: () {
-                              Navigator.push(context, MaterialPageRoute(
-                                builder: (context) {
-                                  return WalletDetails(
-                                    profile: profileData,
-                                  );
-                                },
-                              ));
-                            },
-                          ),
-                          ProfileMenuWidget(
-                            title: 'Booking Transactions',
-                            icon: LineIcons.calendar,
-                            onPress: () {
-                              Navigator.push(context, MaterialPageRoute(
-                                builder: (context) {
-                                  return BookingTransactions(
-                                    uid: profileData.uid,
-                                  );
-                                },
-                              ));
-                            },
-                          ),
-                          const Divider(),
-                          const SizedBox(height: defaultPadding),
-                          Container(
-                            width: double.infinity,
-                            decoration: BoxDecoration(
-                                color: kPrimaryColor.withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(20)),
-                            child: ProfileMenuWidget(
-                              title: 'Logout',
-                              icon: LineIcons.alternateSignOut,
-                              endIcon: false,
-                              onPress: signUserOut,
-                            ),
-                          ),
                         ],
                       );
                     } else {
@@ -230,7 +162,9 @@ class _MyProfileState extends State<MyProfile> {
                   onPress: () {
                     Navigator.push(context, MaterialPageRoute(
                       builder: (context) {
-                        return BookingTransactions();
+                        return BookingTransactions(
+                          uid: currentUser!.uid,
+                        );
                       },
                     ));
                   },

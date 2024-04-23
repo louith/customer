@@ -77,99 +77,6 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-// <<<<<<< master
-//       body: Background(
-//         child: Center(
-//           child: Padding(
-//             padding: const EdgeInsets.fromLTRB(15, 30, 15, 0),
-//             child: Form(
-//                 key: _formKey,
-//                 child: Column(
-//                     mainAxisAlignment: MainAxisAlignment.center,
-//                     children: [
-//                       const LoginScreenTopImage(),
-//                       const SizedBox(height: defaultPadding),
-//                       FormContainerWidget(
-//                         hintText: 'Email',
-//                         controller: _emailController,
-//                         isPasswordField: false,
-//                         validator: (value) =>
-//                             value!.isEmpty ? "Please enter your Email" : null,
-//                       ),
-//                       const SizedBox(height: defaultPadding),
-//                       FormContainerWidget(
-//                         hintText: 'Password',
-//                         controller: _passwordController,
-//                         isPasswordField: true,
-//                         validator: (value) =>
-//                             value!.isEmpty ? 'Type your password' : null,
-//                       ),
-//                       const SizedBox(height: defaultPadding),
-//                       GestureDetector(
-//                         onTap: _signIn,
-//                         child: Container(
-//                           width: double.infinity,
-//                           height: 50,
-//                           decoration: BoxDecoration(
-//                             color: kPrimaryColor,
-//                             borderRadius: BorderRadius.circular(90),
-//                           ),
-//                           child: const Center(
-//                               child: Text(
-//                             "LOGIN",
-//                             style: TextStyle(
-//                               color: Colors.white,
-//                               fontSize: 13,
-//                               fontFamily: 'Inter',
-//                               fontWeight: FontWeight.w500,
-//                             ),
-//                           )),
-//                         ),
-//                       ),
-//                       SizedBox(height: 5),
-//                       Text('OR'),
-//                       SizedBox(height: 5),
-//                       SizedBox(
-//                           width: double.infinity,
-//                           height: 60,
-//                           child: OutlinedButton.icon(
-//                               style: OutlinedButton.styleFrom(
-//                                 side: BorderSide(color: kPrimaryColor),
-//                               ),
-//                               onPressed: () {},
-//                               icon: Image(
-//                                 image: AssetImage(GoogleLogoImg),
-//                                 width: 20.0,
-//                               ),
-//                               label: Text('Sign-in with Google'))),
-//                       SizedBox(
-//                         height: 20,
-//                       ),
-//                       Row(
-//                         mainAxisAlignment: MainAxisAlignment.center,
-//                         children: [
-//                           Text("Don't have an account?"),
-//                           SizedBox(
-//                             width: 5,
-//                           ),
-//                           GestureDetector(
-//                             onTap: () {
-//                               Navigator.push(
-//                                   context,
-//                                   MaterialPageRoute(
-//                                       builder: ((context) => CustSignUp())));
-//                             },
-//                             child: Text(
-//                               "Sign Up",
-//                               style: TextStyle(
-//                                   color: kPrimaryColor,
-//                                   fontWeight: FontWeight.bold),
-//                             ),
-//                           )
-//                         ],
-//                       ),
-//                     ])),
-// =======
         body: Background(
       child: Center(
         child: Padding(
@@ -260,10 +167,9 @@ class _LoginScreenState extends State<LoginScreen> {
                 ],
               ),
             ]),
-// >>>>>>> master
           ),
         ),
       ),
-    );
+    ));
   }
 }

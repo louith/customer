@@ -7,6 +7,7 @@ import 'package:customer/screens/Booking/bookingScreen.dart';
 import 'package:customer/screens/Chat/indivChat.dart';
 import 'package:customer/screens/ServicesOffered/servicesList.dart';
 import 'package:customer/screens/indivProfile/moreinfo_screen.dart';
+import 'package:customer/screens/indivProfile/rating_display.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:intl/intl.dart';
@@ -229,23 +230,60 @@ class IndivWorkerProfile extends StatelessWidget {
                                   )
                                 ],
                               ),
-                              InkWell(
-                                  onTap: () {
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => MoreInfo(
-                                            clientId: snapshot.data!.id,
-                                            role: snapshot.data!.role,
-                                          ),
-                                        ));
-                                  },
-                                  child: const Text(
-                                    'More Info',
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: kPrimaryColor),
-                                  ))
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  InkWell(
+                                      onTap: () {
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) => MoreInfo(
+                                                clientId: snapshot.data!.id,
+                                                role: snapshot.data!.role,
+                                              ),
+                                            ));
+                                      },
+                                      child: const Text(
+                                        'More Info',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            color: kPrimaryColor),
+                                      )),
+                                  SizedBox(
+                                    width: defaultPadding,
+                                  ),
+                                  SizedBox(
+                                    width: defaultPadding,
+                                    child: Text(
+                                      '|',
+                                      style: TextStyle(
+                                          color: kPrimaryColor,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                  TextButton(
+                                      onPressed: () {
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    RatingDisplay(
+                                                      clientId:
+                                                          snapshot.data!.id,
+                                                      role: snapshot.data!.role,
+                                                      averageRating: snapshot
+                                                          .data!.rating!,
+                                                    )));
+                                      },
+                                      child: Text(
+                                        'Rating',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            color: kPrimaryColor),
+                                      ))
+                                ],
+                              )
                             ],
                           ),
                         ),

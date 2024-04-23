@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class Transactions {
+  String clientId;
   String clientID;
   DateTime dateFrom;
   DateTime dateTo;
@@ -24,6 +25,7 @@ class Transactions {
   String? reason;
 
   Transactions({
+    required this.clientId,
     required this.clientID,
     required this.dateFrom,
     required this.dateTo,
@@ -74,6 +76,7 @@ class _BookingTransactionsState extends State<BookingTransactions> {
         // String? worker = doc['worker'];
         //add required fields
         transactionsList.add(Transactions(
+          clientId: doc['clientId'],
           serviceFee: doc['serviceFee'],
           total: doc['totalAmount'],
           clientID: doc['clientUsername'],
