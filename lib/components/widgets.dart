@@ -29,10 +29,7 @@ TextFormField textField(
   TextEditingController controller,
 ) {
   return TextFormField(
-    validator: (value) {
-      if (value == null || value.isEmpty) return 'This field cannot be empty';
-      return null;
-    },
+    validator: (value) => value!.isEmpty ? "Please enter your Email" : null,
     controller: controller,
     obscureText: isPasswordType,
     style: const TextStyle(
@@ -53,6 +50,7 @@ TextFormField textField(
 TextField flatTextField(String text, TextEditingController controller,
     {void Function(String)? onchanged, dynamic numberfield}) {
   return TextField(
+    controller: controller,
     onChanged: onchanged,
     style: const TextStyle(
       fontSize: 13,

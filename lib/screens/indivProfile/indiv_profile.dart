@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:customer/components/constants.dart';
 import 'package:customer/models/service.dart';
 import 'package:customer/screens/Booking/bookingScreen.dart';
+import 'package:customer/screens/Booking/payment_screen.dart';
 import 'package:customer/screens/Chat/indivChat.dart';
 import 'package:customer/screens/ServicesOffered/servicesList.dart';
 import 'package:customer/screens/indivProfile/moreinfo_screen.dart';

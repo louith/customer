@@ -35,6 +35,9 @@ class BookingAppointment extends StatefulWidget {
   State<BookingAppointment> createState() => _BookingAppointmentState();
 }
 
+User? currentUser = FirebaseAuth.instance.currentUser;
+final db = FirebaseFirestore.instance;
+
 class _BookingAppointmentState extends State<BookingAppointment> {
   DateTime timeFrom = DateTime.now();
   DateTime timeTo = DateTime.now();
@@ -45,8 +48,6 @@ class _BookingAppointmentState extends State<BookingAppointment> {
   late String long;
   GeoCode geoCode = GeoCode();
   String location = '';
-
-  User? currentUser = FirebaseAuth.instance.currentUser;
 
   String formatDouble(double value) {
     final format = NumberFormat('#,##0.00');
@@ -304,37 +305,59 @@ class _BookingAppointmentState extends State<BookingAppointment> {
                                 Text(location.isEmpty
                                     ? 'My Location'
                                     : location),
-                                InkWell(
-                                    onTap: () {
+                                const SizedBox(height: defaultPadding),
+                                ElevatedButton(
+                                    style: const ButtonStyle(
+                                        foregroundColor:
+                                            MaterialStatePropertyAll(
+                                                kPrimaryLightColor)),
+                                    onPressed: _selectAddress,
+                                    child:
+                                        const Text('Select From My Addresses')),
+                                const SizedBox(height: defaultPadding),
+                                ElevatedButton(
+                                    style: const ButtonStyle(
+                                        backgroundColor:
+                                            MaterialStatePropertyAll(
+                                                kPrimaryLightColor),
+                                        foregroundColor:
+                                            MaterialStatePropertyAll(
+                                                kPrimaryColor)),
+                                    onPressed: () {
                                       getCurrentLocation().then((value) {
-                                        lat = '${value.latitude}';
+                                        lat = '${value!.latitude}';
                                         long = '${value.longitude}';
                                         geocodeAddress(lat, long);
                                       });
                                     },
-                                    child: const Text(
-                                      'Get Location',
-                                      style: TextStyle(
-                                        color: kPrimaryColor,
-                                        decoration: TextDecoration.underline,
-                                      ),
+                                    child: const Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Icon(Icons.location_pin),
+                                        SizedBox(width: defaultPadding / 2),
+                                        Text('Get Current Address'),
+                                      ],
                                     )),
-                                InkWell(
-                                  onTap: () {
-                                    try {
-                                      openMap(lat, long);
-                                    } catch (e) {
-                                      log(e.toString());
-                                    }
-                                  },
-                                  child: const Text(
-                                    'Open Map',
-                                    style: TextStyle(
-                                      color: kPrimaryColor,
-                                      decoration: TextDecoration.underline,
-                                    ),
-                                  ),
-                                ),
+                                const SizedBox(height: defaultPadding),
+                                ElevatedButton(
+                                    style: const ButtonStyle(
+                                        backgroundColor:
+                                            MaterialStatePropertyAll(
+                                                kPrimaryLightColor),
+                                        foregroundColor:
+                                            MaterialStatePropertyAll(
+                                                kPrimaryColor)),
+                                    onPressed: () {},
+                                    child: const Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Icon(Icons.map),
+                                        SizedBox(width: defaultPadding / 2),
+                                        Text('Open In Google Maps'),
+                                      ],
+                                    )),
                               ],
                             ),
                     ],
@@ -358,6 +381,53 @@ class _BookingAppointmentState extends State<BookingAppointment> {
               color: kPrimaryLightColor,
             )),
       ),
+    );
+  }
+
+  Future<void> _selectAddress() async {
+    return showDialog(
+      context: context,
+      builder: (context) {
+        return FutureBuilder(
+          future: getMyAddresses(),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              return AlertDialog(
+                title: const Text('Select Address'),
+                content: StatefulBuilder(builder: (context, setState) {
+                  return ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: snapshot.data!.length,
+                    itemBuilder: (context, index) {
+                      String address =
+                          "${snapshot.data![index].addressname} - ${snapshot.data![index].barangay}, ${snapshot.data![index].city}, ${snapshot.data![index].province}";
+                      return RadioListTile<String>(
+                        title: Text(address),
+                        value: address,
+                        groupValue: location,
+                        onChanged: (value) => setState(() {
+                          location = value.toString();
+                        }),
+                      );
+                    },
+                  );
+                }),
+                actions: [
+                  TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text('BACK'))
+                ],
+              );
+            } else {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            }
+          },
+        );
+      },
     );
   }
 
@@ -389,24 +459,29 @@ class _BookingAppointmentState extends State<BookingAppointment> {
     }
   }
 
-  Future<Position> getCurrentLocation() async {
-    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      return Future.error('Location services are disabled');
-    }
+  Future<Position?> getCurrentLocation() async {
+    try {
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        return Future.error('Location services are disabled');
+      }
 
-    LocationPermission permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      log('Location permission denied');
-      return Future.error('Location permission denied');
-    }
-    if (permission == LocationPermission.deniedForever) {
-      log('Location permission permanently denied, cannot get location');
-      return Future.error(
-          'Location permission permanently denied, cannot get location');
-    }
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        log('Location permission denied');
+        // return Future.error('Location permission denied');
+      }
+      if (permission == LocationPermission.deniedForever) {
+        log('Location permission permanently denied, cannot get location');
+        // return Future.error(
+        //     'Location permission permanently denied, cannot get location');
+      }
 
-    return await Geolocator.getCurrentPosition();
+      return await Geolocator.getCurrentPosition();
+    } catch (e) {
+      log('error getting current location $e');
+      return null;
+    }
   }
 
   DateTime addDuration(DateTime from) {
@@ -712,5 +787,47 @@ class _ServicesBookingListState extends State<ServicesBookingList> {
         );
       },
     );
+  }
+}
+
+class MyAddress {
+  String id;
+  String addressname;
+  String barangay;
+  String city;
+  String extended;
+  String province;
+
+  MyAddress({
+    required this.id,
+    required this.addressname,
+    required this.barangay,
+    required this.city,
+    required this.extended,
+    required this.province,
+  });
+}
+
+Future<List<MyAddress>> getMyAddresses() async {
+  try {
+    List<MyAddress> addresses = [];
+    QuerySnapshot querySnapshot = await db
+        .collection('users')
+        .doc(currentUser!.uid)
+        .collection('addresses')
+        .get();
+    querySnapshot.docs.forEach((element) {
+      addresses.add(MyAddress(
+          id: element.id,
+          addressname: element['Address Name'],
+          barangay: element['Barangay'],
+          city: element['City'],
+          extended: element['Extended Address'],
+          province: element['Province']));
+    });
+    return addresses;
+  } catch (e) {
+    log('error getting addresses');
+    return [];
   }
 }

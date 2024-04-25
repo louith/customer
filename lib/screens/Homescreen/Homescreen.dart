@@ -361,15 +361,13 @@ class _CustHomeState extends State<CustHome> {
 
   Future<void> payService(String clientId, String reference) async {
     try {
-      //update status of customer and client db
-      //customer
+      //updates a field in the customer doc
       await db
           .collection('users')
           .doc(currentUser!.uid)
           .collection('bookings')
           .doc(reference)
           .update({'status': 'paid'});
-      // await db.collection('users').doc(currentUser!.uid).collection('transaction')
       //client
       await db
           .collection('users')

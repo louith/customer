@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:customer/components/constants.dart';
 import 'package:customer/components/widgets.dart';
 import 'package:customer/screens/Homescreen/Homescreen.dart';
+import 'package:customer/screens/Homescreen/add_address.dart';
 import 'package:customer/screens/Homescreen/booking_transcations.dart';
 import 'package:customer/screens/Homescreen/wallet_details.dart';
 import 'package:customer/screens/WelcomeScreen/CustWelcomeScreen.dart';
@@ -49,6 +50,7 @@ class _MyProfileState extends State<MyProfile> {
           .collection('users')
           .doc(currentUser!.uid)
           .get();
+      log(userDoc.id);
       return Profile(
         uid: userDoc.id,
         username: userDoc['Username'],
@@ -136,7 +138,13 @@ class _MyProfileState extends State<MyProfile> {
                           ProfileMenuWidget(
                             title: 'My Addresses',
                             icon: LineIcons.locationArrow,
-                            onPress: () {},
+                            onPress: () {
+                              Navigator.of(context).push(MaterialPageRoute(
+                                builder: (context) {
+                                  return const AddAddress();
+                                },
+                              ));
+                            },
                           ),
                           ProfileMenuWidget(
                             title: 'Settings',
@@ -191,65 +199,6 @@ class _MyProfileState extends State<MyProfile> {
                           color: kPrimaryColor);
                     }
                   },
-                ),
-                const SizedBox(height: 20),
-                SizedBox(
-                    width: 200,
-                    height: 45,
-                    child: elevButton(
-                        title: 'Edit Profile',
-                        onClicked: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: ((context) => EditProfile())));
-                          //separate page na dapat na naga fetch ug data from db
-                        })),
-                const SizedBox(height: defaultPadding),
-                const Divider(),
-                const SizedBox(height: defaultPadding),
-                //Menu
-                ProfileMenuWidget(
-                  title: 'My Addresses',
-                  icon: LineIcons.locationArrow,
-                  onPress: () {},
-                ),
-                // ProfileMenuWidget(
-                // title: 'Settings',
-                // icon: LineIcons.cog,
-                // onPress: () {},
-                // ),
-                ProfileMenuWidget(
-                  title: 'Billing Details',
-                  icon: LineIcons.wallet,
-                  onPress: () {},
-                ),
-                ProfileMenuWidget(
-                  title: 'Booking Transactions',
-                  icon: LineIcons.calendar,
-                  onPress: () {
-                    Navigator.push(context, MaterialPageRoute(
-                      builder: (context) {
-                        return BookingTransactions(
-                          customerUid: currentUser!.uid,
-                        );
-                      },
-                    ));
-                  },
-                ),
-                const Divider(),
-                const SizedBox(height: defaultPadding),
-                Container(
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                      color: kPrimaryColor.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(20)),
-                  child: ProfileMenuWidget(
-                    title: 'Logout',
-                    icon: LineIcons.alternateSignOut,
-                    endIcon: false,
-                    onPress: signUserOut,
-                  ),
                 ),
               ],
             ),

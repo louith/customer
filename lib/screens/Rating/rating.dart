@@ -162,39 +162,37 @@ class _RatingState extends State<Rating> {
                 onPressed: uploadProfPic,
                 child: const Text('Upload Pictures'),
               ),
-              nextButton(context, () async {
-                String clientUid = '';
-                DocumentSnapshot documentSnapshot =
-                    await db.collection('users').doc(currentUser!.uid).get();
-                String customerUsername = documentSnapshot['Username'];
-                QuerySnapshot querySnapshot = await db
-                    .collection('users')
-                    .where('name',
-                        isEqualTo: widget.transactions.clientUsername)
-                    .get();
-                querySnapshot.docs.forEach((element) {
-                  clientUid = element.id;
-                });
-                await db
-                    .collection('users')
-                    .doc(clientUid)
-                    .collection('ratings')
-                    .add({
-                  'rating': ratingValue,
-                  'customer': customerUsername,
-                  'comment': _comment.text,
-                });
-                if (mounted) {
-                  Navigator.pop(context);
-                }
-              }, 'SUBMIT RATING')
+              nextButton(context, sendFeedback, 'SUBMIT RATING')
             ]),
           ),
         ),
       ),
     );
   }
+
+  Future<void> sendFeedback() async {
+    String clientUid = '';
+    DocumentSnapshot documentSnapshot =
+        await db.collection('users').doc(currentUser!.uid).get();
+    String customerUsername = documentSnapshot['Username'];
+    QuerySnapshot querySnapshot = await db
+        .collection('users')
+        .where('name', isEqualTo: widget.transactions.clientUsername)
+        .get();
+    querySnapshot.docs.forEach((element) {
+      clientUid = element.id;
+    });
+    await db.collection('users').doc(clientUid).collection('ratings').add({
+      'rating': ratingValue,
+      'customer': customerUsername,
+      'comment': _comment.text,
+    });
+    if (mounted) {
+      Navigator.pop(context);
+    }
+  }
 }
+
 
 
 //  SizedBox(
