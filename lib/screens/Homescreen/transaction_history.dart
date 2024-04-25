@@ -28,17 +28,20 @@ class TransactionHistory extends StatefulWidget {
 
 class _TransactionHistoryState extends State<TransactionHistory> {
   User? currentUser = FirebaseAuth.instance.currentUser;
-  bool ratingIsExisting = false;
+  // Future<bool> ratingIsExisting = false as Future<bool>;
   Future<bool> doesSubcollectionExist() async {
-    QuerySnapshot<Map<String, dynamic>> documentSnapshot =
+    //if rating doc exists on customer
+    DocumentSnapshot<Map<String, dynamic>> documentSnapshot =
         await FirebaseFirestore.instance
             .collection('users')
             .doc(currentUser!.uid)
             .collection('bookings')
-            .doc(widget.transactions.clientUsername)
-            .collection('rating')
+            .doc(widget.transactions.reference)
+            .collection('ratings')
+            .doc('rating')
             .get();
-    return documentSnapshot.docs.isNotEmpty;
+    print(documentSnapshot.exists);
+    return documentSnapshot.exists;
   }
 
   @override
@@ -111,8 +114,7 @@ class _TransactionHistoryState extends State<TransactionHistory> {
 //                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 const SizedBox(height: defaultPadding),
                 widget.transactions.preferredWorker != null
-                    ? Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    ? Column(
                         children: [
                           const Text('Preferred Stylist'),
 // <<<<<<< master
@@ -166,56 +168,69 @@ class _TransactionHistoryState extends State<TransactionHistory> {
                     Text(widget.transactions.reason!),
                   ]),
                 const SizedBox(height: defaultPadding),
-                if (widget.transactions.status == 'finished' ||
-                    widget.transactions.status == 'confirmed')
-                  FutureBuilder<bool>(
-                      future: doesSubcollectionExist(),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return Center(
-                            child: Text(
-                              'loading Review button...',
-                              style: TextStyle(
-                                  fontStyle: FontStyle.italic,
-                                  color: grayText,
-                                  fontSize: 12),
-                            ),
-                          );
-                        } else if (snapshot.hasError) {
-                          return Text('Error: ${snapshot.error}');
-                        } else {
-                          ratingIsExisting = snapshot.data!;
+                widget.transactions.status == 'finished'
+                    ? FutureBuilder<bool>(
+                        future: doesSubcollectionExist(),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return Center(
+                              child: Text(
+                                'loading Review button...',
+                                style: TextStyle(
+                                    fontStyle: FontStyle.italic,
+                                    color: grayText,
+                                    fontSize: 12),
+                              ),
+                            );
+                          } else if (snapshot.hasError) {
+                            return Text('Error: ${snapshot.error}');
+                          } else {
+                            final hasRating = snapshot.data!;
 
-                          return Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(ratingIsExisting
-                                    ? 'Rating'
-                                    : 'No rating yet'),
-                                TextButton(
-                                    onPressed: () {
-                                      // print(widget.transactions.reference);
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) => Rating(
-                                                    transactions:
-                                                        widget.transactions,
-                                                    reference: widget
-                                                        .transactions.reference,
-                                                  )));
-                                    },
-                                    child: Text(
-                                      ratingIsExisting
-                                          ? 'View rating'
-                                          : 'Leave a rating',
-                                      style: TextStyle(
-                                          decoration: TextDecoration.underline),
-                                    ))
-                              ]);
-                        }
-                      })
+                            return Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    hasRating ? 'RATING DONE' : 'NO RATING YET',
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: hasRating
+                                            ? Colors.green[800]
+                                            : Colors.red[800]),
+                                  ),
+                                  hasRating
+                                      ? Text('')
+                                      : TextButton(
+                                          onPressed: () {
+                                            // print(widget.transactions.reference);
+                                            print(hasRating.toString());
+                                            Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        Rating(
+                                                          // transactions:
+                                                          // widget.transactions,
+                                                          reference: widget
+                                                              .transactions
+                                                              .reference,
+                                                          clientId: widget
+                                                              .transactions
+                                                              .clientId,
+                                                        )));
+                                          },
+                                          child: Text(
+                                            'Leave a rating',
+                                            style: TextStyle(
+                                                decoration:
+                                                    TextDecoration.underline),
+                                          ))
+                                ]);
+                          }
+                        })
+                    : Text('')
               ],
             ))
           ],

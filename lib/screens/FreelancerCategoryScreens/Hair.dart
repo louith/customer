@@ -90,7 +90,7 @@ class _HairFreelancersState extends State<HairFreelancers> {
               itemCount: hairWorkers.length,
               itemBuilder: (context, index) {
                 return Container(
-                  margin: const EdgeInsets.fromLTRB(0, 0, 0, 4),
+                  margin: const EdgeInsets.only(bottom: 4),
                   decoration: const BoxDecoration(
                     color: Colors.white,
                     //boxshadow code/styling

@@ -57,6 +57,8 @@ dependencies:
   geocode: ^1.0.3
   http: ^0.13.6
   slide_to_act: ^2.0.2
+  simple_accordion: ^0.1.4
+  firebase_app_check: ^0.2.2+3
 
 dev_dependencies:
   flutter_test:

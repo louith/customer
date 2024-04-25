@@ -224,7 +224,9 @@ class _CustHomeState extends State<CustHome> {
                                       context,
                                       MaterialPageRoute(
                                         builder: (context) => FinishBooking(
-                                            transaction: ongoing[0]),
+                                          // transaction: ongoing[0]
+                                          transaction: ongoing[0],
+                                        ),
                                       ));
                                   toastification.show(
                                     type: ToastificationType.success,

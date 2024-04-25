@@ -26,6 +26,7 @@ class Transactions {
 
   Transactions({
     required this.clientUsername,
+    required this.clientID,
     required this.dateFrom,
     required this.dateTo,
     required this.location,
@@ -76,6 +77,7 @@ class _BookingTransactionsState extends State<BookingTransactions> {
         // String? worker = doc['worker'];
         //add required fields
         transactionsList.add(Transactions(
+          clientID: doc['clientId'],
           serviceFee: doc['serviceFee'],
           total: doc['totalAmount'],
           clientUsername: doc['clientUsername'],
