@@ -198,7 +198,7 @@ class _RatingState extends State<Rating> {
                     direction: Axis.horizontal,
                     allowHalfRating: true,
                     itemCount: 5,
-                    itemSize: 30,
+                    itemSize: 50,
                     itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
                     itemBuilder: (context, _) => Icon(
                           Icons.star,

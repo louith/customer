@@ -40,7 +40,7 @@ class _TransactionHistoryState extends State<TransactionHistory> {
             .collection('ratings')
             .doc('rating')
             .get();
-    print(documentSnapshot);
+    print(documentSnapshot.exists);
     return documentSnapshot.exists;
   }
 
@@ -168,64 +168,69 @@ class _TransactionHistoryState extends State<TransactionHistory> {
                     Text(widget.transactions.reason!),
                   ]),
                 const SizedBox(height: defaultPadding),
-                FutureBuilder<bool>(
-                    future: doesSubcollectionExist(),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return Center(
-                          child: Text(
-                            'loading Review button...',
-                            style: TextStyle(
-                                fontStyle: FontStyle.italic,
-                                color: grayText,
-                                fontSize: 12),
-                          ),
-                        );
-                      } else if (snapshot.hasError) {
-                        return Text('Error: ${snapshot.error}');
-                      } else {
-                        final hasRating = snapshot.data!;
-
-                        return Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                hasRating ? 'RATING DONE' : 'NO RATING YET',
+                widget.transactions.status == 'finished'
+                    ? FutureBuilder<bool>(
+                        future: doesSubcollectionExist(),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return Center(
+                              child: Text(
+                                'loading Review button...',
                                 style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: hasRating
-                                        ? Colors.green[800]
-                                        : Colors.red[800]),
+                                    fontStyle: FontStyle.italic,
+                                    color: grayText,
+                                    fontSize: 12),
                               ),
-                              hasRating
-                                  ? Text('')
-                                  : TextButton(
-                                      onPressed: () {
-                                        // print(widget.transactions.reference);
-                                        print(hasRating.toString());
-                                        Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) => Rating(
-                                                      // transactions:
-                                                      // widget.transactions,
-                                                      reference: widget
-                                                          .transactions
-                                                          .reference,
-                                                      clientId: widget
-                                                          .transactions
-                                                          .clientId,
-                                                    )));
-                                      },
-                                      child: Text(
-                                        'Leave a rating',
-                                        style: TextStyle(
-                                            decoration:
-                                                TextDecoration.underline),
-                                      ))
-                            ]);
-                      }
-                    })
+                            );
+                          } else if (snapshot.hasError) {
+                            return Text('Error: ${snapshot.error}');
+                          } else {
+                            final hasRating = snapshot.data!;
+
+                            return Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    hasRating ? 'RATING DONE' : 'NO RATING YET',
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: hasRating
+                                            ? Colors.green[800]
+                                            : Colors.red[800]),
+                                  ),
+                                  hasRating
+                                      ? Text('')
+                                      : TextButton(
+                                          onPressed: () {
+                                            // print(widget.transactions.reference);
+                                            print(hasRating.toString());
+                                            Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        Rating(
+                                                          // transactions:
+                                                          // widget.transactions,
+                                                          reference: widget
+                                                              .transactions
+                                                              .reference,
+                                                          clientId: widget
+                                                              .transactions
+                                                              .clientId,
+                                                        )));
+                                          },
+                                          child: Text(
+                                            'Leave a rating',
+                                            style: TextStyle(
+                                                decoration:
+                                                    TextDecoration.underline),
+                                          ))
+                                ]);
+                          }
+                        })
+                    : Text('')
               ],
             ))
           ],

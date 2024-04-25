@@ -264,6 +264,8 @@ class IndivWorkerProfile extends StatelessWidget {
                                   ),
                                   TextButton(
                                       onPressed: () {
+                                        print(
+                                            'clientId: ${snapshot.data!.id}, clientName:${snapshot.data!.name}');
                                         Navigator.push(
                                             context,
                                             MaterialPageRoute(
