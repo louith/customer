@@ -61,7 +61,9 @@ class _CashInScreenState extends State<CashInScreen> {
               Column(
                 children: [
                   SlideAction(
-                    onSubmit: cashIn,
+                    onSubmit: () {
+                      cashIn(_amountController.text);
+                    },
                     borderRadius: 8,
                     elevation: 0,
                     innerColor: kPrimaryLightColor,
@@ -82,15 +84,15 @@ class _CashInScreenState extends State<CashInScreen> {
     );
   }
 
-  Future<void> cashIn() async {
+  Future<void> cashIn(String amount) async {
     try {
       Map<String, dynamic> transaction = {
-        'amount': int.parse(_amountController.text),
+        'amount': int.parse(amount),
         'description': 'deposit',
         'timestamp': DateTime.now(),
       };
 
-      if (_amountController.text.isNotEmpty) {
+      if (amount.isNotEmpty) {
         //adding transaction to customer db
         await db
             .collection('users')
@@ -111,8 +113,9 @@ class _CashInScreenState extends State<CashInScreen> {
           autoCloseDuration: const Duration(seconds: 5),
         );
       }
-      log('amount cashed in ${_amountController.text}');
-      Navigator.of(context).pop();
+      if (mounted) {
+        Navigator.of(context).pop();
+      }
       setState(() {});
     } catch (e) {
       log('error cashing in $e');

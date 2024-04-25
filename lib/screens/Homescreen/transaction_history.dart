@@ -112,7 +112,7 @@ class _TransactionHistoryState extends State<TransactionHistory> {
 //                 transactions.preferredWorker != null
 //                     ? Row(
 //                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-// =======
+                const SizedBox(height: defaultPadding),
                 widget.transactions.preferredWorker != null
                     ? Column(
                         children: [
@@ -150,7 +150,7 @@ class _TransactionHistoryState extends State<TransactionHistory> {
 //                     ),
 // =======
                   Text(
-                    widget.transactions.clientID,
+                    widget.transactions.clientUsername,
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   )
                 ]),

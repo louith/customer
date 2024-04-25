@@ -1,4 +1,3 @@
-import 'dart:ffi';
 import 'dart:io';
 import 'package:customer/components/assets_strings.dart';
 import 'package:customer/components/constants.dart';

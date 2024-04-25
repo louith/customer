@@ -8,6 +8,7 @@ import 'package:customer/components/constants.dart';
 import 'package:customer/components/widgets.dart';
 import 'package:customer/models/service.dart';
 import 'package:customer/screens/Booking/added_appointment.dart';
+import 'package:customer/screens/Booking/payment_screen.dart';
 import 'package:customer/screens/Homescreen/MainScreen.dart';
 import 'package:customer/screens/Homescreen/wallet_details.dart';
 import 'package:customer/screens/customerProfile/custprofile.dart';
@@ -80,181 +81,210 @@ class _ApproveAppointmentState extends State<ApproveAppointment> {
   @override
   Widget build(BuildContext context) {
     return Background(
-        child: Column(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Column(
-          children: [
-            const Text(
-              'Appointment Details',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-                color: kPrimaryColor,
-              ),
-            ),
-            const SizedBox(height: defaultPadding),
-            bookingCard(Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text('Customer Name'),
-                Text(
-                  widget.customer.fullName,
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: defaultPadding),
-                const Text('Customer Username'),
-                Text(
-                  widget.customerUsername,
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: defaultPadding),
-                const Text('Salon Place'),
-                Text(
-                  widget.address,
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: defaultPadding),
-                const Text('Time & Date'),
-                Text(
-                  "${DateFormat.jm().format(widget.dateTimeFrom)} - ${DateFormat.jm().format(widget.dateTimeTo)} | ${DateFormat('MMMMd').format(widget.dateTimeTo)}",
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: defaultPadding),
-                const Text('Services'),
-                LayoutBuilder(
-                  builder: (context, constraints) {
-                    return SizedBox(
-                      width: constraints.maxWidth,
-                      height: 30,
-                      child: ListView.builder(
-                        shrinkWrap: true,
-                        scrollDirection: Axis.horizontal,
-                        itemCount: cart.length,
-                        itemBuilder: (context, index) {
-                          return ServiceCard(cart[index].serviceName);
-                        },
-                      ),
-                    );
-                  },
-                ),
-              ],
-            )),
-            const SizedBox(height: defaultPadding),
-            bookingCard(Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                RowDetails([
-                  const Text('Payment Method'),
-                  Text(widget.paymentMethod),
-                ]),
-                RowDetails([
-                  const Text('Total',
-                      style: TextStyle(fontWeight: FontWeight.bold)),
-                  Text('PHP ${format.format(getTotal())}',
-                      style: const TextStyle(fontWeight: FontWeight.bold))
-                ]),
-                const Divider(),
-                ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: cart.length + 1,
-                  itemBuilder: (context, index) {
-                    if (index == cart.length) {
-                      cart.forEach((element) {
-                        prices.add(int.parse(element.price));
-                      });
-                      return RowDetails([
-                        const Text('Service Fee'),
-                        Text('PHP ${widget.serviceFee}')
-                      ]);
-                    } else {
-                      return RowDetails([
-                        Text(cart[index].serviceName),
-                        Text(
-                            "PHP ${format.format(double.parse(cart[index].price))}"),
-                      ]);
-                    }
-                  },
-                ),
-              ],
-            )),
-            const SizedBox(height: defaultPadding),
-            widget.role == 'salon'
-                ? StreamBuilder<List<String>>(
-                    stream: Stream.fromFuture(getStaffs()),
-                    builder: (context, snapshot) {
-                      if (snapshot.hasData) {
-                        final data = snapshot.data!;
-                        return bookingCard(DropdownButton(
-                            hint: const Text('Preferred Stylist'),
-                            value: dropdownValue,
-                            items: data.map((e) {
-                              return DropdownMenuItem<String>(
-                                  value: e, child: Text(e));
-                            }).toList(),
-                            onChanged: (String? newValue) {
-                              setState(() {
-                                dropdownValue = newValue!;
-                              });
-                            }));
-                      } else {
-                        return Container();
-                      }
-                    },
-                  )
-                : Container(),
-          ],
-        ),
-        Column(
-          children: [
-            Container(
-                margin: const EdgeInsets.symmetric(horizontal: defaultPadding),
-                child: ElevatedButton(
-                    onPressed: () async {
-                      //if online payment
-                      if (widget.paymentMethod.toLowerCase() ==
-                          "online wallet") {
-                        //check wallet if has enough balance
-                        if (getTotal() > await computeBalance()) {
-                          toastification.show(
-                            type: ToastificationType.error,
-                            context: context,
-                            title: const Text('Not enough balace'),
-                            autoCloseDuration: const Duration(seconds: 5),
-                          );
-                        } else {
-                          await addBookingWithPayment();
-                          //add sa transaction collection
-                          await db
-                              .collection('users')
-                              .doc(currentUser!.uid)
-                              .collection('transaction')
-                              .doc(ref)
-                              .set({
-                            'amount': -getTotal(),
-                            'description': 'on hold',
-                            'timestamp': DateTime.now(),
-                          });
-                        }
-                        //if cash payment
-                      } else if (widget.paymentMethod.toLowerCase() == "cash") {
-                        addBookingWithPayment();
-                      }
-                    },
-                    child: const Text(
-                      'BOOK',
-                      style: TextStyle(color: kPrimaryLightColor),
-                    ))),
-            const SizedBox(height: defaultPadding),
-          ],
-        )
-      ],
-    ));
+        child: FutureBuilder(
+            future: getCustomerDetails(),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      children: [
+                        const Text(
+                          'Appointment Details',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            color: kPrimaryColor,
+                          ),
+                        ),
+                        const SizedBox(height: defaultPadding),
+                        bookingCard(Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text('Customer Name'),
+                            Text(
+                              widget.customer.fullName,
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            const SizedBox(height: defaultPadding),
+                            const Text('Customer Username'),
+                            Text(
+                              widget.customerUsername,
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            const SizedBox(height: defaultPadding),
+                            const Text('Customer Contact Number'),
+                            Text(
+                              snapshot.data!.contactNum,
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            const SizedBox(height: defaultPadding),
+                            const Text('Salon Place'),
+                            Text(
+                              widget.address,
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            const SizedBox(height: defaultPadding),
+                            const Text('Time & Date'),
+                            Text(
+                              "${DateFormat.jm().format(widget.dateTimeFrom)} - ${DateFormat.jm().format(widget.dateTimeTo)} | ${DateFormat('MMMMd').format(widget.dateTimeTo)}",
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            const SizedBox(height: defaultPadding),
+                            const Text('Services'),
+                            LayoutBuilder(
+                              builder: (context, constraints) {
+                                return SizedBox(
+                                  width: constraints.maxWidth,
+                                  height: 30,
+                                  child: ListView.builder(
+                                    shrinkWrap: true,
+                                    scrollDirection: Axis.horizontal,
+                                    itemCount: cart.length,
+                                    itemBuilder: (context, index) {
+                                      return ServiceCard(
+                                          cart[index].serviceName);
+                                    },
+                                  ),
+                                );
+                              },
+                            ),
+                          ],
+                        )),
+                        const SizedBox(height: defaultPadding),
+                        bookingCard(Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            RowDetails([
+                              const Text('Payment Method'),
+                              Text(widget.paymentMethod),
+                            ]),
+                            RowDetails([
+                              const Text('Total',
+                                  style:
+                                      TextStyle(fontWeight: FontWeight.bold)),
+                              Text('PHP ${format.format(getTotal())}',
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold))
+                            ]),
+                            const Divider(),
+                            ListView.builder(
+                              shrinkWrap: true,
+                              itemCount: cart.length + 1,
+                              itemBuilder: (context, index) {
+                                if (index == cart.length) {
+                                  cart.forEach((element) {
+                                    prices.add(int.parse(element.price));
+                                  });
+                                  return RowDetails([
+                                    const Text('Service Fee'),
+                                    Text('PHP ${widget.serviceFee}')
+                                  ]);
+                                } else {
+                                  return RowDetails([
+                                    Text(cart[index].serviceName),
+                                    Text(
+                                        "PHP ${format.format(double.parse(cart[index].price))}"),
+                                  ]);
+                                }
+                              },
+                            ),
+                          ],
+                        )),
+                        const SizedBox(height: defaultPadding),
+                        widget.role == 'salon'
+                            ? StreamBuilder<List<String>>(
+                                stream: Stream.fromFuture(getStaffs()),
+                                builder: (context, snapshot) {
+                                  if (snapshot.hasData) {
+                                    final data = snapshot.data!;
+                                    return bookingCard(DropdownButton(
+                                        hint: const Text('Preferred Stylist'),
+                                        value: dropdownValue,
+                                        items: data.map((e) {
+                                          return DropdownMenuItem<String>(
+                                              value: e, child: Text(e));
+                                        }).toList(),
+                                        onChanged: (String? newValue) {
+                                          setState(() {
+                                            dropdownValue = newValue!;
+                                          });
+                                        }));
+                                  } else {
+                                    return Container();
+                                  }
+                                },
+                              )
+                            : Container(),
+                      ],
+                    ),
+                    Column(
+                      children: [
+                        Container(
+                            margin: const EdgeInsets.symmetric(
+                                horizontal: defaultPadding),
+                            child: ElevatedButton(
+                                onPressed: () async {
+                                  //if online payment
+                                  if (widget.paymentMethod.toLowerCase() ==
+                                      "online wallet") {
+                                    //check wallet if has enough balance
+                                    if (getTotal() > await computeBalance()) {
+                                      toastification.show(
+                                        type: ToastificationType.error,
+                                        context: context,
+                                        title: const Text('Not enough balace'),
+                                        autoCloseDuration:
+                                            const Duration(seconds: 5),
+                                      );
+                                    } else {
+                                      await addBookingWithPayment(
+                                          snapshot.data!.contactNum);
+                                      //add sa transaction collection
+                                      await db
+                                          .collection('users')
+                                          .doc(currentUser!.uid)
+                                          .collection('transaction')
+                                          .doc(ref)
+                                          .set({
+                                        'amount': -getTotal(),
+                                        'description': 'on hold',
+                                        'timestamp': DateTime.now(),
+                                      });
+                                    }
+                                    //if cash payment
+                                  } else if (widget.paymentMethod
+                                          .toLowerCase() ==
+                                      "cash") {
+                                    addBookingWithPayment(
+                                        snapshot.data!.contactNum);
+                                  }
+                                },
+                                child: const Text(
+                                  'BOOK',
+                                  style: TextStyle(color: kPrimaryLightColor),
+                                ))),
+                        const SizedBox(height: defaultPadding),
+                      ],
+                    )
+                  ],
+                );
+              } else {
+                return const Center(child: CircularProgressIndicator());
+              }
+            }));
   }
 
-  Future<void> addBookingWithPayment() async {
+  Future<void> addBookingWithPayment(String contactNum) async {
     bookingToFirestore(
-            format.format(double.parse(getServiceFeeFromList(prices))))
+            format.format(double.parse(getServiceFeeFromList(prices))),
+            contactNum)
         .then((value) {
       Navigator.push(
           context,
@@ -314,7 +344,7 @@ class _ApproveAppointmentState extends State<ApproveAppointment> {
     return (sum * .05).toStringAsFixed(2);
   }
 
-  Future<void> bookingToFirestore(String serviceFee) async {
+  Future<void> bookingToFirestore(String serviceFee, String contactNum) async {
     List<Map<String, dynamic>> services = [];
     cart.forEach((element) {
       services.add({
@@ -333,6 +363,7 @@ class _ApproveAppointmentState extends State<ApproveAppointment> {
     });
     try {
       Map<String, dynamic> booking = {
+        'contactNum': contactNum,
         'serviceFee': widget.serviceFee,
         'totalAmount': format.format(getTotal()),
         'clientId': widget.clientID,

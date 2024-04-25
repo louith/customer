@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:customer/components/constants.dart';
 import 'package:customer/components/widgets.dart';
 import 'package:customer/screens/Homescreen/Homescreen.dart';
+import 'package:customer/screens/Homescreen/add_address.dart';
 import 'package:customer/screens/Homescreen/booking_transcations.dart';
 import 'package:customer/screens/Homescreen/wallet_details.dart';
 import 'package:customer/screens/WelcomeScreen/CustWelcomeScreen.dart';
@@ -49,6 +50,7 @@ class _MyProfileState extends State<MyProfile> {
           .collection('users')
           .doc(currentUser!.uid)
           .get();
+      log(userDoc.id);
       return Profile(
         uid: userDoc.id,
         username: userDoc['Username'],

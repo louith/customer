@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:customer/components/background.dart';
 import 'package:customer/components/constants.dart';
 import 'package:customer/components/widgets.dart';
@@ -65,10 +67,14 @@ class _FinishBookingState extends State<FinishBooking> {
           ]),
           if (switchValue)
             ListView.builder(
-              shrinkWrap: false,
+              shrinkWrap: true,
               itemCount: widget.transaction.services!.length,
               itemBuilder: (context, index) {
-                return Text('data');
+                return RowDetails([
+                  Text(widget.transaction.services![index]['serviceName']),
+                  Text(
+                      "PHP ${widget.transaction.services![index]['price'].toStringAsFixed(2)}"),
+                ]);
               },
             ),
           TextButton(

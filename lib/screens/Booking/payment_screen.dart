@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:customer/components/background.dart';
 import 'package:customer/components/constants.dart';
 import 'package:customer/screens/Booking/approve_appointment.dart';
+import 'package:customer/screens/Booking/editEvent.dart';
 import 'package:customer/screens/Homescreen/MainScreen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -140,21 +141,21 @@ class _PaymentScreenState extends State<PaymentScreen> {
         cart.fold(0, (previousValue, element) => int.parse(element.price));
     return amount;
   }
+}
 
-  Future<Customer?> getCustomerDetails() async {
-    try {
-      DocumentSnapshot query =
-          await db.collection('users').doc(currentUser!.uid).get();
-      return Customer(
-          fullName:
-              '${query['First Name']} ${query['Middle Name']} ${query['Last Name']}',
-          contactNum: query['Contact Number'],
-          gender: query['Gender'],
-          profilePicture: query['Profile Picture'],
-          username: query['Username']);
-    } catch (e) {
-      log(e.toString());
-      return null;
-    }
+Future<Customer?> getCustomerDetails() async {
+  try {
+    DocumentSnapshot query =
+        await db.collection('users').doc(currentUser!.uid).get();
+    return Customer(
+        fullName:
+            '${query['First Name']} ${query['Middle Name']} ${query['Last Name']}',
+        contactNum: query['Contact Number'],
+        gender: query['Gender'],
+        profilePicture: query['Profile Picture'],
+        username: query['Username']);
+  } catch (e) {
+    log(e.toString());
+    return null;
   }
 }

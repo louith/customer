@@ -1,9 +1,9 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:customer/components/background.dart';
 import 'package:customer/components/constants.dart';
-import 'package:customer/components/form_container_widget.dart';
 import 'package:customer/components/widgets.dart';
 import 'package:customer/screens/FreelancerCategoryScreens/Hair.dart';
 import 'package:customer/screens/Homescreen/booking_transcations.dart';
@@ -15,14 +15,19 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:simple_accordion/simple_accordion.dart';
 import 'package:toastification/toastification.dart';
 
 class Rating extends StatefulWidget {
   final String clientId;
+  Transactions transactions;
   final String reference;
   // final Transactions transactions;
-  Rating({super.key, required this.reference, required this.clientId});
+  Rating({
+    super.key,
+    required this.reference,
+    required this.clientId,
+    required this.transactions,
+  });
 
   @override
   State<Rating> createState() => _RatingState();
@@ -117,7 +122,7 @@ class _RatingState extends State<Rating> {
     double screenHeight = MediaQuery.of(context).size.height;
     return Container(
       color: kPrimaryColor,
-      padding: EdgeInsets.only(top: 45),
+      padding: const EdgeInsets.only(top: 45),
       child: Scaffold(
         appBar: AppBar(
           centerTitle: true,
@@ -325,7 +330,30 @@ class _RatingState extends State<Rating> {
       ),
     );
   }
+
+  Future<void> sendFeedback() async {
+    String clientUid = '';
+    DocumentSnapshot documentSnapshot =
+        await db.collection('users').doc(currentUser!.uid).get();
+    String customerUsername = documentSnapshot['Username'];
+    QuerySnapshot querySnapshot = await db
+        .collection('users')
+        .where('name', isEqualTo: widget.transactions.clientUsername)
+        .get();
+    querySnapshot.docs.forEach((element) {
+      clientUid = element.id;
+    });
+    await db.collection('users').doc(clientUid).collection('ratings').add({
+      'rating': ratingValue,
+      'customer': customerUsername,
+      'comment': _comment.text,
+    });
+    if (mounted) {
+      Navigator.pop(context);
+    }
+  }
 }
+
 
 
 //  SizedBox(

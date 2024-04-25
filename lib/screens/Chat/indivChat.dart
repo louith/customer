@@ -184,7 +184,7 @@ class _IndivChatState extends State<IndivChat> {
   }
 
   void sendImage() async {
-    if (!imageAdded && image.toString().isEmpty) {
+    if (imageAdded && image.toString().isNotEmpty) {
       Reference referenceRoot = FirebaseStorage.instance.ref();
       Reference dirImages =
           referenceRoot.child('chatImages').child(currentUser!.uid);

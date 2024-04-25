@@ -168,11 +168,6 @@ class _CustProfileState extends State<CustProfile> {
         };
         // Add document to the collection
         await users.set(userData);
-        var addressCol = db
-            .collection('users')
-            .doc(currentUser!.uid)
-            .collection('addresses')
-            .doc(addressName);
         Map<String, dynamic> addressData = {
           'Address Name': addressName,
           'Province': prov,
@@ -181,7 +176,11 @@ class _CustProfileState extends State<CustProfile> {
           'Extended Address': extAddress,
           // 'Default Address': isDefaultAddress,
         };
-        await addressCol.set(addressData);
+        await db
+            .collection('users')
+            .doc(currentUser!.uid)
+            .collection('addresses')
+            .add(addressData);
         toastification.show(
             type: ToastificationType.success,
             context: context,

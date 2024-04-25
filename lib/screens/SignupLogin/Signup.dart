@@ -1,9 +1,7 @@
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:customer/components/already_have_an_account_check.dart';
 import 'package:customer/components/assets_strings.dart';
-import 'package:customer/components/widgets.dart';
 import 'package:customer/components/constants.dart';
 import 'package:customer/screens/SignupLogin/Login.dart';
 import 'package:customer/screens/SignupLogin/components/signup_topimg.dart';
@@ -177,9 +175,7 @@ class _CustSignUpState extends State<CustSignUp> {
     String username = _usernameController.text;
     String email = _emailController.text;
     String password = _passwordController.text;
-    String error = "";
 
-    User? user = await _auth.signUpWithEmailAndPassword(email, password);
     postEmailToFireStore();
 
     if (_formKey.currentState!.validate()) {

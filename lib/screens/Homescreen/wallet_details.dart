@@ -118,12 +118,17 @@ class _WalletDetailsState extends State<WalletDetails> {
                         ],
                       );
                     } else {
-                      return ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: snapshot.data!.length,
-                        itemBuilder: (context, index) {
-                          return transactionCard(transaction, index);
+                      return RefreshIndicator(
+                        onRefresh: () async {
+                          setState(() {});
                         },
+                        child: ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: snapshot.data!.length,
+                          itemBuilder: (context, index) {
+                            return transactionCard(transaction, index);
+                          },
+                        ),
                       );
                     }
                   } else {
@@ -166,7 +171,7 @@ class _WalletDetailsState extends State<WalletDetails> {
       List<Transaction> transactions = [];
       QuerySnapshot querySnapshot = await db
           .collection('users')
-          .doc(widget.profile.uid)
+          .doc(currentUser!.uid)
           .collection('transaction')
           .get();
       querySnapshot.docs.forEach((doc) {
