@@ -107,23 +107,16 @@ class _TransactionHistoryState extends State<TransactionHistory> {
                 const Text('Address'),
                 Text(widget.transactions.location,
                     style: const TextStyle(fontWeight: FontWeight.bold)),
-// <<<<<<< master
-//                 const SizedBox(height: defaultPadding),
-//                 transactions.preferredWorker != null
-//                     ? Row(
-//                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 const SizedBox(height: defaultPadding),
                 widget.transactions.preferredWorker != null
-                    ? Column(
+                    ? Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           const Text('Preferred Stylist'),
-// <<<<<<< master
-//                           Text(
-//                             transactions.preferredWorker!,
-//                             style: const TextStyle(fontWeight: FontWeight.bold),
-//                           )
-// =======
-                          Text(widget.transactions.preferredWorker!)
+                          Text(
+                            widget.transactions.preferredWorker!,
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          )
                         ],
                       )
                     : Container()
@@ -218,7 +211,7 @@ class _TransactionHistoryState extends State<TransactionHistory> {
                                                               .reference,
                                                           clientId: widget
                                                               .transactions
-                                                              .clientId,
+                                                              .clientID,
                                                         )));
                                           },
                                           child: Text(

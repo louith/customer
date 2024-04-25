@@ -117,6 +117,75 @@ class _MyProfileState extends State<MyProfile> {
                                 fontWeight: FontWeight.bold, fontSize: 20),
                           ),
                           Text(profileData.email),
+                          const SizedBox(height: 20),
+                          SizedBox(
+                              width: 200,
+                              height: 45,
+                              child: elevButton(
+                                  title: 'Edit Profile',
+                                  onClicked: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: ((context) =>
+                                                EditProfile())));
+                                    //separate page na dapat na naga fetch ug data from db
+                                  })),
+                          const SizedBox(height: defaultPadding),
+                          const Divider(),
+                          const SizedBox(height: defaultPadding),
+                          //Menu
+                          ProfileMenuWidget(
+                            title: 'My Addresses',
+                            icon: LineIcons.locationArrow,
+                            onPress: () {
+                              Navigator.of(context).push(MaterialPageRoute(
+                                builder: (context) {
+                                  return const AddAddress();
+                                },
+                              ));
+                            },
+                          ),
+                          ProfileMenuWidget(
+                            title: 'Wallet Details',
+                            icon: LineIcons.wallet,
+                            onPress: () {
+                              Navigator.push(context, MaterialPageRoute(
+                                builder: (context) {
+                                  return WalletDetails(
+                                    profile: profileData,
+                                  );
+                                },
+                              ));
+                            },
+                          ),
+                          ProfileMenuWidget(
+                            title: 'Booking Transactions',
+                            icon: LineIcons.calendar,
+                            onPress: () {
+                              Navigator.push(context, MaterialPageRoute(
+                                builder: (context) {
+                                  return BookingTransactions(
+                                    customerUid: profileData.uid,
+                                  );
+                                },
+                              ));
+                            },
+                          ),
+                          const Divider(),
+                          const SizedBox(height: defaultPadding),
+                          Container(
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                                color: kPrimaryColor.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(20)),
+                            child: ProfileMenuWidget(
+                              title: 'Logout',
+                              icon: LineIcons.alternateSignOut,
+                              endIcon: false,
+                              onPress: signUserOut,
+                            ),
+                          ),
                         ],
                       );
                     } else {
@@ -125,65 +194,6 @@ class _MyProfileState extends State<MyProfile> {
                           color: kPrimaryColor);
                     }
                   },
-                ),
-                const SizedBox(height: 20),
-                SizedBox(
-                    width: 200,
-                    height: 45,
-                    child: elevButton(
-                        title: 'Edit Profile',
-                        onClicked: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: ((context) => EditProfile())));
-                          //separate page na dapat na naga fetch ug data from db
-                        })),
-                const SizedBox(height: defaultPadding),
-                const Divider(),
-                const SizedBox(height: defaultPadding),
-                //Menu
-                ProfileMenuWidget(
-                  title: 'My Addresses',
-                  icon: LineIcons.locationArrow,
-                  onPress: () {},
-                ),
-                // ProfileMenuWidget(
-                // title: 'Settings',
-                // icon: LineIcons.cog,
-                // onPress: () {},
-                // ),
-                ProfileMenuWidget(
-                  title: 'Billing Details',
-                  icon: LineIcons.wallet,
-                  onPress: () {},
-                ),
-                ProfileMenuWidget(
-                  title: 'Booking Transactions',
-                  icon: LineIcons.calendar,
-                  onPress: () {
-                    Navigator.push(context, MaterialPageRoute(
-                      builder: (context) {
-                        return BookingTransactions(
-                          uid: currentUser!.uid,
-                        );
-                      },
-                    ));
-                  },
-                ),
-                const Divider(),
-                const SizedBox(height: defaultPadding),
-                Container(
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                      color: kPrimaryColor.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(20)),
-                  child: ProfileMenuWidget(
-                    title: 'Logout',
-                    icon: LineIcons.alternateSignOut,
-                    endIcon: false,
-                    onPress: signUserOut,
-                  ),
                 ),
               ],
             ),

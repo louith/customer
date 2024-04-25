@@ -9,7 +9,9 @@ import 'package:customer/screens/Chat/indivChat.dart';
 import 'package:customer/screens/ServicesOffered/servicesList.dart';
 import 'package:customer/screens/indivProfile/moreinfo_screen.dart';
 import 'package:customer/screens/indivProfile/rating_display.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:intl/intl.dart';
 
@@ -93,10 +95,6 @@ class IndivWorkerProfile extends StatelessWidget {
     final format = NumberFormat('#,##0.00');
 
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: kPrimaryColor,
-        foregroundColor: kPrimaryLightColor,
-      ),
       body: Stack(children: [
         Container(
           color: kPrimaryColor,
@@ -122,25 +120,26 @@ class IndivWorkerProfile extends StatelessWidget {
               return Padding(
                 padding: const EdgeInsets.all(defaultPadding),
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     const SizedBox(height: defaultPadding),
+                    clientData.profileimage!.isEmpty
+                        ? const CircleAvatar(
+                            radius: 50,
+                            child: Text(
+                              'Profile Picture',
+                              style: TextStyle(fontSize: 12),
+                              textAlign: TextAlign.center,
+                            ),
+                          )
+                        : CircleAvatar(
+                            radius: 50,
+                            backgroundImage:
+                                NetworkImage(clientData.profileimage!),
+                          ),
                     Row(
                       children: [
-                        clientData.profileimage!.isEmpty
-                            ? const CircleAvatar(
-                                radius: 50,
-                                child: Text(
-                                  'Profile Picture',
-                                  style: TextStyle(fontSize: 12),
-                                  textAlign: TextAlign.center,
-                                ),
-                              )
-                            : CircleAvatar(
-                                radius: 50,
-                                backgroundImage:
-                                    NetworkImage(clientData.profileimage!),
-                              ),
                         Expanded(
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.start,
@@ -153,20 +152,31 @@ class IndivWorkerProfile extends StatelessWidget {
                                 ),
                               ),
                               CategoriesRow(itemList: clientData.categories),
-                              Wrap(
-                                  crossAxisAlignment: WrapCrossAlignment.start,
+                              const SizedBox(height: defaultPadding),
+                              Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    const Icon(Icons.location_on_outlined),
+                                    const Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Text('Address'),
+                                        Icon(Icons.location_pin),
+                                      ],
+                                    ),
                                     Text(
                                       clientData.address,
-                                    )
+                                      textAlign: TextAlign.center,
+                                    ),
                                   ]),
+                              const SizedBox(height: defaultPadding),
                               Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceAround,
                                 children: [
                                   SizedBox(
                                     width: 135,
+                                    height: 50,
                                     child: ElevatedButton(
                                         style: const ButtonStyle(
                                           backgroundColor:
@@ -199,6 +209,7 @@ class IndivWorkerProfile extends StatelessWidget {
                                   ),
                                   SizedBox(
                                     width: 135,
+                                    height: 50,
                                     child: ElevatedButton(
                                         style: const ButtonStyle(
                                             foregroundColor:
@@ -251,10 +262,8 @@ class IndivWorkerProfile extends StatelessWidget {
                                             fontWeight: FontWeight.bold,
                                             color: kPrimaryColor),
                                       )),
-                                  SizedBox(
-                                    width: defaultPadding,
-                                  ),
-                                  SizedBox(
+                                  const SizedBox(width: defaultPadding),
+                                  const SizedBox(
                                     width: defaultPadding,
                                     child: Text(
                                       '|',
@@ -265,8 +274,6 @@ class IndivWorkerProfile extends StatelessWidget {
                                   ),
                                   TextButton(
                                       onPressed: () {
-                                        print(
-                                            'clientId: ${snapshot.data!.id}, clientName:${snapshot.data!.name}');
                                         Navigator.push(
                                             context,
                                             MaterialPageRoute(
@@ -279,7 +286,7 @@ class IndivWorkerProfile extends StatelessWidget {
                                                           .data!.rating!,
                                                     )));
                                       },
-                                      child: Text(
+                                      child: const Text(
                                         'Rating',
                                         style: TextStyle(
                                             fontWeight: FontWeight.bold,

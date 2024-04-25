@@ -11,22 +11,18 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:toastification/toastification.dart';
 
 class Rating extends StatefulWidget {
   final String clientId;
-  Transactions transactions;
   final String reference;
-  // final Transactions transactions;
+
   Rating({
     super.key,
     required this.reference,
     required this.clientId,
-    required this.transactions,
   });
 
   @override
@@ -141,7 +137,7 @@ class _RatingState extends State<Rating> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  Text(
+                  const Text(
                     'Services: ',
                     style: TextStyle(fontSize: 16),
                   ),
@@ -154,7 +150,7 @@ class _RatingState extends State<Rating> {
                         builder: (context, snapshot) {
                           if (snapshot.connectionState ==
                               ConnectionState.waiting) {
-                            return Center(
+                            return const Center(
                                 child: Text(
                               'Loading service...',
                               style: TextStyle(fontStyle: FontStyle.italic),
@@ -172,12 +168,12 @@ class _RatingState extends State<Rating> {
                                 itemBuilder: (context, index) {
                                   _services.add(services[index]['serviceName']);
                                   return Container(
-                                      margin: EdgeInsets.only(right: 4),
+                                      margin: const EdgeInsets.only(right: 4),
                                       decoration: BoxDecoration(
                                           color: kPrimaryLightColor,
                                           borderRadius:
                                               BorderRadius.circular(100)),
-                                      padding: EdgeInsets.symmetric(
+                                      padding: const EdgeInsets.symmetric(
                                           vertical: 4, horizontal: 8),
                                       child:
                                           Text(services[index]['serviceName']));
@@ -189,11 +185,9 @@ class _RatingState extends State<Rating> {
                   )
                 ],
               ),
-              SizedBox(
-                height: defaultformspacing,
-              ),
+              const SizedBox(height: defaultformspacing),
               Row(children: [
-                Text(
+                const Text(
                   'Rating:',
                   style: TextStyle(fontSize: 16),
                 ),
@@ -204,26 +198,25 @@ class _RatingState extends State<Rating> {
                     allowHalfRating: true,
                     itemCount: 5,
                     itemSize: 50,
-                    itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
-                    itemBuilder: (context, _) => Icon(
+                    itemPadding: const EdgeInsets.symmetric(horizontal: 2.0),
+                    itemBuilder: (context, _) => const Icon(
                           Icons.star,
                           color: Colors.amber,
+                          size: 16,
                         ),
                     onRatingUpdate: (rating) =>
                         setState(() => _rating = rating)),
               ]),
-              SizedBox(
-                height: defaultformspacing,
-              ),
+              const SizedBox(height: defaultformspacing),
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(
+                const Text(
                   'Comment:',
                   style: TextStyle(fontSize: 16),
                 ),
                 TextFormField(
                     maxLines: 4,
                     controller: _comment,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       hintText: 'The worker did a good job...',
                     ),
                     validator: (String? value) {
@@ -232,68 +225,7 @@ class _RatingState extends State<Rating> {
                       }
                     }),
               ]),
-              SizedBox(
-                height: defaultformspacing,
-              ),
-              // Row(
-              // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              // children: [
-              // TextButton.icon(
-              // onPressed: () async {
-              // ImagePicker imagePicker = ImagePicker();
-              // XFile? file = await imagePicker.pickImage(
-              // source: ImageSource.gallery);
-              // print('Path: ${file?.path}');
-
-              // if (file == null) return;
-              // Reference referenceRoot =
-              // FirebaseStorage.instance.ref();
-              // Reference referenceDirImages = referenceRoot
-              // .child('ratings')
-              // .child(currentUser!.uid)
-              // .child(widget.reference);
-              // Reference refImgToUpload =
-              // referenceDirImages.child('ratingImg');
-
-              // try {
-              // await refImgToUpload.putFile(File(file.path));
-              // _imgUrl = await refImgToUpload.getDownloadURL();
-              // } catch (e) {
-              // print('Error occured $e');
-              // }
-              // },
-              // icon: const Icon(Icons.image_outlined),
-              // label: const Text('Pick from Gallery')),
-              // TextButton.icon(
-              // onPressed: () async {
-              // ImagePicker imagePicker = ImagePicker();
-              // XFile? file = await imagePicker.pickImage(
-              // source: ImageSource.camera);
-              // print('${file?.path}');
-              // if (file == null) return;
-              // String uniqueFileName = widget.reference + 'ratingImg';
-              // Reference referenceRoot =
-              // FirebaseStorage.instance.ref();
-              // Reference referenceDirImages =
-              // referenceRoot.child('ratings');
-              // Reference folderId =
-              // referenceDirImages.child(currentUser!.uid);
-              // Reference refImgToUpload =
-              // folderId.child(uniqueFileName);
-              // try {
-              // await refImgToUpload.putFile(File(file.path));
-              // var imageUrl = await refImgToUpload.getDownloadURL();
-              // } catch (e) {
-              // print('Error occured $e');
-              // }
-              // },
-              // icon: const Icon(Icons.camera_outlined),
-              // label: const Text('Pick from Camera')),
-              // ],
-              // ),
-              // const SizedBox(
-              // height: defaultformspacing,
-              // ),
+              const SizedBox(height: defaultformspacing),
               nextButton(context, () async {
                 DocumentSnapshot<Map<String, dynamic>> userInfo =
                     await FirebaseFirestore.instance
@@ -317,8 +249,8 @@ class _RatingState extends State<Rating> {
                 toastification.show(
                     type: ToastificationType.success,
                     context: context,
-                    icon: Icon(Icons.rate_review),
-                    title: Text('Rating saved!'),
+                    icon: const Icon(Icons.rate_review),
+                    title: const Text('Rating saved!'),
                     autoCloseDuration: const Duration(seconds: 3),
                     showProgressBar: false,
                     alignment: Alignment.topCenter,
@@ -330,68 +262,4 @@ class _RatingState extends State<Rating> {
       ),
     );
   }
-
-  Future<void> sendFeedback() async {
-    String clientUid = '';
-    DocumentSnapshot documentSnapshot =
-        await db.collection('users').doc(currentUser!.uid).get();
-    String customerUsername = documentSnapshot['Username'];
-    QuerySnapshot querySnapshot = await db
-        .collection('users')
-        .where('name', isEqualTo: widget.transactions.clientUsername)
-        .get();
-    querySnapshot.docs.forEach((element) {
-      clientUid = element.id;
-    });
-    await db.collection('users').doc(clientUid).collection('ratings').add({
-      'rating': ratingValue,
-      'customer': customerUsername,
-      'comment': _comment.text,
-    });
-    if (mounted) {
-      Navigator.pop(context);
-    }
-  }
 }
-
-
-
-//  SizedBox(
-//  height: defaultformspacing,
-//  ),
-//  Row(children: [
-//  Text(
-//  'Rating:',
-//  style: TextStyle(fontSize: 16),
-//  ),
-//  RatingBar.builder(
-//  initialRating: 1,
-//  minRating: 1,
-//  direction: Axis.horizontal,
-//  allowHalfRating: true,
-//  itemCount: 5,
-//  itemSize: 20,
-//  itemPadding:
-//  EdgeInsets.symmetric(horizontal: 4.0),
-//  itemBuilder: (context, _) => Icon(
-//  Icons.star,
-//  color: Colors.amber,
-//  ),
-//  onRatingUpdate: (rating) {
-//  print(rating);
-//  }),
-//  ]),
-//  SizedBox(
-//  height: defaultformspacing,
-//  ),
-//  Column(
-//  crossAxisAlignment: CrossAxisAlignment.start,
-//  mainAxisAlignment: MainAxisAlignment.center,
-//  children: [
-//  Text('Comment:',
-//  style: TextStyle(fontSize: 16)),
-//  FormContainerWidget(
-//  icon: Icons.comment,
-//  controller: _comment,
-//  )
-//  ])

@@ -23,6 +23,7 @@ class Transactions {
   String? preferredWorker;
   String? reason;
   String customerUid;
+  String clientID;
 
   Transactions({
     required this.clientUsername,
@@ -61,7 +62,7 @@ class _BookingTransactionsState extends State<BookingTransactions> {
     try {
       QuerySnapshot querySnapshot = await db
           .collection('users')
-          .doc(widget.customerUid)
+          .doc(currentUser!.uid)
           .collection('bookings')
           .get();
       querySnapshot.docs.forEach((doc) {
@@ -74,8 +75,6 @@ class _BookingTransactionsState extends State<BookingTransactions> {
           worker = doc['worker'];
         }
 
-        // String? worker = doc['worker'];
-        //add required fields
         transactionsList.add(Transactions(
           clientID: doc['clientId'],
           serviceFee: doc['serviceFee'],
@@ -123,60 +122,66 @@ class _BookingTransactionsState extends State<BookingTransactions> {
               builder: (context, transactions) {
                 if (transactions.hasData) {
                   final data = transactions.data!;
-                  return ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: transactions.data!.length,
-                    itemBuilder: (context, index) {
-                      Color statusColor = data[index].status.toLowerCase() ==
-                              'pending'
-                          ? Colors.grey
-                          : data[index].status.toLowerCase() == 'confirmed'
-                              ? Colors.green
-                              : data[index].status.toLowerCase() == 'complete'
-                                  ? kPrimaryColor
-                                  : data[index].status.toLowerCase() == 'denied'
-                                      ? Colors.red
-                                      : Colors.black;
-                      return transaction(
-                          Column(
-                            children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Row(
-                                    children: [
-                                      //client name
-                                      Text(
-                                        data[index].clientUsername,
-                                        style: const TextStyle(
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                      //date from and date to of appointment
-                                      Text(
-                                          ' - ${DateFormat.MMMEd().format(data[index].dateFrom)}'),
-                                    ],
-                                  ),
-                                  //status
-                                ],
-                              ),
-                              const SizedBox(height: defaultPadding),
-                              Text(data[index].location), //address
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  Text(
-                                    data[index].status.toUpperCase(),
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: statusColor),
-                                  ),
-                                ],
-                              )
-                            ],
-                          ),
-                          TransactionHistory(transactions: data[index]));
+                  return RefreshIndicator(
+                    onRefresh: () async {
+                      setState(() {});
                     },
+                    child: ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: transactions.data!.length,
+                      itemBuilder: (context, index) {
+                        Color statusColor = data[index].status.toLowerCase() ==
+                                'pending'
+                            ? Colors.grey
+                            : data[index].status.toLowerCase() == 'confirmed'
+                                ? Colors.green
+                                : data[index].status.toLowerCase() == 'complete'
+                                    ? kPrimaryColor
+                                    : data[index].status.toLowerCase() ==
+                                            'denied'
+                                        ? Colors.red
+                                        : Colors.black;
+                        return transaction(
+                            Column(
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        //client name
+                                        Text(
+                                          data[index].clientUsername,
+                                          style: const TextStyle(
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        //date from and date to of appointment
+                                        Text(
+                                            ' - ${DateFormat.MMMEd().format(data[index].dateFrom)}'),
+                                      ],
+                                    ),
+                                    //status
+                                  ],
+                                ),
+                                const SizedBox(height: defaultPadding),
+                                Text(data[index].location), //address
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    Text(
+                                      data[index].status.toUpperCase(),
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: statusColor),
+                                    ),
+                                  ],
+                                )
+                              ],
+                            ),
+                            TransactionHistory(transactions: data[index]));
+                      },
+                    ),
                   );
                 } else {
                   return const Center(

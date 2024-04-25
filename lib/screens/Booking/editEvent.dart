@@ -49,7 +49,7 @@ class _BookingAppointmentState extends State<BookingAppointment> {
   GeoCode geoCode = GeoCode();
   String location = '';
 
-  String formatDouble(double value) {
+  String formatNum(num value) {
     final format = NumberFormat('#,##0.00');
     return format.format(value);
   }
@@ -131,7 +131,7 @@ class _BookingAppointmentState extends State<BookingAppointment> {
                                                   style: TextStyle(
                                                       fontWeight:
                                                           FontWeight.bold)),
-                                              Text("PHP ${formatDouble(total)}",
+                                              Text("PHP ${formatNum(total)}",
                                                   style: const TextStyle(
                                                       fontWeight:
                                                           FontWeight.bold)),
@@ -148,7 +148,7 @@ class _BookingAppointmentState extends State<BookingAppointment> {
                                         children: [
                                           Text(mapToList[index].serviceName),
                                           Text(
-                                              "PHP ${formatDouble(double.parse(mapToList[index].price))}"),
+                                              "PHP ${formatNum(double.parse(mapToList[index].price))}"),
                                         ],
                                       );
                                     }
@@ -758,7 +758,7 @@ class _ServicesBookingListState extends State<ServicesBookingList> {
       itemBuilder: (context, index) {
         String serviceName = widget.services[index].serviceName;
         String price =
-            priceFormat.format(int.parse(widget.services[index].price));
+            priceFormat.format(double.parse(widget.services[index].price));
         String duration = widget.services[index].duration;
         return Container(
           width: double.infinity,
