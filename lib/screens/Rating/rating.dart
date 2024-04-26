@@ -294,7 +294,6 @@ class _RatingState extends State<Rating> {
       ),
     );
   }
-
 }
 
   // Future<void> sendFeedback() async {
@@ -318,7 +317,7 @@ class _RatingState extends State<Rating> {
   // Navigator.pop(context);
   // }
   // }
-}
+  // }
 
 //  SizedBox(
 //  height: defaultformspacing,
