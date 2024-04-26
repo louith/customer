@@ -1,4 +1,7 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:customer/screens/Booking/editEvent.dart';
 import 'package:customer/screens/FreelancerCategoryScreens/Hair.dart';
 import 'package:flutter/material.dart';
 import 'package:customer/components/constants.dart';
@@ -192,18 +195,19 @@ class _RatingDisplayState extends State<RatingDisplay> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    getRatingsServices();
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
       color: kPrimaryColor,
-      padding: EdgeInsets.only(top: 65),
+      padding: const EdgeInsets.only(top: 45),
       child: Scaffold(
         appBar: AppBar(
           foregroundColor: kPrimaryLightColor,
           backgroundColor: kPrimaryColor,
-          title: Text(
+          title: const Text(
             'Customer Ratings',
             style: TextStyle(color: kPrimaryLightColor),
           ),
@@ -282,5 +286,26 @@ class _RatingDisplayState extends State<RatingDisplay> {
             }),
       ),
     );
+  }
+
+  Future<List> getRatingsServices() async {
+    try {
+      List<String> ids = [];
+      QuerySnapshot querySnapshot = await db
+          .collection('users')
+          .doc(widget.clientId)
+          .collection('bookings')
+          .where('status', isEqualTo: 'finished')
+          .get();
+      querySnapshot.docs.forEach((element) {
+        ids.add(element.id);
+      });
+      log("$ids");
+
+      return ids;
+    } catch (e) {
+      log('error getting service ratings $e');
+      return [];
+    }
   }
 }

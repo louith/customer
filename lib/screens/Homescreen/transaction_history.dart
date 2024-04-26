@@ -141,10 +141,14 @@ class _TransactionHistoryState extends State<TransactionHistory> {
                     style: const TextStyle(fontWeight: FontWeight.bold)),
                 const SizedBox(height: defaultPadding),
                 widget.transactions.preferredWorker != null
-                    ? Column(
+                    ? Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           const Text('Preferred Stylist'),
-                          Text(widget.transactions.preferredWorker!)
+                          Text(
+                            widget.transactions.preferredWorker!,
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          )
                         ],
                       )
                     : Container()
@@ -200,6 +204,48 @@ class _TransactionHistoryState extends State<TransactionHistory> {
                           } else {
                             final hasRating = snapshot.data!;
 
+// <<<<<<< master
+//                             return Row(
+//                                 mainAxisAlignment:
+//                                     MainAxisAlignment.spaceBetween,
+//                                 children: [
+//                                   Text(
+//                                     hasRating ? 'RATING DONE' : 'NO RATING YET',
+//                                     style: TextStyle(
+//                                         fontWeight: FontWeight.bold,
+//                                         color: hasRating
+//                                             ? Colors.green[800]
+//                                             : Colors.red[800]),
+//                                   ),
+//                                   hasRating
+//                                       ? Text('')
+//                                       : TextButton(
+//                                           onPressed: () {
+//                                             // print(widget.transactions.reference);
+//                                             print(hasRating.toString());
+//                                             Navigator.push(
+//                                                 context,
+//                                                 MaterialPageRoute(
+//                                                     builder: (context) =>
+//                                                         Rating(
+//                                                           // transactions:
+//                                                           // widget.transactions,
+//                                                           reference: widget
+//                                                               .transactions
+//                                                               .reference,
+//                                                           clientId: widget
+//                                                               .transactions
+//                                                               .clientID,
+//                                                         )));
+//                                           },
+//                                           child: Text(
+//                                             'Leave a rating',
+//                                             style: TextStyle(
+//                                                 decoration:
+//                                                     TextDecoration.underline),
+//                                           ))
+//                                 ]);
+// =======
                             return RefreshIndicator(
                               onRefresh: () async {
                                 setState(() {});
@@ -246,6 +292,7 @@ class _TransactionHistoryState extends State<TransactionHistory> {
                                             ))
                                   ]),
                             );
+// >>>>>>> master
                           }
                         })
                     : Text('')

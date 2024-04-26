@@ -11,22 +11,18 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:toastification/toastification.dart';
 
 class Rating extends StatefulWidget {
   final String clientId;
-  Transactions transactions;
   final String reference;
-  // final Transactions transactions;
+
   Rating({
     super.key,
     required this.reference,
     required this.clientId,
-    required this.transactions,
   });
 
   @override
@@ -172,7 +168,7 @@ class _RatingState extends State<Rating> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  Text(
+                  const Text(
                     'Services: ',
                     style: TextStyle(fontSize: 16),
                   ),
@@ -185,7 +181,7 @@ class _RatingState extends State<Rating> {
                         builder: (context, snapshot) {
                           if (snapshot.connectionState ==
                               ConnectionState.waiting) {
-                            return Center(
+                            return const Center(
                                 child: Text(
                               'Loading service...',
                               style: TextStyle(fontStyle: FontStyle.italic),
@@ -203,12 +199,12 @@ class _RatingState extends State<Rating> {
                                 itemBuilder: (context, index) {
                                   _services.add(services[index]['serviceName']);
                                   return Container(
-                                      margin: EdgeInsets.only(right: 4),
+                                      margin: const EdgeInsets.only(right: 4),
                                       decoration: BoxDecoration(
                                           color: kPrimaryLightColor,
                                           borderRadius:
                                               BorderRadius.circular(100)),
-                                      padding: EdgeInsets.symmetric(
+                                      padding: const EdgeInsets.symmetric(
                                           vertical: 4, horizontal: 8),
                                       child:
                                           Text(services[index]['serviceName']));
@@ -220,11 +216,9 @@ class _RatingState extends State<Rating> {
                   )
                 ],
               ),
-              SizedBox(
-                height: defaultformspacing,
-              ),
+              const SizedBox(height: defaultformspacing),
               Row(children: [
-                Text(
+                const Text(
                   'Rating:',
                   style: TextStyle(fontSize: 16),
                 ),
@@ -235,26 +229,25 @@ class _RatingState extends State<Rating> {
                     allowHalfRating: true,
                     itemCount: 5,
                     itemSize: 50,
-                    itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
-                    itemBuilder: (context, _) => Icon(
+                    itemPadding: const EdgeInsets.symmetric(horizontal: 2.0),
+                    itemBuilder: (context, _) => const Icon(
                           Icons.star,
                           color: Colors.amber,
+                          size: 16,
                         ),
                     onRatingUpdate: (rating) =>
                         setState(() => _rating = rating)),
               ]),
-              SizedBox(
-                height: defaultformspacing,
-              ),
+              const SizedBox(height: defaultformspacing),
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(
+                const Text(
                   'Comment:',
                   style: TextStyle(fontSize: 16),
                 ),
                 TextFormField(
                     maxLines: 4,
                     controller: _comment,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       hintText: 'The worker did a good job...',
                     ),
                     validator: (String? value) {
@@ -263,9 +256,7 @@ class _RatingState extends State<Rating> {
                       }
                     }),
               ]),
-              SizedBox(
-                height: defaultformspacing,
-              ),
+              const SizedBox(height: defaultformspacing),
               nextButton(context, () async {
                 DocumentSnapshot<Map<String, dynamic>> userInfo =
                     await FirebaseFirestore.instance
@@ -290,8 +281,8 @@ class _RatingState extends State<Rating> {
                 toastification.show(
                     type: ToastificationType.success,
                     context: context,
-                    icon: Icon(Icons.rate_review),
-                    title: Text('Rating saved!'),
+                    icon: const Icon(Icons.rate_review),
+                    title: const Text('Rating saved!'),
                     autoCloseDuration: const Duration(seconds: 3),
                     showProgressBar: false,
                     alignment: Alignment.topCenter,
@@ -303,6 +294,8 @@ class _RatingState extends State<Rating> {
       ),
     );
   }
+
+}
 
   // Future<void> sendFeedback() async {
   // String clientUid = '';
@@ -366,3 +359,4 @@ class _RatingState extends State<Rating> {
 //  controller: _comment,
 //  )
 //  ])
+
