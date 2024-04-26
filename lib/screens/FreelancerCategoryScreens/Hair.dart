@@ -150,6 +150,7 @@ class SubCategoriesRow extends StatelessWidget {
         children: List.generate(
           itemList.length,
           (index) => Container(
+            margin: EdgeInsets.only(right: 3),
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
             decoration: BoxDecoration(
                 color: Colors.purple[100],

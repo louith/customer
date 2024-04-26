@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class Transactions {
+  String clientID;
   String clientUsername;
   DateTime dateFrom;
   DateTime dateTo;

@@ -165,7 +165,7 @@ class _MyProfileState extends State<MyProfile> {
                     Navigator.push(context, MaterialPageRoute(
                       builder: (context) {
                         return BookingTransactions(
-                          uid: currentUser!.uid,
+                          customerUid: currentUser!.uid,
                         );
                       },
                     ));

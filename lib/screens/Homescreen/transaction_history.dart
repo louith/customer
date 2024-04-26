@@ -37,12 +37,44 @@ class _TransactionHistoryState extends State<TransactionHistory> {
             .doc(currentUser!.uid)
             .collection('bookings')
             .doc(widget.transactions.reference)
+            // .get();
             .collection('ratings')
             .doc('rating')
             .get();
+
+    // if (documentSnapshot.data()!.containsKey('rating')) {
+    // return true;
+    // } else {
+    // return false;
+    // }
+
     print(documentSnapshot.exists);
     return documentSnapshot.exists;
   }
+
+  // Future<bool> doesRatingExist() async {
+  // bool ratingIsExisting = false;
+  // DocumentSnapshot<Map<String, dynamic>> documentSnapshot =
+  // await FirebaseFirestore.instance
+  // .collection('users')
+  // .doc(currentUser!.uid)
+  // .collection('bookings')
+  // .doc(widget.transactions.reference)
+  // .get();
+//
+  // if ((documentSnapshot.data() as Map<String, dynamic>)
+  // .containsKey('rating')) {
+  // setState(() {
+  // ratingIsExisting = true;
+  // });
+  // } else {
+  // setState(() {
+  // ratingIsExisting = false;
+  // });
+  // }
+//
+  // return ratingIsExisting;
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -107,22 +139,11 @@ class _TransactionHistoryState extends State<TransactionHistory> {
                 const Text('Address'),
                 Text(widget.transactions.location,
                     style: const TextStyle(fontWeight: FontWeight.bold)),
-// <<<<<<< master
-//                 const SizedBox(height: defaultPadding),
-//                 transactions.preferredWorker != null
-//                     ? Row(
-//                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 const SizedBox(height: defaultPadding),
                 widget.transactions.preferredWorker != null
                     ? Column(
                         children: [
                           const Text('Preferred Stylist'),
-// <<<<<<< master
-//                           Text(
-//                             transactions.preferredWorker!,
-//                             style: const TextStyle(fontWeight: FontWeight.bold),
-//                           )
-// =======
                           Text(widget.transactions.preferredWorker!)
                         ],
                       )
@@ -140,15 +161,6 @@ class _TransactionHistoryState extends State<TransactionHistory> {
                 const SizedBox(height: defaultPadding),
                 RowDetails([
                   const Text('Booked Provider'),
-// <<<<<<< master
-//                   const Spacer(),
-//                   Flexible(
-//                     child: Text(
-//                       overflow: TextOverflow.ellipsis,
-//                       transactions.clientID,
-//                       style: const TextStyle(fontWeight: FontWeight.bold),
-//                     ),
-// =======
                   Text(
                     widget.transactions.clientUsername,
                     style: const TextStyle(fontWeight: FontWeight.bold),
@@ -169,8 +181,8 @@ class _TransactionHistoryState extends State<TransactionHistory> {
                   ]),
                 const SizedBox(height: defaultPadding),
                 widget.transactions.status == 'finished'
-                    ? FutureBuilder<bool>(
-                        future: doesSubcollectionExist(),
+                    ? StreamBuilder<bool>(
+                        stream: Stream.fromFuture(doesSubcollectionExist()),
                         builder: (context, snapshot) {
                           if (snapshot.connectionState ==
                               ConnectionState.waiting) {
@@ -188,46 +200,52 @@ class _TransactionHistoryState extends State<TransactionHistory> {
                           } else {
                             final hasRating = snapshot.data!;
 
-                            return Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    hasRating ? 'RATING DONE' : 'NO RATING YET',
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: hasRating
-                                            ? Colors.green[800]
-                                            : Colors.red[800]),
-                                  ),
-                                  hasRating
-                                      ? Text('')
-                                      : TextButton(
-                                          onPressed: () {
-                                            // print(widget.transactions.reference);
-                                            print(hasRating.toString());
-                                            Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        Rating(
-                                                          // transactions:
-                                                          // widget.transactions,
-                                                          reference: widget
-                                                              .transactions
-                                                              .reference,
-                                                          clientId: widget
-                                                              .transactions
-                                                              .clientId,
-                                                        )));
-                                          },
-                                          child: Text(
-                                            'Leave a rating',
-                                            style: TextStyle(
-                                                decoration:
-                                                    TextDecoration.underline),
-                                          ))
-                                ]);
+                            return RefreshIndicator(
+                              onRefresh: () async {
+                                setState(() {});
+                              },
+                              child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      hasRating
+                                          ? 'RATING DONE'
+                                          : 'NO RATING YET',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: hasRating
+                                              ? Colors.green[800]
+                                              : Colors.red[800]),
+                                    ),
+                                    hasRating
+                                        ? Text('')
+                                        : TextButton(
+                                            onPressed: () {
+                                              print(hasRating.toString());
+                                              Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          Rating(
+                                                            transactions: widget
+                                                                .transactions,
+                                                            reference: widget
+                                                                .transactions
+                                                                .reference,
+                                                            clientId: widget
+                                                                .transactions
+                                                                .clientID,
+                                                          )));
+                                            },
+                                            child: Text(
+                                              'Leave a rating',
+                                              style: TextStyle(
+                                                  decoration:
+                                                      TextDecoration.underline),
+                                            ))
+                                  ]),
+                            );
                           }
                         })
                     : Text('')

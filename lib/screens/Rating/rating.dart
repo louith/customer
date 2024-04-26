@@ -89,6 +89,8 @@ class _RatingState extends State<Rating> {
 
   Future<void> addRatingToFirestore(Map<String, dynamic> data) async {
     final firestore = FirebaseFirestore.instance;
+
+    //purpose kay para ma add sa collection
     final collectionRef = firestore
         .collection('users')
         .doc(currentUser!.uid)
@@ -97,6 +99,8 @@ class _RatingState extends State<Rating> {
         .collection('ratings')
         .doc('rating');
 
+    //purpose kay para ma add sa collection sa worker
+    //checker ra ata if naa na ba rating
     final worker_salonRef = firestore
         .collection('users')
         .doc(widget.clientId)
@@ -109,10 +113,37 @@ class _RatingState extends State<Rating> {
     try {
       await collectionRef.set(data);
       await worker_salonRef.set(data);
+
+      //ending shit nani
       print("Data added to collection: rating");
     } on FirebaseException catch (error) {
       print("Error adding data: ${error.message}");
     }
+  }
+
+  Future<void> addRatingMapFieldToWorker(
+      String mapFieldName, Map<String, dynamic> mapData) async {
+    final firestore = FirebaseFirestore.instance;
+    final documentRef = firestore
+        .collection('users')
+        .doc(widget.clientId)
+        .collection('bookings')
+        .doc(widget.reference);
+
+    await firestore.runTransaction((transaction) async {
+      final docSnapshot = await transaction.get(documentRef);
+
+      if (docSnapshot.exists) {
+        final updatedData = {
+          ...docSnapshot.data()!,
+          mapFieldName: mapData,
+        };
+
+        transaction.update(documentRef, updatedData);
+      } else {
+        print('error adding rating to specific worker bookingDoc');
+      }
+    });
   }
 
   @override
@@ -235,65 +266,6 @@ class _RatingState extends State<Rating> {
               SizedBox(
                 height: defaultformspacing,
               ),
-              // Row(
-              // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              // children: [
-              // TextButton.icon(
-              // onPressed: () async {
-              // ImagePicker imagePicker = ImagePicker();
-              // XFile? file = await imagePicker.pickImage(
-              // source: ImageSource.gallery);
-              // print('Path: ${file?.path}');
-
-              // if (file == null) return;
-              // Reference referenceRoot =
-              // FirebaseStorage.instance.ref();
-              // Reference referenceDirImages = referenceRoot
-              // .child('ratings')
-              // .child(currentUser!.uid)
-              // .child(widget.reference);
-              // Reference refImgToUpload =
-              // referenceDirImages.child('ratingImg');
-
-              // try {
-              // await refImgToUpload.putFile(File(file.path));
-              // _imgUrl = await refImgToUpload.getDownloadURL();
-              // } catch (e) {
-              // print('Error occured $e');
-              // }
-              // },
-              // icon: const Icon(Icons.image_outlined),
-              // label: const Text('Pick from Gallery')),
-              // TextButton.icon(
-              // onPressed: () async {
-              // ImagePicker imagePicker = ImagePicker();
-              // XFile? file = await imagePicker.pickImage(
-              // source: ImageSource.camera);
-              // print('${file?.path}');
-              // if (file == null) return;
-              // String uniqueFileName = widget.reference + 'ratingImg';
-              // Reference referenceRoot =
-              // FirebaseStorage.instance.ref();
-              // Reference referenceDirImages =
-              // referenceRoot.child('ratings');
-              // Reference folderId =
-              // referenceDirImages.child(currentUser!.uid);
-              // Reference refImgToUpload =
-              // folderId.child(uniqueFileName);
-              // try {
-              // await refImgToUpload.putFile(File(file.path));
-              // var imageUrl = await refImgToUpload.getDownloadURL();
-              // } catch (e) {
-              // print('Error occured $e');
-              // }
-              // },
-              // icon: const Icon(Icons.camera_outlined),
-              // label: const Text('Pick from Camera')),
-              // ],
-              // ),
-              // const SizedBox(
-              // height: defaultformspacing,
-              // ),
               nextButton(context, () async {
                 DocumentSnapshot<Map<String, dynamic>> userInfo =
                     await FirebaseFirestore.instance
@@ -313,6 +285,7 @@ class _RatingState extends State<Rating> {
                 };
 
                 addRatingToFirestore(userData);
+                addRatingMapFieldToWorker('rating', userData);
                 Navigator.pop(context);
                 toastification.show(
                     type: ToastificationType.success,
@@ -331,30 +304,28 @@ class _RatingState extends State<Rating> {
     );
   }
 
-  Future<void> sendFeedback() async {
-    String clientUid = '';
-    DocumentSnapshot documentSnapshot =
-        await db.collection('users').doc(currentUser!.uid).get();
-    String customerUsername = documentSnapshot['Username'];
-    QuerySnapshot querySnapshot = await db
-        .collection('users')
-        .where('name', isEqualTo: widget.transactions.clientUsername)
-        .get();
-    querySnapshot.docs.forEach((element) {
-      clientUid = element.id;
-    });
-    await db.collection('users').doc(clientUid).collection('ratings').add({
-      'rating': ratingValue,
-      'customer': customerUsername,
-      'comment': _comment.text,
-    });
-    if (mounted) {
-      Navigator.pop(context);
-    }
-  }
+  // Future<void> sendFeedback() async {
+  // String clientUid = '';
+  // DocumentSnapshot documentSnapshot =
+  // await db.collection('users').doc(currentUser!.uid).get();
+  // String customerUsername = documentSnapshot['Username'];
+  // QuerySnapshot querySnapshot = await db
+  // .collection('users')
+  // .where('name', isEqualTo: widget.transactions.clientUsername)
+  // .get();
+  // querySnapshot.docs.forEach((element) {
+  // clientUid = element.id;
+  // });
+  // await db.collection('users').doc(clientUid).collection('ratings').add({
+  // 'rating': ratingValue,
+  // 'customer': customerUsername,
+  // 'comment': _comment.text,
+  // });
+  // if (mounted) {
+  // Navigator.pop(context);
+  // }
+  // }
 }
-
-
 
 //  SizedBox(
 //  height: defaultformspacing,
