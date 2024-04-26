@@ -23,7 +23,7 @@ class WorkerDetailsCard {
   final List<String> categories;
   final String? profileimage;
   final String? worksAt;
-  final String? rating;
+  final double? rating;
 
   WorkerDetailsCard({
     required this.id,
@@ -71,7 +71,7 @@ class IndivWorkerProfile extends StatelessWidget {
         role: userMap['role'],
         address: userMap['address'],
         profileimage: userMap['profilePicture'],
-        rating: userMap['rating'],
+        rating: double.parse(userMap['rating'].toString()),
         categories: cats);
   }
 
@@ -300,18 +300,6 @@ class IndivWorkerProfile extends StatelessWidget {
                       ],
                     ),
                     //
-                    RatingBar.builder(
-                      allowHalfRating: true,
-                      ignoreGestures: true,
-                      initialRating: double.parse(clientData.rating!),
-                      maxRating: 5,
-                      minRating: 0,
-                      itemBuilder: (context, index) => const Icon(
-                        Icons.star,
-                        color: Colors.amber,
-                      ),
-                      onRatingUpdate: (value) => {},
-                    ),
                     const SizedBox(height: defaultPadding),
 
                     Expanded(
@@ -379,17 +367,31 @@ class IndivWorkerProfile extends StatelessWidget {
                                                                         FontWeight
                                                                             .bold),
                                                               ),
-                                                              Text(
-                                                                  ' - ${serviceData[serviceIndex].duration}')
+                                                              serviceData[serviceIndex]
+                                                                      .duration
+                                                                      .isEmpty
+                                                                  ? const Text(
+                                                                      ' - Duration')
+                                                                  : Text(
+                                                                      ' - ${serviceData[serviceIndex].duration}')
                                                             ],
                                                           ),
-                                                          Text(serviceData[
-                                                                  serviceIndex]
-                                                              .description),
+                                                          serviceData[serviceIndex]
+                                                                  .description
+                                                                  .isEmpty
+                                                              ? const Text(
+                                                                  'Description')
+                                                              : Text(serviceData[
+                                                                      serviceIndex]
+                                                                  .description),
                                                         ],
                                                       ),
-                                                      Text(
-                                                          "PHP ${format.format(double.parse(serviceData[serviceIndex].price))}"),
+                                                      serviceData[serviceIndex]
+                                                              .price
+                                                              .isEmpty
+                                                          ? const Text('Price')
+                                                          : Text(
+                                                              "PHP ${serviceData[serviceIndex].price}"),
                                                     ],
                                                   ),
                                                 );

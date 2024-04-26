@@ -26,7 +26,7 @@ class RatingCard {
 class RatingDisplay extends StatefulWidget {
   final String clientId;
   final String role;
-  final String averageRating;
+  final double averageRating;
   const RatingDisplay(
       {super.key,
       required this.clientId,
