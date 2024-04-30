@@ -274,8 +274,6 @@ class _TransactionHistoryState extends State<TransactionHistory> {
                                                   MaterialPageRoute(
                                                       builder: (context) =>
                                                           Rating(
-                                                            transactions: widget
-                                                                .transactions,
                                                             reference: widget
                                                                 .transactions
                                                                 .reference,

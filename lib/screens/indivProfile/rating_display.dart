@@ -291,7 +291,7 @@ class _RatingDisplayState extends State<RatingDisplay> {
   Future<List> getRatingsServices() async {
     try {
       List<String> ids = [];
-      QuerySnapshot querySnapshot = await db
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
           .collection('users')
           .doc(widget.clientId)
           .collection('bookings')

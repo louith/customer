@@ -24,7 +24,6 @@ class Transactions {
   String? preferredWorker;
   String? reason;
   String customerUid;
-  String clientID;
 
   Transactions({
     required this.clientUsername,

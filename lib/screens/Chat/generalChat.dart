@@ -81,19 +81,6 @@ class _GeneralChatPageState extends State<GeneralChatPage> {
     );
   }
 
-  String getChatName(String chatRoom) {
-    List<String> parts = chatRoom.split("_");
-
-    if (parts[0] == username) {
-      return parts[1];
-    } else if (parts[1] == username) {
-      return parts[0];
-    } else {
-      log("Current username not found in chatroom name");
-      return '';
-    }
-  }
-
   getUsername() async {
     try {
       final docRef =
@@ -104,6 +91,19 @@ class _GeneralChatPageState extends State<GeneralChatPage> {
       });
     } catch (e) {
       log('error getting username $e');
+    }
+  }
+
+  String getChatName(String chatRoom) {
+    List<String> parts = chatRoom.split("_");
+
+    if (parts[0] == username) {
+      return parts[1];
+    } else if (parts[1] == username) {
+      return parts[0];
+    } else {
+      log("Current username not found in chatroom name");
+      return '';
     }
   }
 
