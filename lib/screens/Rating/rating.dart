@@ -318,7 +318,6 @@ class _RatingState extends State<Rating> {
   // }
   // }
 
-
 //  SizedBox(
 //  height: defaultformspacing,
 //  ),

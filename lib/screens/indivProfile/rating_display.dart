@@ -195,7 +195,6 @@ class _RatingDisplayState extends State<RatingDisplay> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    getRatingsServices();
   }
 
   @override
@@ -288,6 +287,7 @@ class _RatingDisplayState extends State<RatingDisplay> {
     );
   }
 
+
   Future<List> getRatingsServices() async {
     try {
       List<String> ids = [];
@@ -302,10 +302,24 @@ class _RatingDisplayState extends State<RatingDisplay> {
       });
       log("$ids");
 
-      return ids;
-    } catch (e) {
-      log('error getting service ratings $e');
-      return [];
-    }
-  }
+  // Future<List> getRatingsServices() async {
+  // try {
+  // List<String> ids = [];
+  // QuerySnapshot querySnapshot = await db
+  // .collection('users')
+  // .doc(widget.clientId)
+  // .collection('bookings')
+  // .where('status', isEqualTo: 'finished')
+  // .get();
+  // querySnapshot.docs.forEach((element) {
+  // ids.add(element.id);
+  // });
+  // log("$ids");
+
+  // return ids;
+  // } catch (e) {
+  // log('error getting service ratings $e');
+  // return [];
+  // }
+  // }
 }
