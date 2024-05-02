@@ -317,7 +317,6 @@ class _RatingState extends State<Rating> {
   // Navigator.pop(context);
   // }
   // }
-  // }
 
 //  SizedBox(
 //  height: defaultformspacing,

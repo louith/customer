@@ -14,12 +14,8 @@ class ChatBubble extends StatelessWidget {
           borderRadius: BorderRadius.all(Radius.circular(10)),
           color: kPrimaryLightColor,
         ),
-        child: message.substring(0, 4) != "http"
-            ? Text(
-                message,
-                style: const TextStyle(fontSize: 16),
-              )
-            : InkWell(
+        child: message.length >= 4 && message.substring(0, 4) == "http"
+            ? InkWell(
                 onTap: () {
                   showDialog(
                     context: context,
@@ -34,6 +30,10 @@ class ChatBubble extends StatelessWidget {
                   message,
                   height: 100,
                 ),
+              )
+            : Text(
+                message,
+                style: const TextStyle(fontSize: 16),
               ));
   }
 }

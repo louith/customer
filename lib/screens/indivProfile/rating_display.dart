@@ -34,7 +34,7 @@ class RatingCard {
 class RatingDisplay extends StatefulWidget {
   final String clientId;
   final String role;
-  final String averageRating;
+  final double averageRating;
   const RatingDisplay(
       {super.key,
       required this.clientId,
@@ -286,6 +286,21 @@ class _RatingDisplayState extends State<RatingDisplay> {
       ),
     );
   }
+
+
+  Future<List> getRatingsServices() async {
+    try {
+      List<String> ids = [];
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(widget.clientId)
+          .collection('bookings')
+          .where('status', isEqualTo: 'finished')
+          .get();
+      querySnapshot.docs.forEach((element) {
+        ids.add(element.id);
+      });
+      log("$ids");
 
   // Future<List> getRatingsServices() async {
   // try {

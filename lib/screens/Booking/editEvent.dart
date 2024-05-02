@@ -757,8 +757,8 @@ class _ServicesBookingListState extends State<ServicesBookingList> {
       itemCount: widget.services.length,
       itemBuilder: (context, index) {
         String serviceName = widget.services[index].serviceName;
-        String price =
-            priceFormat.format(double.parse(widget.services[index].price));
+        String price = widget.services[index].price;
+        // priceFormat.format(double.parse(widget.services[index].price));
         String duration = widget.services[index].duration;
         return Container(
           width: double.infinity,
@@ -775,13 +775,26 @@ class _ServicesBookingListState extends State<ServicesBookingList> {
               children: [Text("PHP $price"), Text(duration)],
             ),
             onChanged: (bool? value) {
-              setState(() {
-                checkboxvalues[widget.serviceTypeIndex][index] =
-                    value!; //checks for each card
-                widget.updateCart(
-                  widget.services[index],
+              if (price.isNotEmpty && duration.isNotEmpty) {
+                setState(() {
+                  checkboxvalues[widget.serviceTypeIndex][index] =
+                      value!; //checks for each card
+                  widget.updateCart(
+                    widget.services[index],
+                  );
+                });
+              } else {
+                showDialog(
+                  barrierDismissible: false,
+                  context: context,
+                  builder: (context) {
+                    return const AlertDialog(
+                      content: Text(
+                          'Service has no details, selected service wont be added'),
+                    );
+                  },
                 );
-              });
+              }
             },
           ),
         );
